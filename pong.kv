@@ -2,6 +2,7 @@
 
 <PongGame>:
     ball: pong_ball
+    ball2: pong_ball2
     
     canvas:
         Rectangle:
@@ -23,8 +24,21 @@
     PongBall:
         id: pong_ball
         center: self.parent.center
+    PongBall2:
+        id: pong_ball2
+        center: self.parent.center
+
 
 <PongBall>:
+    size: 50, 50 
+    canvas:
+        Color: 
+            rgb: (0,1,0)
+        Ellipse:
+            pos: self.pos
+            size: self.size          
+
+<PongBall2>:
     size: 50, 50 
     canvas:
         Color: 
