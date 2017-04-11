@@ -16,21 +16,25 @@ background_colour = (255, 255, 255)
 (width, height) = (600, 600)
 random.seed(186)
 
-c = csv.writer(open("parasites_data.csv", "wb"))
+# Crée un fichier csv pour y écrire le nombre de particules par classe par nombre de cycles 
+# dans la boucle while principale
+#c = csv.writer(open("parasites_data.csv", "wb"))
 
-def decompte_temps(period):
-    nexttime = time.time() + period
-    for i in count():
-        now = time.time()
-        tosleep = nexttime - now
-        if tosleep > 0:
-            time.sleep(tosleep)
-            nexttime += period
-        else:
-            nexttime = now + period
-        yield i, nexttime
+#Tentative d'ajouter un timer pour contrôler la durée avant un changement de classe( par ex infecté -> mort )
+#def decompte_temps(period):
+    #nexttime = time.time() + period
+    #for i in count():
+        #now = time.time()
+        #tosleep = nexttime - now
+        #if tosleep > 0:
+            #time.sleep(tosleep)
+            #nexttime += period
+        #else:
+            #nexttime = now + period
+        #yield i, nexttime
 
 
+# Met les particules en mouvement au début de la simulation        
 def addVectors((angle1, length1), (angle2, length2)):
     x = math.sin(angle1) * length1 + math.sin(angle2) * length2
     y = math.cos(angle1) * length1 + math.cos(angle2) * length2
@@ -47,16 +51,20 @@ def findParticle(particles, x, y):
             return p
     return None
 
-
+# Règle sur les collisions des particules et la transmission du parasite/maladie 
 def collide(p1, p2):
-
-    if (p1.state != "mort") and (p2.state != "mort"):
+    
+    #Pas de collision contre une particule morte
+    if (p1.state != "mort") and (p2.state != "mort"):  
 
         dx = p1.x - p2.x
         dy = p1.y - p2.y
-
+        
+        #calcul de la distance entre le centre des particules
         dist = math.hypot(dx, dy)
-
+        
+        #probabilité d'infection concernant l'infection en cas de collision
+        #valade si les 2 particules ne sont pas dans l'état "mort"
         if dist < p1.size + p2.size and p2.state != "mort"  and p2.state != "mort_mais_contagieux" \
                 and (p1.state == "malade" or p1.state == "mort_mais_contagieux"):
             chance_transmission = random.randint(1,100)
@@ -69,7 +77,7 @@ def collide(p1, p2):
             if chance_transmission < 90:
                 p1.state = "malade"
 
-
+        # comportement physique des particules en cas de collision
         if dist < p1.size + p2.size :
             tangent = math.atan2(dy, dx)
             angle = 0.5 * math.pi + tangent
@@ -102,9 +110,9 @@ class Particle():
         self.thickness = 0
         self.speed = 1
         self.angle = 0
-        self.state = state
+        self.state = state # 4 états : sain, malade, mort_mais_contagieux, mort
 
-
+    #Dessine la particule
     def display(self):
         pygame.draw.circle(screen, self.colour, (int(self.x), int(self.y)), self.size, self.thickness)
 
@@ -113,7 +121,8 @@ class Particle():
         self.x += math.sin(self.angle) * self.speed
         self.y -= math.cos(self.angle) * self.speed
         #self.speed *= drag
-
+    
+    #Rebondissement des particules contre les bords
     def bounce(self):
         if self.x > width - self.size:
             self.x = 2 * (width - self.size) - self.x
@@ -135,6 +144,7 @@ class Particle():
             self.angle = math.pi - self.angle
             #self.speed *= elasticity
 
+    #état des particules : sain, malade, mort_mais_contagieux, mort        
     def etat(self):
         if self.state == "mort":
             self.speed = 0
@@ -173,20 +183,25 @@ class Particle():
 pygame.font.init()
 screen = pygame.display.set_mode((width, height))
 
-
+#Tentative d'ajouter du texte à l'écran
 # initialize font; must be called after 'pygame.init()' to avoid 'Font not Initialized' error
-myfont = pygame.font.SysFont("monospace", 15)
+#myfont = pygame.font.SysFont("monospace", 15)
 
 # render text
-label = myfont.render("Some text!", 1, (255,255,0))
-screen.blit(label, (100, 100))
+#label = myfont.render("Some text!", 1, (255,255,0))
+#screen.blit(label, (100, 100))
+
+#Titre de la fenêtre du programme
 pygame.display.set_caption('Parasites_sim')
 
+#Nombre initial de particules saines, malades ou résistantes(pas encore fait)
 number_of_particles =100
 number_of_particles_resistant = 10
 number_of_particles_infected = 10
 my_particles = []
 
+
+#Création des particules au lancement du programme
 for n in range(number_of_particles):
     size = 10 #random.randint(10, 20)
     x = random.randint(size, width - size)
@@ -207,6 +222,7 @@ for n in range(number_of_particles):
 selected_particle = None
 running = True
 
+# Variable utilisé dans la boucle principale
 nb_de_cycles = 0
 plot_cycle = []
 plot_liste_sain = []
@@ -214,6 +230,7 @@ plot_liste_malade = []
 plot_liste_mort = []
 plot_liste_mmc = []
 
+#Boucle principale
 while running:
 
     for event in pygame.event.get():
@@ -223,7 +240,7 @@ while running:
             (mouseX, mouseY) = pygame.mouse.get_pos()
             selected_particle = findParticle(my_particles, mouseX, mouseY)
         elif event.type == pygame.MOUSEBUTTONUP:
-            plt.show()
+            plt.show() # Affiche un grahique du nombre de particule si clic gauche
             selected_particle = None
 
     if selected_particle:
@@ -235,12 +252,14 @@ while running:
 
     screen.fill(background_colour) #efface particules apres mouvement
 
-
+    #Variables pour le calcul du nombre de particules en temps réél (pas la somme totale)
+    #Elles doivent être remise à zéro à chaque cycle
     nb_sain = 0
     nb_malade = 0
     nb_mort = 0
     nb_mort_mais_contagieux = 0
 
+    # Vérifie et incrémente le nombre de particules
     for i, particle in enumerate(my_particles):
         if particle.state == "malade":
             nb_malade += 1
@@ -259,7 +278,9 @@ while running:
         particle.display()
 
 
-    nb_de_cycles += 1
+    nb_de_cycles += 1 
+    
+    #Calcul du nombre de particules dans la simulation
     if nb_de_cycles % 50 == 0:
 
         plot_cycle.append(nb_de_cycles)
@@ -277,13 +298,10 @@ while running:
         plt.plot(x, y2, "r")
         #plt.plot(x, y3, "black")
         plt.plot(x, y4, "g")
-
+        
+        #inscrit le nombre de particules tous les 50 cycles dasn un fichier csv
         #c.writerow([nb_de_cycles, nb_sain, nb_malade, nb_mort])
 
-    pygame.display.flip()
+    pygame.display.flip() #Rafraichissement de l'écran
 
 
-
-#def initial_infection_chance():
- #   n = random.randint(1,100)
-  #  if n =
