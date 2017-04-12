@@ -58,13 +58,14 @@ class BallsContainer(Widget):
                 balls.append(c)
         #balls = (c for c in self.children if isinstance(c, Ball))
         for ball in balls:
-            # bounce of walls
             # (note: Y axis is pointing *up*)
-            if ball.x < 0 or ball.right > self.width:
+            #bounce ball off left or right
+            if (ball.x < self.x) or (ball.right > self.right):
                 ball.velocity_x *= -1
-            if ball.y < 0 or ball.top > self.height:
+            #bounce ball off bottom or top
+            if (ball.y < self.y) or (ball.top > self.top):
                 ball.velocity_y *= -1
-
+            
             #bounce other balls
             for other_ball in balls:
                 ball.collide(other_ball)
