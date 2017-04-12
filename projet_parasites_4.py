@@ -75,7 +75,7 @@ def collide(p1, p2):
                 and (p2.state == "malade" or p2.state == "mort_mais_contagieux"):
             chance_transmission = random.randint(1, 100)
             if chance_transmission < 90:
-                p1.state = "malade"
+               p1.state = "malade"
 
         # comportement physique des particules en cas de collision
         if dist < p1.size + p2.size :
@@ -97,9 +97,6 @@ def collide(p1, p2):
             p1.y -= math.cos(angle)
             p2.x -= math.sin(angle)
             p2.y += math.cos(angle)
-
-
-
 
 class Particle():
     def __init__(self, (x, y), size, colour, state):
@@ -195,7 +192,7 @@ screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption('Parasites_sim')
 
 #Nombre initial de particules saines, malades ou resistantes(pas encore fait)
-number_of_particles =100
+number_of_particles =300
 number_of_particles_resistant = 10
 number_of_particles_infected = 10
 my_particles = []
