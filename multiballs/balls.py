@@ -83,7 +83,7 @@ class BallsContainer(Widget):
 #        self.add_widget(ball)
 
     def start_balls(self):
-        for i in range(0,100):
+        for i in range(0,15):
             ball = Ball()
             r = randint(-100,100)
             ball.center = (400+r,400+r)
