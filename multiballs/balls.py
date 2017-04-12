@@ -60,10 +60,10 @@ class BallsContainer(Widget):
         for ball in balls:
             # (note: Y axis is pointing *up*)
             #bounce ball off left or right
-            if (ball.x < self.x) or (ball.right > self.right):
+            if (ball.x < self.x and ball.velocity_x < 0) or (ball.right > self.right and ball.velocity_x > 0):
                 ball.velocity_x *= -1
             #bounce ball off bottom or top
-            if (ball.y < self.y) or (ball.top > self.top):
+            if (ball.y < self.y and ball.velocity_y < 0) or (ball.top > self.top and ball.velocity_y > 0):
                 ball.velocity_y *= -1
             
             #bounce other balls
@@ -84,7 +84,7 @@ class BallsContainer(Widget):
 #        self.add_widget(ball)
 
     def start_balls(self):
-        for i in range(0,15):
+        for i in range(0,35):
             ball = Ball()
             r = randint(-100,100)
             ball.center = (400+r,400+r)
@@ -101,7 +101,6 @@ class BallsApp(App):
         root.start_balls()
         Clock.schedule_interval(root.update, DELTA_TIME)
         return root
-
 
 if __name__ == '__main__':
     BallsApp().run()
