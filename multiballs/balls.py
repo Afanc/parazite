@@ -18,7 +18,7 @@ MAX_BALL_SPEED = 1
 
 class Ball(Widget):
     """Class for bouncing ball."""
-    velocity_x = NumericProperty(0)
+    velocity_x = NumericProperty(0)         #if it's float or int, doesn't work
     velocity_y = NumericProperty(0)
     angle = NumericProperty(0)
     velocity = ReferenceListProperty(velocity_x, velocity_y)
@@ -53,20 +53,19 @@ class BallsContainer(Widget):
     """Class for balls container, a main widget."""
     def update(self, dt):
         balls = []
-        for c in self.children:
-            if isinstance(c,Ball) :
+        for c in self.children:     #pour tous les enfants
+            if isinstance(c,Ball) : #si ce sont des balles equiv à #balls = (c for c in self.children if isinstance(c, Ball))
                 balls.append(c)
-        #balls = (c for c in self.children if isinstance(c, Ball))
+        
         for ball in balls:
-            # (note: Y axis is pointing *up*)
             #bounce ball off left or right
-            if (ball.x < self.x and ball.velocity_x < 0) or (ball.right > self.right and ball.velocity_x > 0):
+            if (ball.x < self.x and ball.velocity_x < 0) or (ball.right > self.right and ball.velocity_x > 0):       # (note: X axis is pointing *right*, Y axis is pointing *up*)
                 ball.velocity_x *= -1
             #bounce ball off bottom or top
             if (ball.y < self.y and ball.velocity_y < 0) or (ball.top > self.top and ball.velocity_y > 0):
                 ball.velocity_y *= -1
             
-            #bounce other balls
+            #bounce other balls --- N^2 c'est moche change it
             for other_ball in balls:
                 ball.collide(other_ball)
                 other_ball.update(dt)
@@ -86,7 +85,7 @@ class BallsContainer(Widget):
     def start_balls(self):
         for i in range(0,35):
             ball = Ball()
-            r = randint(-100,100)
+            r = randint(-100,100)               #placement aléatoire à faire MIEUX
             ball.center = (400+r,400+r)
             ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),
                              -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
