@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 #!/usr/bin/env python
 """
-Bouncing balls
+Bouncing balls 
 """
 from random import *
 
@@ -54,7 +55,7 @@ class BallsContainer(Widget):
     def update(self, dt):
         balls = []
         for c in self.children:     #pour tous les enfants
-            if isinstance(c,Ball) : #si ce sont des balles equiv a #balls = (c for c in self.children if isinstance(c, Ball))
+            if isinstance(c,Ball) : #si ce sont des balles equiv à #balls = (c for c in self.children if isinstance(c, Ball))
                 balls.append(c)
         
         for ball in balls:
@@ -85,7 +86,7 @@ class BallsContainer(Widget):
     def start_balls(self):
         for i in range(0,35):
             ball = Ball()
-            r = randint(-100,100)               #placement aleatoire a faire MIEUX
+            r = randint(-100,100)               #placement aléatoire à faire MIEUX
             ball.center = (400+r,400+r)
             ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),
                              -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
