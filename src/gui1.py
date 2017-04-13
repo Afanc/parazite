@@ -92,7 +92,7 @@ class BallsContainer(Widget):
                              -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
             self.add_widget(ball)
 
-class BallsApp(App):
+class Gui1App(App):
     """Represents the whole application."""
 
     def build(self):
@@ -103,4 +103,4 @@ class BallsApp(App):
         return root
 
 if __name__ == '__main__':
-    BallsApp().run()
+    Gui1App().run()

@@ -192,7 +192,7 @@ screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption('Parasites_sim')
 
 #Nombre initial de particules saines, malades ou resistantes(pas encore fait)
-number_of_particles =100
+number_of_particles =15
 number_of_particles_resistant = 10
 number_of_particles_infected = 10
 my_particles = []
