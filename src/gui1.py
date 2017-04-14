@@ -11,6 +11,7 @@ from kivy.properties import NumericProperty, ReferenceListProperty
 from kivy.vector import Vector
 from kivy.uix.widget import Widget
 import math
+from datetime import datetime
 
 
 DELTA_TIME = 1.0 / 60.0
@@ -58,6 +59,7 @@ class BallsContainer(Widget):
             if isinstance(c,Ball) : #si ce sont des balles equiv à #balls = (c for c in self.children if isinstance(c, Ball))
                 balls.append(c)
         
+        startTime = datetime.now()
         for ball in balls:
             #bounce ball off left or right
             if (ball.x < self.x and ball.velocity_x < 0) or (ball.right > self.right and ball.velocity_x > 0):       # (note: X axis is pointing *right*, Y axis is pointing *up*)
@@ -72,6 +74,7 @@ class BallsContainer(Widget):
                 other_ball.update(dt)
 
             ball.update(dt)
+        print datetime.now() - startTime
 
 #    def on_touch_up(self, touch):
 #        """Touch (or click) 'up' event: releasing the mouse button
@@ -84,7 +87,7 @@ class BallsContainer(Widget):
 #        self.add_widget(ball)
 
     def start_balls(self):
-        for i in range(0,30):
+        for i in range(0,10):
             ball = Ball()
             r = randint(-100,100)               #placement aléatoire à faire MIEUX
             ball.center = (400+r,400+r)
