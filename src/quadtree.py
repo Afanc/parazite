@@ -15,7 +15,6 @@ class Quadtree:
     MAX_LEVEL = 5
 
     objects = []               #ce qu'il contient
-    #box = [None]*4             #les 4 sous-niveaux
     box = []
     actual_level = None
     space = None
@@ -23,6 +22,8 @@ class Quadtree:
     def __init__(self, lev, space):     #space est un int, space une liste des 4 coins (coordonnées)
         self.actual_level = lev                         #niveau actuel (0 = top)
         self.space = space                              #espace total à dispo
+        self.objects = []
+        self.box = []
 
     def add_object(self,obj):
         self.objects.append(obj)
@@ -40,7 +41,7 @@ class Quadtree:
         #space[i] est rectangle du type [gauche, droite, bas, haut] décrivant chacun les valeurs limites
         midWidth_x = self.space[1] / 2
         midHeight_y = self.space[3] / 2      #on calcule les milieux
-        
+
         #on attribue de gauche à droite, et de bas en haut
         #self.box[0] = Quadtree(self.actual_level + 1, [ self.space[0], midWidth_x, self.space[2], midHeight_y])
         #self.box[1] = Quadtree(self.actual_level + 1, [ midWidth_x, self.space[1], self.space[2], midHeight_y])
@@ -79,8 +80,10 @@ class Quadtree:
     def insert(self,obj):
         object_level = self.index(obj)
 
+        print '\nOn rajoute un objet ! Level ', self.actual_level, 'objet : ', obj, 'contenu : ', self.objects
 #        try :
         if self.box and object_level != -1:                 #s'il y a un gosse et que ça fit
+            print 'déjà un enfant !'
             self.box[object_level].insert(obj)              #on descend encore
             return                                          #jusqu'au max, puis on sort
 
@@ -88,20 +91,23 @@ class Quadtree:
             
 #        except :
         #print "could not fit object in quadtree"
-
         #try : 
         if len(self.objects) > self.MAX_SIZE and self.actual_level < self.MAX_LEVEL :     #si on atteint la limite d'objets, qu'on peut descendre
+            print 'split', self.actual_level, obj
             if not self.box :
                 self.split()
             
             for child in self.objects :                             #et dans cec cas, faut mettre tous les enfants dans leurs cases aussi
                 child_level = self.index(child)
+                print 'distribue child', child, "à l'index", child_level, '\n'
                 if child_level != -1 :                              #s'ils fittent plus bas
                     self.box[child_level].insert(child)             #on les place plus bas
+                    print 'child inséré', self.box[child_level].objects , 'et les parents ont', self.objects
                     self.objects.remove(child)                      #et pas oublier de les enlever du parent
+                    print 'on enlève le gosse aux parents', self.objects
 
         #except :
-        print "could not split and fit children"
+        #print "could not split and fit children"
 
 
     def fetch(self,obj):
@@ -113,7 +119,8 @@ class Quadtree:
             self.box[object_level].fetch(obj)
         
         potential_collisions.extend(self.objects)                      #arrivé au bon niveau, on charge
-        potential_collisions.remove(obj)                               #on en profite pour enlever l'objet lui-même
+        if obj in potential_collisions :
+            potential_collisions.remove(obj)                               #on en profite pour enlever l'objet lui-même
         print obj,'trouve', potential_collisions, 'en', self.actual_level
 
         return potential_collisions                                    #pas trouvé de méthode sans créer de nouvelle variable :S
@@ -128,7 +135,10 @@ test_quad = Quadtree(0, [0,10,0,10])              #on crée un quadtree au nivea
 a = [3.7,4.7,2,3]
 b = [3.5,4.5,2,3]
 c = [7,8,2,3]
-test_obj = [a,b,c]
+d = [7.2,8.2,2,3]
+e = [7.2,8.2,4.5,5.5]
+f = [3.5,4.5,8,9]
+test_obj = [a,b,c,d,e,f]
 #et à chaque dt :
 test_quad.reset()
 for i in test_obj :         #donc là ça fait n
@@ -137,6 +147,8 @@ for i in test_obj:          #eh oui, faut attendre que chaque objet ait été in
     potential_collisions = test_quad.fetch(i)
 
     for j in potential_collisions:                          #et là ça fait m = min(MAX_SIZE,len(potential_collisions))
+
+        print '\n ------ On teste ', i, 'contre ', j, '\n'
         
         #calcul de la distance entre le centre des particules
         dx = i[0] - j[0]
