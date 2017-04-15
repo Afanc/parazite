@@ -12,10 +12,11 @@ from kivy.vector import Vector
 from kivy.uix.widget import Widget
 import math
 from datetime import datetime
-
+from quadtree import Quadtree
+import cProfile
 
 DELTA_TIME = 1.0 / 60.0
-MAX_BALL_SPEED = 1
+MAX_BALL_SPEED = 50
 
 
 class Ball(Widget):
@@ -28,32 +29,70 @@ class Ball(Widget):
     def update(self, dt):
         self.pos = Vector(*self.velocity) * dt + self.pos
 
-    def collide(self,p2):
-        #calcul de la distance entre le centre des particules
-        dx = self.x - p2.x
-        dy = self.y - p2.y
-        dist = math.hypot(dx, dy)
-        
-        # comportement physique des particules en cas de collision
-        if dist < self.size[0]/2 + p2.size[0]/2 :
-            tangent = math.atan2(dy, dx)
-            angle = 0.5 * math.pi + tangent
-
-            self.angle -= 2 * tangent
-            p2.angle -= 2 * tangent
-
-            angle = 0.5 * math.pi + tangent
-
-            #self.x += math.sin(angle)
-            #self.y -= math.cos(angle)
-            self.velocity_x += math.sin(angle)
-            self.velocity_y -= math.cos(angle)
-            p2.velocity_x -= math.sin(angle)
-            p2.velocity_y += math.cos(angle)
-
 class BallsContainer(Widget):
     """Class for balls container, a main widget."""
-    def update(self, dt):
+    #@profile
+    def update(self,dt):
+
+        quad = Quadtree(0,[self.x,self.x + self.width, self.y, self.y + self.height])
+        quad.reset()    #est-ce que ça sert à rien ?
+        balls = {}
+
+        for c in self.children: 
+            if isinstance(c,Ball) :
+                balls[(c.x, c.x + c.width, c.y, c.y + c.height)] = c   #key : position, access : ball
+
+        for i in balls :         #donc là ça fait n
+            quad.insert(i) 
+
+        for i in balls:                                         #for each key (=position)
+            temp_keys = quad.fetch(i)
+            other_balls = {key:balls[key] for key in temp_keys} #on crée un nouveau dico avec que les collisions
+
+            for j in other_balls:
+                
+                dx = i[0] - j[0]
+                dy = i[2] - j[2]
+
+                dist = math.hypot(dx, dy)
+                if dist < float(i[1]-i[0])/2 + float(j[1] - j[0])/2 :
+                    tangent = math.atan2(dy, dx)
+                    angle = 0.5 * math.pi + tangent
+
+                    balls[i].angle -= 2 * tangent
+                    other_balls[j].angle -= 2 * tangent
+
+                    angle = 0.5 * math.pi + tangent
+
+                    balls[i].velocity_x += math.sin(angle)
+                    balls[i].velocity_y -= math.cos(angle)
+                    other_balls[j].velocity_x -= math.sin(angle)
+                    other_balls[j].velocity_y += math.cos(angle)
+
+                    #other_balls[j].update(dt)
+                #balls[i].update(dt)
+
+        """
+        """
+
+        balls = []
+        for c in self.children:     
+            if isinstance(c,Ball) :
+                balls.append(c)
+        
+        for ball in balls:
+            if (ball.x < self.x and ball.velocity_x < 0) or (ball.right > self.right and ball.velocity_x > 0):
+                ball.velocity_x *= -1
+            if (ball.y < self.y and ball.velocity_y < 0) or (ball.top > self.top and ball.velocity_y > 0):
+                ball.velocity_y *= -1
+
+            ball.update(dt)
+            
+
+        #print datetime.now() - startTime
+
+
+    def old_update(self, dt):
         balls = []
         for c in self.children:     #pour tous les enfants
             if isinstance(c,Ball) : #si ce sont des balles equiv à #balls = (c for c in self.children if isinstance(c, Ball))
@@ -76,18 +115,8 @@ class BallsContainer(Widget):
             ball.update(dt)
         print datetime.now() - startTime
 
-#    def on_touch_up(self, touch):
-#        """Touch (or click) 'up' event: releasing the mouse button
-#        or lifting finger.
-#     f   """
-#        ball = Ball()
-#        ball.center = (touch.x, touch.y)
-#        ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),
-#                         -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
-#        self.add_widget(ball)
-
     def start_balls(self):
-        for i in range(0,10):
+        for i in range(0,5):
             ball = Ball()
             r = randint(-100,100)               #placement aléatoire à faire MIEUX
             ball.center = (400+r,400+r)
@@ -97,7 +126,6 @@ class BallsContainer(Widget):
 
 class Gui1App(App):
     """Represents the whole application."""
-
     def build(self):
         """Entry point for creating app's UI."""
         root = BallsContainer()

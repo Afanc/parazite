@@ -11,8 +11,8 @@ from datetime import datetime
 
 class Quadtree:
     
-    MAX_SIZE = 3
-    MAX_LEVEL = 5
+    MAX_SIZE = 5
+    MAX_LEVEL = 3
 
     objects = []               #ce qu'il contient
     box = []
@@ -43,16 +43,11 @@ class Quadtree:
         midHeight_y = self.space[3] / 2      #on calcule les milieux
 
         #on attribue de gauche à droite, et de bas en haut
-        #self.box[0] = Quadtree(self.actual_level + 1, [ self.space[0], midWidth_x, self.space[2], midHeight_y])
-        #self.box[1] = Quadtree(self.actual_level + 1, [ midWidth_x, self.space[1], self.space[2], midHeight_y])
-        #self.box[2] = Quadtree(self.actual_level + 1, [ self.space[0], midWidth_x, midHeight_y, self.space[3]])
-        #self.box[3] = Quadtree(self.actual_level + 1, [ midWidth_x, self.space[2], midHeight_y, self.space[3]])
         self.box.append(Quadtree(self.actual_level + 1, [ self.space[0], midWidth_x, self.space[2], midHeight_y]))
         self.box.append(Quadtree(self.actual_level + 1, [ midWidth_x, self.space[1], self.space[2], midHeight_y]))
         self.box.append(Quadtree(self.actual_level + 1, [ self.space[0], midWidth_x, midHeight_y, self.space[3]]))
         self.box.append(Quadtree(self.actual_level + 1, [ midWidth_x, self.space[2], midHeight_y, self.space[3]]))
 
-        
     def index(self,obj):         #obj est un rectangle
         midWidth_x = self.space[1] / 2
         midHeight_y = self.space[3] / 2
@@ -134,6 +129,7 @@ class Quadtree:
 
 
 # ---------------- testing -----------------------
+"""
 startTime = datetime.now()
 test_quad = Quadtree(0, [0,10,0,10])              #on crée un quadtree au niveau 0, limites : [0,10,0,10]
 #lui peut rester toujours vivant
@@ -164,8 +160,8 @@ test_quad.reset()
 for i in test_obj :         #donc là ça fait n
     test_quad.insert(i)   
 
-print 'au niveau 0, on a ', test_quad.objects
-print '\nau niveau 1, on a', test_quad.box[0].objects,'\n',test_quad.box[1].objects,'\n',test_quad.box[2].objects,'\n',test_quad.box[3].objects
+#print 'au niveau 0, on a ', test_quad.objects
+#print '\nau niveau 1, on a', test_quad.box[0].objects,'\n',test_quad.box[1].objects,'\n',test_quad.box[2].objects,'\n',test_quad.box[3].objects
 
 for i in test_obj:          #eh oui, faut attendre que chaque objet ait été inséré, on n'a pas tous les index sinon ! Donc on a encore n
     potential_collisions = test_quad.fetch(i)
@@ -181,7 +177,7 @@ for i in test_obj:          #eh oui, faut attendre que chaque objet ait été in
     # comportement physique des particules en cas de collision
         if dist <= float(i[1]-i[0])/2 + float(j[1] - j[0])/2 :             #on suppose que c'est sphérique ici
             print "collision ! entre ", i, j
-            """ Et après on détermine le rest
+             Et après on détermine le rest
             tangent = math.atan2(dy, dx)
             angle = 0.5 * math.pi + tangent
 
@@ -196,6 +192,6 @@ for i in test_obj:          #eh oui, faut attendre que chaque objet ait été in
             self.velocity_y -= math.cos(angle)
             p2.velocity_x -= math.sin(angle)                                                                           
             p2.velocity_y += math.cos(angle)
-            """
+            
 print datetime.now() - startTime
-
+"""
