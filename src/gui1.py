@@ -16,7 +16,7 @@ from quadtree import Quadtree
 import cProfile
 
 DELTA_TIME = 1.0 / 60.0
-MAX_BALL_SPEED = 50
+MAX_BALL_SPEED = 100
 
 
 class Ball(Widget):
@@ -55,25 +55,32 @@ class BallsContainer(Widget):
                 dy = i[2] - j[2]
 
                 dist = math.hypot(dx, dy)
-                if dist < float(i[1]-i[0])/2 + float(j[1] - j[0])/2 :
+                if dist < (i[1]-i[0])/2 + (j[1] - j[0])/2 :
                     tangent = math.atan2(dy, dx)
                     angle = 0.5 * math.pi + tangent
+                    
+                    balls[i].angle = 2 * tangent - balls[i].angle
+                    other_balls[j].angle = 2 * tangent - other_balls[j].angle
 
-                    balls[i].angle -= 2 * tangent
-                    other_balls[j].angle -= 2 * tangent
+                    balls[i].x += math.sin(angle)
+                    balls[i].y -= math.cos(angle)
+                    other_balls[j].x -= math.sin(angle)
+                    other_balls[j].y += math.cos(angle)
 
-                    angle = 0.5 * math.pi + tangent
+                    b_vel = math.sqrt(balls[i].velocity_x**2 + balls[i].velocity_y**2)
+                    o_vel = math.sqrt(other_balls[j].velocity_x**2 + other_balls[j].velocity_y**2)
 
-                    balls[i].velocity_x += math.sin(angle)
-                    balls[i].velocity_y -= math.cos(angle)
-                    other_balls[j].velocity_x -= math.sin(angle)
-                    other_balls[j].velocity_y += math.cos(angle)
+                    balls[i].velocity_x = math.sin(angle)*b_vel
+                    balls[i].velocity_y = -math.cos(angle)*b_vel
+                    other_balls[j].velocity_x = -math.sin(angle)*o_vel
+                    other_balls[j].velocity_y = math.cos(angle)*o_vel
+                   # balls[i].velocity_x += math.sin(angle)
+                   # balls[i].velocity_y -= math.cos(angle)
+                   # other_balls[j].velocity_x -= math.sin(angle)
+                   # other_balls[j].velocity_y += math.cos(angle)
 
                     #other_balls[j].update(dt)
                 #balls[i].update(dt)
-
-        """
-        """
 
         balls = []
         for c in self.children:     
@@ -86,8 +93,9 @@ class BallsContainer(Widget):
             if (ball.y < self.y and ball.velocity_y < 0) or (ball.top > self.top and ball.velocity_y > 0):
                 ball.velocity_y *= -1
 
+            #-------------- update balls here -----------------
             ball.update(dt)
-            
+            #-------------- update balls here -----------------
 
         #print datetime.now() - startTime
 
@@ -116,7 +124,7 @@ class BallsContainer(Widget):
         print datetime.now() - startTime
 
     def start_balls(self):
-        for i in range(0,5):
+        for i in range(0,200):
             ball = Ball()
             r = randint(-100,100)               #placement aléatoire à faire MIEUX
             ball.center = (400+r,400+r)
