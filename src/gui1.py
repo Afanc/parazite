@@ -50,14 +50,14 @@ class BallsContainer(Widget):
             if isinstance(c,Ball) :
                 balls[(c.x, c.x + c.width, c.y, c.y + c.height)] = c   #key : position, access : ball
 
-        for i in balls :         #donc là ça fait n
-            if balls[i].get_col() != BASE_COLOR:        #petit hack pour les couleurs
+        for i in balls :                                        #obligés de faire un 1e boucle pour toutes les placer
+            if balls[i].get_col() != BASE_COLOR:                #petit hack pour les couleurs, on profite des boucles
                 balls[i].set_col(BASE_COLOR)
 
-            quad.insert(i) 
+            quad.insert(i)                                      #préparer le quad
 
         for i in balls:                                         #for each key (=position)
-            temp_keys = quad.fetch(i)
+            temp_keys = quad.fetch(i)                           #on fetch les collisions
             other_balls = {key:balls[key] for key in temp_keys} #on crée un nouveau dico avec que les collisions
 
             for j in other_balls:
@@ -89,28 +89,21 @@ class BallsContainer(Widget):
                     balls[i].set_col((1,0,1))
                     other_balls[j].set_col((1,0,1))
 
-        balls = []
-        for c in self.children:     
-            if isinstance(c,Ball) :
-                balls.append(c)
-        
-        for ball in balls:
-            if (ball.x < self.x and ball.velocity_x < 0) or (ball.right > self.right and ball.velocity_x > 0):
-                ball.velocity_x *= -1
-            if (ball.y < self.y and ball.velocity_y < 0) or (ball.top > self.top and ball.velocity_y > 0):
-                ball.velocity_y *= -1
+            #walls
+            if (balls[i].x < self.x and balls[i].velocity_x < 0) or (balls[i].right > self.right and balls[i].velocity_x > 0):
+                balls[i].velocity_x *= -1
+            if (balls[i].y < self.y and balls[i].velocity_y < 0) or (balls[i].top > self.top and balls[i].velocity_y > 0):
+                balls[i].velocity_y *= -1
 
             #-------------- update balls here -----------------
-            ball.update(dt)
+            balls[i].update(dt)
             #-------------- update balls here -----------------
-            
 
-    def start_balls(self):
-        for i in range(0,50):
+    def start_balls(self,dt):
+        for i in range(0,300):
             ball = Ball()
-            r = randint(-100,100)               #placement aléatoire à faire MIEUX
-            ball.center = (400+r,400+r)
-            ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),
+            ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
+            ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
                              -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
             self.add_widget(ball)
 
@@ -119,7 +112,7 @@ class Gui1App(App):
     def build(self):
         """Entry point for creating app's UI."""
         root = BallsContainer()
-        root.start_balls()
+        Clock.schedule_once(root.start_balls,1)         #on attend que la fenêtre soit lancée
         Clock.schedule_interval(root.update, DELTA_TIME)
         return root
 
