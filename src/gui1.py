@@ -74,14 +74,6 @@ class BallsContainer(Widget):
                     balls[i].velocity_y = -math.cos(angle)*b_vel
                     other_balls[j].velocity_x = -math.sin(angle)*o_vel
                     other_balls[j].velocity_y = math.cos(angle)*o_vel
-                   # balls[i].velocity_x += math.sin(angle)
-                   # balls[i].velocity_y -= math.cos(angle)
-                   # other_balls[j].velocity_x -= math.sin(angle)
-                   # other_balls[j].velocity_y += math.cos(angle)
-
-                    #other_balls[j].update(dt)
-                #balls[i].update(dt)
-
         balls = []
         for c in self.children:     
             if isinstance(c,Ball) :
@@ -100,31 +92,8 @@ class BallsContainer(Widget):
         #print datetime.now() - startTime
 
 
-    def old_update(self, dt):
-        balls = []
-        for c in self.children:     #pour tous les enfants
-            if isinstance(c,Ball) : #si ce sont des balles equiv à #balls = (c for c in self.children if isinstance(c, Ball))
-                balls.append(c)
-        
-        startTime = datetime.now()
-        for ball in balls:
-            #bounce ball off left or right
-            if (ball.x < self.x and ball.velocity_x < 0) or (ball.right > self.right and ball.velocity_x > 0):       # (note: X axis is pointing *right*, Y axis is pointing *up*)
-                ball.velocity_x *= -1
-            #bounce ball off bottom or top
-            if (ball.y < self.y and ball.velocity_y < 0) or (ball.top > self.top and ball.velocity_y > 0):
-                ball.velocity_y *= -1
-            
-            #bounce other balls --- N^2 c'est moche change it
-            for other_ball in balls:
-                ball.collide(other_ball)
-                other_ball.update(dt)
-
-            ball.update(dt)
-        print datetime.now() - startTime
-
     def start_balls(self):
-        for i in range(0,200):
+        for i in range(0,50):
             ball = Ball()
             r = randint(-100,100)               #placement aléatoire à faire MIEUX
             ball.center = (400+r,400+r)
