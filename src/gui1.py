@@ -7,7 +7,7 @@ from random import *
 
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.properties import NumericProperty, ReferenceListProperty
+from kivy.properties import NumericProperty, ReferenceListProperty, ListProperty
 from kivy.vector import Vector
 from kivy.uix.widget import Widget
 import math
@@ -17,6 +17,7 @@ import cProfile
 
 DELTA_TIME = 1.0 / 60.0
 MAX_BALL_SPEED = 100
+BASE_COLOR = [0,0,1]
 
 
 class Ball(Widget):
@@ -25,15 +26,22 @@ class Ball(Widget):
     velocity_y = NumericProperty(0)
     angle = NumericProperty(0)
     velocity = ReferenceListProperty(velocity_x, velocity_y)
+
+    col = ListProperty (BASE_COLOR)
     
     def update(self, dt):
         self.pos = Vector(*self.velocity) * dt + self.pos
+
+    def get_col(self):
+        return self.col
+    def set_col(self, a):
+        self.col = a
 
 class BallsContainer(Widget):
     """Class for balls container, a main widget."""
     #@profile
     def update(self,dt):
-
+        
         quad = Quadtree(0,[self.x,self.x + self.width, self.y, self.y + self.height])
         quad.reset()    #est-ce que ça sert à rien ?
         balls = {}
@@ -43,6 +51,9 @@ class BallsContainer(Widget):
                 balls[(c.x, c.x + c.width, c.y, c.y + c.height)] = c   #key : position, access : ball
 
         for i in balls :         #donc là ça fait n
+            if balls[i].get_col() != BASE_COLOR:        #petit hack pour les couleurs
+                balls[i].set_col(BASE_COLOR)
+
             quad.insert(i) 
 
         for i in balls:                                         #for each key (=position)
@@ -74,6 +85,10 @@ class BallsContainer(Widget):
                     balls[i].velocity_y = -math.cos(angle)*b_vel
                     other_balls[j].velocity_x = -math.sin(angle)*o_vel
                     other_balls[j].velocity_y = math.cos(angle)*o_vel
+
+                    balls[i].set_col((1,0,1))
+                    other_balls[j].set_col((1,0,1))
+
         balls = []
         for c in self.children:     
             if isinstance(c,Ball) :
@@ -88,9 +103,7 @@ class BallsContainer(Widget):
             #-------------- update balls here -----------------
             ball.update(dt)
             #-------------- update balls here -----------------
-
-        #print datetime.now() - startTime
-
+            
 
     def start_balls(self):
         for i in range(0,50):
