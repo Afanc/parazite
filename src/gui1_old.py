@@ -7,13 +7,16 @@ from random import *
 
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.properties import NumericProperty, ReferenceListProperty
+from kivy.properties import NumericProperty, ReferenceListProperty, ListProperty
 from kivy.vector import Vector
 from kivy.uix.widget import Widget
 import math
 from datetime import datetime
 from quadtree import Quadtree
 import cProfile
+
+
+BASE_COLOR = [0,0,1]
 
 class MyApp(App):
     def on_start(self):
@@ -35,6 +38,9 @@ class Ball(Widget):
     velocity_y = NumericProperty(0)
     angle = NumericProperty(0)
     velocity = ReferenceListProperty(velocity_x, velocity_y)
+
+    col = ListProperty(BASE_COLOR)
+
     
     def update(self, dt):
         self.pos = Vector(*self.velocity) * dt + self.pos
@@ -140,7 +146,7 @@ class BallsContainer(Widget):
             ball.update(dt)
 
     def start_balls(self):
-        for i in range(0,200):
+        for i in range(0,50):
             ball = Ball()
             r = randint(-100,100)               #placement aléatoire à faire MIEUX
             ball.center = (400+r,400+r)
