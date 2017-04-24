@@ -12,7 +12,7 @@ from datetime import datetime
 class Quadtree:
     
     MAX_SIZE = 5
-    MAX_LEVEL = 3
+    MAX_LEVEL = 4
 
     objects = []               #ce qu'il contient
     box = []
@@ -69,43 +69,36 @@ class Quadtree:
             elif fit_right :
                 object_level = 3            #4e cadran
 
-        #print obj, object_level
         return object_level
 
     def insert(self,obj):
         object_level = self.index(obj)
 
-       # print '\nOn rajoute un objet ! Level ', self.actual_level, 'objet : ', obj, 'contenu : ', self.objects
-#        try :
-        if self.box and object_level != -1:                 #s'il y a un gosse et que ça fit
-            #print obj, 'déjà un enfant !'
-            self.box[object_level].insert(obj)              #on descend encore
-            return                                          #jusqu'au max, puis on sort
+        try :
+            if self.box and object_level != -1:                 #s'il y a un gosse et que ça fit
+                self.box[object_level].insert(obj)              #on descend encore
+                return                                          #jusqu'au max, puis on sort
 
-        self.add_object(obj)                                #on met l'objet - c'est bien le seul moment où on n'utilise pas la récursive !
+            self.add_object(obj)                                #on met l'objet - c'est bien le seul moment où on n'utilise pas la récursive !
             
-#        except :
-        #print "could not fit object in quadtree"
-        #try : 
-        if len(self.objects) > self.MAX_SIZE and self.actual_level < self.MAX_LEVEL :     #si on atteint la limite d'objets, qu'on peut descendre
-            #print 'split', self.actual_level, obj
-            if not self.box :
-                self.split()
-            for child in list(self.objects) :                             #et dans cec cas, faut mettre tous les enfants dans leurs cases aussi
-                child_level = self.index(child)
-                #print 'distribue child', child, "à l'index", child_level, '\n'
-                if child_level != -1 :                              #s'ils fittent plus bas
-                    self.box[child_level].insert(child)             #on les place plus bas
-                #    print 'child inséré', self.box[child_level].objects , 'et les parents ont', self.objects
-                    self.objects.remove(child)                      #et pas oublier de les enlever du parent (à la liste originale, on itère sur une copie !)
-                #    print 'on enlève le gosse aux parents', self.objects
+        except :
+            print "could not fit object in quadtree"
 
-        #except :
-        #print "could not split and fit children"
+        try : 
+            if len(self.objects) > self.MAX_SIZE and self.actual_level < self.MAX_LEVEL :     #si on atteint la limite d'objets, qu'on peut descendre
+                if not self.box :
+                    self.split()
+                for child in list(self.objects) :                             #et dans cec cas, faut mettre tous les enfants dans leurs cases aussi - aussi : on fait une copie !
+                    child_level = self.index(child)
+                    if child_level != -1 :                              #s'ils fittent plus bas
+                        self.box[child_level].insert(child)             #on les place plus bas
+                        self.objects.remove(child)                      #et pas oublier de les enlever du parent (à la liste originale, on itère sur une copie !)
+
+        except :
+            print "could not split and fit children"
 
 
     def fetch(self,obj):
-        #print '\nje reçois', obj, 'niveau', self.actual_level
 
         object_level = self.index(obj)
         potential_collisions = []
@@ -115,14 +108,8 @@ class Quadtree:
         
         potential_collisions.extend(self.objects)                      #arrivé au bon niveau, on charge
 
-        #print obj, 'je trouve', potential_collisions, 'niveau', self.actual_level
-
         if obj in potential_collisions :
-        #    print "j'enlève", obj
             potential_collisions.remove(obj)                               #on en profite pour enlever l'objet lui-même
-        #    print "je m'enlève", potential_collisions
-
-        #print obj,'je sors', potential_collisions, 'niveau', self.actual_level
 
         return potential_collisions                                    #pas trouvé de méthode sans créer de nouvelle variable :S
 
