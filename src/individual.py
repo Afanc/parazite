@@ -22,9 +22,3 @@ class Individual:
         self.position = pos
 
 
-
-
-
-#s'utilise ainsi
-test = Individual(2,3)  #en réalité on aura un vecteur pour pos et un autre pour vitesse
-print test
