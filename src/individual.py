@@ -9,6 +9,9 @@ class Individual:
         self.speed = speed 
         self.color = color #pas besoin de tout définir à la main (on peut aussi mettre par défaut...)
 
+    def __str__(self):  #pseudo-overload
+        return 'position : '+str(self.position)+'\ncouleur : '+str(self.color)
+
     def getPosition(self):  #oui, en python il faut spécifier dans la méthode que l'on se prend soi-même comme objet...
         return self.position
 
@@ -22,8 +25,6 @@ class Individual:
 
 
 
-
-
 #s'utilise ainsi
 test = Individual(2,3)  #en réalité on aura un vecteur pour pos et un autre pour vitesse
-print test.getPosition()
+print test
