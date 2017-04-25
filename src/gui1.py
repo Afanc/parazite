@@ -100,7 +100,7 @@ class BallsContainer(Widget):
             #-------------- update balls here -----------------
 
     def start_balls(self,dt):
-        for i in range(0,300):
+        for i in range(0,50):
             ball = Ball()
             ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
             ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
