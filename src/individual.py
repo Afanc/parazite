@@ -4,11 +4,11 @@
 class Individual(object):   #object afin d'avoir des 'nouvelles' classes
 
     #Constructeur, s'utilise : 'johnny = Individual(pos, vit, etc.)'
-    def __init__(self, pos, speed, color = [0,0,0]):    #si color n'est pas donné : par défaut !
+    def __init__(self, pos, speed, id, color = [0,0,0]):    #si color n'est pas donné : par défaut !
         self.position = pos 
         self.speed = speed 
         self.color = color #pas besoin de tout définir à la main (on peut aussi mettre par défaut...)
-
+        self.id = id
     def __str__(self):  #pseudo-overload
         return 'position : '+str(self.position)+'\ncouleur : '+str(self.color)
 
