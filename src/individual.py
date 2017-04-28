@@ -11,7 +11,7 @@ class Individual(object):   #object afin d'avoir des 'nouvelles' classes
         self.idd = idd
 
     def __str__(self):  #pseudo-overload
-        return 'position : '+str(self.position)+'\ncouleur : '+str(self.color)
+        return 'ID : ' +str(self.idd) + '\nposition : '+str(self.position)+'\ncouleur : '+str(self.color)
 
     def getPosition(self):  #oui, en python il faut spécifier dans la méthode que l'on se prend soi-même comme objet...
         return self.position
