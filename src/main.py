@@ -28,8 +28,6 @@ def create_id():
         #regarder si la clé idd est unique dans le dico
     else: 
         idd = list_of_freed_id[-1]
-    print idd
-    print list_of_healhies
     return idd
     
 
@@ -37,13 +35,13 @@ def create_id():
 def add_healthy(nb_sains = NB_SAINS):
     for i in range(nb_sains):
         x = randint(0, MAX_VELOCITY)
-        try:
-            temp = create_id()
-            if temp not in dico_id.keys():
-                list_of_healhies.append(Healthy([randint(0, CONTAINER_WIDTH),randint(0, CONTAINER_HEIGHT)], [x , MAX_VELOCITY- x], temp))
-                dico_id[temp] = list_of_healhies[-1]
-        except: 
-            print "could not add health: ID problem"
+        #try:
+        temp = create_id()
+        if temp not in dico_id.keys():
+            list_of_healhies.append(Healthy([randint(0, CONTAINER_WIDTH),randint(0, CONTAINER_HEIGHT)], [x , MAX_VELOCITY- x], temp))
+            dico_id[temp] = list_of_healhies[-1]
+        #except: 
+            #print "could not add health: ID problem"
             
       
 def add_parazite(nb_parasite=NB_PARASITE):
@@ -70,6 +68,21 @@ def actions_when_collision(p1,p2):
             if random.randrange(0,100) < INFECT_CHANCE:
                 print "infect him! "    # à faire
 
+def mort(p):
+    if not isinstance(p, Individual): 
+        print "ça marche pas, impossible de tuer %s" %str(p.getIdd)
+        return
+    elif isinstance(p, Healthy):
+        list_of_healhies.remove(p)
+        list_of_freed_id.append(p.getIdd())
+        del dico_id[p.getIdd()]
+        del p
+    elif isinstance(p, Parazite):
+        list_of_parazites.remove(p)
+        list_of_freed_id.append(p.getIdd())
+        del dico_id[p.getIdd()] 
+        del p
+
 def main():
     print 'le programme de sa mère\n'
     
@@ -80,5 +93,13 @@ if __name__ == '__main__':
 
 main()
 add_healthy(2)
-print dico_id
+print "A" + str(list_of_healhies[0].getIdd())
+print "B" + str(list_of_freed_id)
+print "C" + str(dico_id)
+
+mort(list_of_healhies[1])
+print "D" + str(list_of_healhies)
+print "E" + str(list_of_freed_id)
+print "F" + str(dico_id)
+
 #actions_when_collision(list_of_parazites[1],list_of_healhies[2])    #test

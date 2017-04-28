@@ -6,7 +6,7 @@ import CONSTANTES
 class Individual(object):   #object afin d'avoir des 'nouvelles' classes
 
     #Constructeur, s'utilise : 'johnny = Individual(pos, vit, etc.)'
-    def __init__(self, pos, speed, hourglass, idd, color = [0,0,0]):    #si color n'est pas donné : par défaut !
+    def __init__(self, pos, speed, idd, hourglass = 1, color = [0,0,0]):    #si color n'est pas donné : par défaut !
         self.position = pos 
         self.speed = speed 
         self.hourglass = hourglass

@@ -12,13 +12,13 @@ class Healthy(Individual):  #est de type Individual
         Resistances = []    #c'est un attribut que seuls les healthys ont uniquement
 
     def addResistance(self, idd) :
-        if idd not in self.Resistances
+        if idd not in self.Resistances:
             Resistances.append(idd)
 
     def getResistances(self) :
         return self.Resistances
 
     def isResistant(self, idd) :
-        if idd in self.Resistances
+        if idd in self.Resistances:
             return True
         return False
