@@ -13,6 +13,7 @@ CONTAINER_HEIGHT= 200
 CONTAINER_WIDTH= 300
 MAX_VELOCITY= 10
 MAX_VIRULANCE= 100
+list_of_id = []
 
 list_of_healhies = []
 list_of_parazites = []
