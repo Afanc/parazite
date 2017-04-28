@@ -36,7 +36,6 @@ def start(nb_sains=NB_SAINS, nb_parasite=NB_PARASITE):
 def actions_when_collision(p1,p2):
     possible_classes = [Healthy, Parazite]
     if isinstance(p1, tuple(possible_classes)) :        # si c'est l'un des deux
-        print possible_classes
         possible_classes.remove(type(p1))               #on l'enlève
         if isinstance(p2, tuple(possible_classes)):     #si c'est l'autre
             if random.randrange(0,100) < INFECT_CHANCE:
