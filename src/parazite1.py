@@ -6,8 +6,8 @@ from individual import *
 class Parazite(Individual): 
         
     #Constructeur
-    def __init__(self,pos,speed,vir, id):
-        Individual.__init__(self,pos,speed, id) 
+    def __init__(self,pos,speed,vir, idd):
+        Individual.__init__(self,pos,speed, idd) 
         self.virulance = vir
 
     def getVir(self):
