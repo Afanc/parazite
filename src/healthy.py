@@ -11,3 +11,14 @@ class Healthy(Individual):  #est de type Individual
         Individual.__init__(self,pos,speed, idd)     #et donc quand je crée un healthy, je crée un individu
         Resistances = []    #c'est un attribut que seuls les healthys ont uniquement
 
+    def addResistance(self, idd) :
+        if idd not in self.Resistances
+            Resistances.append(idd)
+
+    def getResistances(self) :
+        return self.Resistances
+
+    def isResistant(self, idd) :
+        if idd in self.Resistances
+            return True
+        return False
