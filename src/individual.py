@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-                                                                                                
 #!/usr/bin/env python
 
+import CONSTANTES
+
 class Individual(object):   #object afin d'avoir des 'nouvelles' classes
 
     #Constructeur, s'utilise : 'johnny = Individual(pos, vit, etc.)'
-    def __init__(self, pos, speed, idd, color = [0,0,0]):    #si color n'est pas donné : par défaut !
+    def __init__(self, pos, speed, hourglass, idd, color = [0,0,0]):    #si color n'est pas donné : par défaut !
         self.position = pos 
         self.speed = speed 
+        self.hourglass = hourglass
         self.color = color #pas besoin de tout définir à la main (on peut aussi mettre par défaut...)
         self.idd = idd
 
@@ -21,6 +24,12 @@ class Individual(object):   #object afin d'avoir des 'nouvelles' classes
 
     def getIdd(self):
         return self.idd
+
+    def setHourglass(self, h) :
+        self.hourglass = h
+
+    def getHourglass(self) :
+        return self.hourglass
 
     def setPosition(self,pos): #pratique, à faire pour ~tous les attributs publiques
         self.position = pos
