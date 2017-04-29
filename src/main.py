@@ -1,26 +1,17 @@
 # -*- coding: utf-8 -*-                                                                                                
 #!/usr/bin/env python
 
+from BallsContainer import *
 from parazite1 import *
 from healthy import *
-from gui1 import *
-import random
 
-NB_SAINS = 5
-NB_PARASITE = 3
-INFECT_CHANCE = 100
-CONTAINER_HEIGHT= 200
-CONTAINER_WIDTH= 300
-MAX_VELOCITY= 10
-MAX_VIRULANCE= 100
+seed(42)
 
 dico_id = {}    #on ajoute les id de individu dans le dico
 list_of_freed_id = [] # on ajoute les id des mort à cette liste
 
 list_of_healhies = []
 list_of_parazites = []
-
-seed(42)
 
 def create_id():
     if len(list_of_freed_id) == 0:
@@ -29,8 +20,6 @@ def create_id():
     else: 
         idd = list_of_freed_id[-1]
     return idd
-    
-
     
 def add_healthy(nb_sains = NB_SAINS):
     for i in range(nb_sains):
@@ -68,7 +57,7 @@ def actions_when_collision(p1,p2):
             if random.randrange(0,100) < INFECT_CHANCE:
                 nb_parasite    # à faire
 
-def mort(p):
+def kill(p):
     if not isinstance(p, Individual): 
         print "%s doit être un individu pour être tué" % str(p)
         return
@@ -82,6 +71,7 @@ def mort(p):
         list_of_freed_id.append(p.getIdd())
         del dico_id[p.getIdd()] 
         del p
+
 
 def guerison(p):
     if not isinstance(p, Individual): 
@@ -104,16 +94,24 @@ if __name__ == '__main__':
     #Gui1App().run()
     print "bravo"
 
-main()
-add_parazite(2)
-print "A: " + str(list_of_parazites[0].getIdd())
-print "a1: " + str(list_of_parazites[0].getPosition())
-print "a2: " + str(list_of_parazites[0].getSpeed())
-print "B: " + str(list_of_parazites[1].getIdd())
-guerison(list_of_parazites[0])
-print "C: " + str(list_of_healhies[0].getIdd())
-print "D: " + str(list_of_healhies[0].getPosition())
-print "E: " + str(list_of_healhies[0].getSpeed())
 
+
+add_healthy(2)
+print "A" + str(list_of_healhies[0].getIdd())
+print "B" + str(list_of_freed_id)
+print "C" + str(dico_id)
+
+kill(list_of_healhies[1])
+print "D" + str(list_of_healhies)
+print "E" + str(list_of_freed_id)
+print "F" + str(dico_id)
 
 #actions_when_collision(list_of_parazites[1],list_of_healhies[2])    #test
+
+
+#-----------------------------Kivy GUI-----------------------------------------------
+if __name__ == '__main__':  
+    mainApp().run()
+#-----------------------------Kivy GUI-----------------------------------------------
+
+

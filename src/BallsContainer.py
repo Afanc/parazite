@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-#!/usr/bin/env python
-"""
-Bouncing balls 
-"""
+#!/usr/bin/python
+
 from random import *
 
 from kivy.app import App
@@ -13,11 +11,16 @@ from kivy.uix.widget import Widget
 import math
 from datetime import datetime
 from quadtree import Quadtree
-import cProfile
+from CONSTANTES import *
 
-DELTA_TIME = 1.0 / 60.0
-MAX_BALL_SPEED = 100
-BASE_COLOR = [0,0,1]
+class mainApp(App):                                                                                                    
+    """Represents the whole application."""
+    def build(self):
+        """Entry point for creating app's UI."""
+        root = BallsContainer()
+        Clock.schedule_once(root.start_balls,1)         #on attend que la fenêtre soit lancée
+        Clock.schedule_interval(root.update, DELTA_TIME)
+        return root
 
 class Ball(Widget):
     """Class for bouncing ball."""
@@ -36,6 +39,7 @@ class Ball(Widget):
     def set_col(self, a):
         self.col = a
 
+
 class BallsContainer(Widget):
     """Class for balls container, a main widget."""
     def start_balls(self,dt):
@@ -46,10 +50,8 @@ class BallsContainer(Widget):
                              -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
             self.add_widget(ball)
 
-
     #@profile
     def update(self,dt):
-        
         quad = Quadtree(0,[self.x,self.x + self.width, self.y, self.y + self.height])
         quad.reset()    #est-ce que ça sert à rien ?
         balls = {}
@@ -107,15 +109,4 @@ class BallsContainer(Widget):
             balls[i].update(dt)
             #-------------- update balls here -----------------
 
-class Gui1App(App):
-    """Represents the whole application."""
-    def build(self):
-        """Entry point for creating app's UI."""
-        root = BallsContainer()
-        print root
-        Clock.schedule_once(root.start_balls,1)         #on attend que la fenêtre soit lancée
-        Clock.schedule_interval(root.update, DELTA_TIME)
-        return root
 
-if __name__ == '__main__':
-    Gui1App().run()

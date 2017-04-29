@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-                                                                                                
 #!/usr/bin/env python
 
-import CONSTANTES
-
 class Individual(object):   #object afin d'avoir des 'nouvelles' classes
 
     #Constructeur, s'utilise : 'johnny = Individual(pos, vit, etc.)'
