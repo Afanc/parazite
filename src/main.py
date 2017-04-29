@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-                                                                                                
 #!/usr/bin/env python
 
+from BallsContainer import *
 from parazite1 import *
 from healthy import *
-import math
-from BallsContainer import *
-from random import *
-from CONSTANTES import *
-from quadtree import Quadtree
 
 seed(42)
 
