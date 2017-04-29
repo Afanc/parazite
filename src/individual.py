@@ -23,7 +23,7 @@ class Individual(object):   #object afin d'avoir des 'nouvelles' classes
     def getIdd(self):
         return self.idd
 
-    def setHourglass(self, h) :
+    def setHourglass(self, h):
         self.hourglass = h
 
     def getHourglass(self) :
