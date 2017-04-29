@@ -19,7 +19,6 @@ DELTA_TIME = 1.0 / 60.0
 MAX_BALL_SPEED = 100
 BASE_COLOR = [0,0,1]
 
-
 class Ball(Widget):
     """Class for bouncing ball."""
     velocity_x = NumericProperty(0)         #if it's float or int, doesn't work
@@ -39,6 +38,15 @@ class Ball(Widget):
 
 class BallsContainer(Widget):
     """Class for balls container, a main widget."""
+    def start_balls(self,dt):
+        for i in range(0,50):
+            ball = Ball()
+            ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
+            ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
+                             -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
+            self.add_widget(ball)
+
+
     #@profile
     def update(self,dt):
         
@@ -99,19 +107,12 @@ class BallsContainer(Widget):
             balls[i].update(dt)
             #-------------- update balls here -----------------
 
-    def start_balls(self,dt):
-        for i in range(0,50):
-            ball = Ball()
-            ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
-            ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
-                             -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
-            self.add_widget(ball)
-
 class Gui1App(App):
     """Represents the whole application."""
     def build(self):
         """Entry point for creating app's UI."""
         root = BallsContainer()
+        print root
         Clock.schedule_once(root.start_balls,1)         #on attend que la fenêtre soit lancée
         Clock.schedule_interval(root.update, DELTA_TIME)
         return root
