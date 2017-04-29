@@ -3,24 +3,19 @@
 
 from parazite1 import *
 from healthy import *
-from gui1 import *
-import random
+import math
+from BallsContainer import *
+from random import *
+from CONSTANTES import *
+from quadtree import Quadtree
 
-NB_SAINS = 5
-NB_PARASITE = 3
-INFECT_CHANCE = 100
-CONTAINER_HEIGHT= 200
-CONTAINER_WIDTH= 300
-MAX_VELOCITY= 10
-MAX_VIRULANCE= 100
+seed(42)
 
 dico_id = {}    #on ajoute les id de individu dans le dico
 list_of_freed_id = [] # on ajoute les id des mort à cette liste
 
 list_of_healhies = []
 list_of_parazites = []
-
-seed(42)
 
 def create_id():
     if len(list_of_freed_id) == 0:
@@ -29,8 +24,6 @@ def create_id():
     else: 
         idd = list_of_freed_id[-1]
     return idd
-    
-
     
 def add_healthy(nb_sains = NB_SAINS):
     for i in range(nb_sains):
@@ -68,9 +61,9 @@ def actions_when_collision(p1,p2):
             if random.randrange(0,100) < INFECT_CHANCE:
                 print "infect him! "    # à faire
 
-def mort(p):
+def kill(p):
     if not isinstance(p, Individual): 
-        print "ça marche pas, impossible de tuer %s" %str(p.getIdd)
+        print "could not kill %s" %str(p.getIdd)
         return
     elif isinstance(p, Healthy):
         list_of_healhies.remove(p)
@@ -83,23 +76,22 @@ def mort(p):
         del dico_id[p.getIdd()] 
         del p
 
-def main():
-    print 'le programme de sa mère\n'
-    
-#start()
-if __name__ == '__main__':                                                                                             
-    #Gui1App().run()
-    print "bravo"
-
-main()
 add_healthy(2)
 print "A" + str(list_of_healhies[0].getIdd())
 print "B" + str(list_of_freed_id)
 print "C" + str(dico_id)
 
-mort(list_of_healhies[1])
+kill(list_of_healhies[1])
 print "D" + str(list_of_healhies)
 print "E" + str(list_of_freed_id)
 print "F" + str(dico_id)
 
 #actions_when_collision(list_of_parazites[1],list_of_healhies[2])    #test
+
+
+#-----------------------------Kivy GUI-----------------------------------------------
+if __name__ == '__main__':  
+    mainApp().run()
+#-----------------------------Kivy GUI-----------------------------------------------
+
+
