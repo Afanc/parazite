@@ -5,7 +5,7 @@ from __future__ import division         #seriously - python 2 has no true divisi
 from individual import *    
 
 class Parazite(Individual): 
-        
+       
     #Constructeur
     def __init__(self,pos,speed, vir, rate, rec, idd):
         Individual.__init__(self,pos,speed, idd) 
@@ -39,32 +39,54 @@ class Parazite(Individual):
     #if vir goes up, transm rate goes up, recov goes down
     def set_New_Vir(self,v) : 
         diff = 1 - ((1-v)**2 + self.getTransmRate()**2 + (1-self.getRecovProb())**2)    #vir up -> diff < 0
-        x = randint(0, 100*diff)/100
-        self.setTransmRate(self.getTransmRate + x)
-        self.setRecovProb(self.getRecovProb() - (diff - x))
+        x = min(uniform(0, diff), self.getTransmRate())
+        self.setTransmRate(self.getTransmRate() + abs(x)**(1/2))
+        self.setRecovProb(self.getRecovProb() - abs(diff - x)**(1/2))
         self.setVir(v)
 
     #if transm rate goes up, vir goes up, recov goes down
     def set_New_TransmRate(self, r) :
         diff = 1 - (r**2 + (1-self.getVir())**2 + (1-self.getRecovProb())**2)    #vir up -> diff < 0
-        x = randint(0, 100*diff)/100
-        self.setVir(self.getVir + x)
-        self.setRecovProb(self.getRecovProb() - (diff - x))
+        x = min(uniform(0, diff), self.getVir())
+        self.setVir(self.getVir() + abs(x)**(1/2))
+        self.setRecovProb(self.getRecovProb() - abs(diff - x)**(1/2))
         self.setTransmRate(r)
 
     #if recov rate goes up, vir goes down, transm rate goes down
     def set_New_RecovProb(self, r) :
-        diff = 1 - ((1-r)**2 + self.getTransmRate()**2 + (1-self.getVir())**2)    #vir up -> diff < 0
-        x = randint(0, 100*diff)/100
+        diff = r - self.getRecovProb()
+        
+        if diff > 0 :       #recov goes up
+            x = uniform(0, self.getVir())
+            y = uniform(0, self.getTransmRate())
+        if diff < 0 :
+            x = -uniform(0, 1-self.getVir())
+            y = -uniform(0, 1-self.getTransmRate())
+
+        if x+y < diff:  #si ça dépasse notre limite
+            norm = diff/(x+y)
+            x *= norm
+            y *= norm
         self.setVir(self.getVir() - x)
-        self.setTransmRate(self.getTransmRate() - (diff - x))
+        self.setTransmRate(self.getTransmRate() - y)
+
         self.setRecovProb(r)
 
 
+    def getTotal(self) :
+        return self.getVir() + self.getRecovProb() + self.getTransmRate()
+
+
 test = Parazite(1,1, 1, 0, 0, 'ID23')
+print 'before'
 print test
 test.set_New_RecovProb(1)
+print 'after - recov -> 1'
 print test
+print test.getTotal()
+test.set_New_RecovProb(0.1)
+print test
+print test.getTotal()
 
 
     #idées
