@@ -39,43 +39,11 @@ class Parazite(Individual):
 
     #if vir goes up, transm rate goes up, recov goes down
     def set_New_Vir(self,r) : 
-        diff = r - self.getVir()
-        
-        if diff > 0 :       #recov goes up
-            x = uniform(0, 1-self.getTransmRate())
-            y = uniform(0, self.getRecovProb())
-        if diff < 0 :
-            x = -uniform(0, self.getTransmRate())
-            y = -uniform(0, 1-self.getRecovProb())
-
-        if x+y < diff:  #si ça dépasse notre limite
-            norm = diff/(x+y)
-            x *= norm
-            y *= norm
-        self.setTransmRate(self.getTransmRate() - x)
-        self.setRecovProb(self.getRecovProb() - y)
-
-        self.setVir(r)
+        print 'todo'
 
     #if transm rate goes up, vir goes up, recov goes down
     def set_New_TransmRate(self, r) :
-        diff = r - self.getTransmRate()
-        
-        if diff > 0 :       #recov goes up
-            x = uniform(0, 1-self.getVir())
-            y = uniform(0, self.getRecovProb())
-        if diff < 0 :
-            x = -uniform(0, self.getVir())
-            y = -uniform(0, 1-self.getRecovProb())
-
-        if x+y < diff:  #si ça dépasse notre limite
-            norm = diff/(x+y)
-            x *= norm
-            y *= norm
-        self.setVir(self.getVir() - x)
-        self.setRecovProb(self.getRecovProb() - y)
-
-        self.setTransmRate(r)
+        print 'todo'
 
     #if recov rate goes up, vir goes down, transm rate goes down
     def set_New_RecovProb(self, r) :
