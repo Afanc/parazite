@@ -37,56 +37,103 @@ class Parazite(Individual):
         self.recovery_prob = r
 
     #if vir goes up, transm rate goes up, recov goes down
-    def set_New_Vir(self,v) : 
-        diff = 1 - ((1-v)**2 + self.getTransmRate()**2 + (1-self.getRecovProb())**2)    #vir up -> diff < 0
-        x = min(uniform(0, diff), self.getTransmRate())
-        self.setTransmRate(self.getTransmRate() + abs(x)**(1/2))
-        self.setRecovProb(self.getRecovProb() - abs(diff - x)**(1/2))
-        self.setVir(v)
+    def set_New_Vir(self,r) : 
+        diff = r - self.getVir()
+        
+        if diff > 0 :       #recov goes up
+            x = uniform(0, 1-self.getTransmRate())
+            y = uniform(0, self.getRecovProb())
+        if diff < 0 :
+            x = -uniform(0, self.getTransmRate())
+            y = -uniform(0, 1-self.getRecovProb())
+
+        if x+y < diff:  #si ça dépasse notre limite
+            norm = diff/(x+y)
+            x *= norm
+            y *= norm
+        self.setTransmRate(self.getTransmRate() - x)
+        self.setRecovProb(self.getRecovProb() - y)
+
+        self.setVir(r)
 
     #if transm rate goes up, vir goes up, recov goes down
     def set_New_TransmRate(self, r) :
-        diff = 1 - (r**2 + (1-self.getVir())**2 + (1-self.getRecovProb())**2)    #vir up -> diff < 0
-        x = min(uniform(0, diff), self.getVir())
-        self.setVir(self.getVir() + abs(x)**(1/2))
-        self.setRecovProb(self.getRecovProb() - abs(diff - x)**(1/2))
-        self.setTransmRate(r)
-
-    #if recov rate goes up, vir goes down, transm rate goes down
-    def set_New_RecovProb(self, r) :
-        diff = r - self.getRecovProb()
+        diff = r - self.getTransmRate()
         
         if diff > 0 :       #recov goes up
-            x = uniform(0, self.getVir())
-            y = uniform(0, self.getTransmRate())
+            x = uniform(0, 1-self.getVir())
+            y = uniform(0, self.getRecovProb())
         if diff < 0 :
-            x = -uniform(0, 1-self.getVir())
-            y = -uniform(0, 1-self.getTransmRate())
+            x = -uniform(0, self.getVir())
+            y = -uniform(0, 1-self.getRecovProb())
 
         if x+y < diff:  #si ça dépasse notre limite
             norm = diff/(x+y)
             x *= norm
             y *= norm
         self.setVir(self.getVir() - x)
-        self.setTransmRate(self.getTransmRate() - y)
+        self.setRecovProb(self.getRecovProb() - y)
+
+        self.setTransmRate(r)
+
+    #if recov rate goes up, vir goes down, transm rate goes down
+    def set_New_RecovProb(self, r) :
+        diff = r - self.getRecovProb()
+        
+        if diff > 0 :       #recov goes up - loss of advantage
+            x = uniform(0, self.getVir())
+            y = uniform(0, self.getTransmRate())
+
+        if diff < 0 :       #recov goes down - gain of advantage
+            x = uniform(0, 1-self.getVir())
+            y = uniform(0, 1-self.getTransmRate())
+
+        if (y - x) < - diff :
+            norm = abs(diff)/(x-y)
+            print 'before, x = ',x,'y =',y,'norm = ',norm
+            x *= norm
+            y *= norm
+            print 'after, x=',x,'y=',y
+
+        print 'x=',x,'y=',y
+
+        if diff < 0 :
+            self.setVir(self.getVir() + x)
+            self.setTransmRate(self.getTransmRate() + y)
+
+        if diff > 0 :
+            self.setVir(self.getVir() - x)
+            self.setTransmRate(self.getTransmRate() - y)
 
         self.setRecovProb(r)
 
 
     def getTotal(self) :
-        return self.getVir() + self.getRecovProb() + self.getTransmRate()
+        return (1 - self.getVir()) + (1 - self.getRecovProb()) + self.getTransmRate()
 
 
-test = Parazite(1,1, 1, 0, 0, 'ID23')
+test = Parazite(1,1, 0, 0, 1, 'ID23')
 print 'before'
-print test
-test.set_New_RecovProb(1)
-print 'after - recov -> 1'
 print test
 print test.getTotal()
 test.set_New_RecovProb(0.1)
 print test
 print test.getTotal()
+#test.set_New_RecovProb(0.2)
+#test.set_New_RecovProb(0.3)
+#test.set_New_RecovProb(0.4)
+#test.set_New_RecovProb(0.5)
+#
+#test.set_New_TransmRate(0.2)
+#test.set_New_TransmRate(0.3)
+#test.set_New_TransmRate(0.4)
+#test.set_New_TransmRate(0.5)
+#test.set_New_TransmRate(0.6)
+#test.set_New_Vir(0.5)
+#test.set_New_Vir(0.4)
+#test.set_New_Vir(0.3)
+#test.set_New_Vir(0.2)
+#test.set_New_Vir(0.1)
 
 
     #idées
