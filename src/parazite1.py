@@ -16,8 +16,8 @@ class Parazite(Individual):
 
     def __str__(self) :
         return 'ID : ' +str(self.idd) + '\nposition : '+str(self.position)+'\ncouleur : '+str(self.color)\
-            +'\nvirulance : '+str(self.virulance) + '\ntransmission rate : '+str(self.transm_rate)\
-            +'\nrecovery prob : '+str(self.recovery_prob)
+            +'\nvirulance : '+str(1-self.virulance) + '\ntransmission rate : '+str(self.transm_rate)\
+            +'\nrecovery prob : '+str(1-self.recovery_prob)+'\nTotal Fitness :'+str(self.getTotalFitness())
 
     def getVir(self):
         return self.virulance
@@ -106,17 +106,17 @@ class Parazite(Individual):
         self.setVir(self.getVir() - s*x)
         self.setTransmRate(self.getTransmRate() - s*y)
 
-    def getTotal(self) :
+    def getTotalFitness(self) :
         return self.getVir() + self.getRecovProb() + self.getTransmRate()
 
 
 test = Parazite(1,1, 0.7, 0.1, 0, 'ID23')
 print 'before'
 print test
-print test.getTotal()
+print test.getTotalFitness()
 test.set_New_RecovProb(0.9)
 print test
-print test.getTotal()
+print test.getTotalFitness()
 #test.set_New_RecovProb(0.2)
 #test.set_New_RecovProb(0.3)
 #test.set_New_RecovProb(0.4)
