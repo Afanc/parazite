@@ -3,6 +3,7 @@
 
 from __future__ import division         #seriously - python 2 has no true division ?!
 from individual import *    
+from numpy import *
 
 class Parazite(Individual): 
        
@@ -78,45 +79,42 @@ class Parazite(Individual):
 
     #if recov rate goes up, vir goes down, transm rate goes down
     def set_New_RecovProb(self, r) :
+        new_fitness = self.getVir() + self.getTransmRate() + r
+        x = 0
+        y = 0
+
         diff = r - self.getRecovProb()
-        
-        if diff > 0 :       #recov goes up - loss of advantage
-            x = uniform(0, self.getVir())
-            y = uniform(0, self.getTransmRate())
+        s = sign(diff)
 
-        if diff < 0 :       #recov goes down - gain of advantage
-            x = uniform(0, 1-self.getVir())
-            y = uniform(0, 1-self.getTransmRate())
+        while(new_fitness > MAX_FITNESS) :
+	    
+	    max_x = (1 - s)/2 + s*self.getVir()
+	    max_y = (1 - s)/2 + s*self.getTransmRate()
 
-        if (y - x) < - diff :
-            norm = abs(diff)/(x-y)
-            print 'before, x = ',x,'y =',y,'norm = ',norm
-            x *= norm
-            y *= norm
-            print 'after, x=',x,'y=',y
+            x = uniform(0, max_x) 	#on définit des pertes/gains aléatoires
+            y = uniform(0, max_y) 
 
-        print 'x=',x,'y=',y
+	    if r + self.getVir()-s*x + self.getTransmRate()-s*y > MAX_FITNESS : #si on ne compense pas le gain de fitness
+		norm = r/(x + y) 	#on essaie de normaliser
+		x = min(norm*x, max_x) 	#au cas où on dépasse la valeur max avec la normalisation
+		y = min(norm*y, max_y)
 
-        if diff < 0 :
-            self.setVir(self.getVir() + x)
-            self.setTransmRate(self.getTransmRate() + y)
+#different from parameter to parameter
+	    new_fitness = r + self.getVir()-x*s + self.getTransmRate()-y*s
 
-        if diff > 0 :
-            self.setVir(self.getVir() - x)
-            self.setTransmRate(self.getTransmRate() - y)
-
-        self.setRecovProb(r)
-
+	self.setRecovProb(r)
+        self.setVir(self.getVir() - s*x)
+        self.setTransmRate(self.getTransmRate() - s*y)
 
     def getTotal(self) :
-        return (1 - self.getVir()) + (1 - self.getRecovProb()) + self.getTransmRate()
+        return self.getVir() + self.getRecovProb() + self.getTransmRate()
 
 
-test = Parazite(1,1, 0, 0, 1, 'ID23')
+test = Parazite(1,1, 0.7, 0.1, 0, 'ID23')
 print 'before'
 print test
 print test.getTotal()
-test.set_New_RecovProb(0.1)
+test.set_New_RecovProb(0.9)
 print test
 print test.getTotal()
 #test.set_New_RecovProb(0.2)
