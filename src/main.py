@@ -13,7 +13,6 @@ from datetime import datetime
 from quadtree import Quadtree
 from collision import *
 
-#-----------------------main --------------------------
 seed(42)
 
 dico_id = {}    #on ajoute les id de individu dans le dico
@@ -94,14 +93,11 @@ def guerison(p):
         list_of_healhies.append(Healthy(pos, speed, idd, hourglass))
         list_of_parazites.remove(p)
         del p
-        
+
+#-----------------------main --------------------------
     
 def main():
     print 'le programme de sa mère\n'
-
-#-----------------------Main--------------------------------------
-
-# ----------------------Balls container--------------------------
 
 class mainApp(App):                                                                                                    
     """Represents the whole application."""
@@ -110,7 +106,15 @@ class mainApp(App):
         root = BallsContainer()
         Clock.schedule_once(root.start_balls,1)         #on attend que la fenêtre soit lancée
         Clock.schedule_interval(root.update, DELTA_TIME)
+        Clock.schedule_interval(test, 60*DELTA_TIME)    #ça ça marche
         return root
+
+def test(dt):
+    print 'youpila'
+
+#-----------------------Main--------------------------------------
+
+# ----------------------Balls container--------------------------
 
 class BallsContainer(Widget):
     """Class for balls container, a main widget."""
