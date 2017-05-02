@@ -27,6 +27,7 @@ def create_id():
         #regarder si la clé idd est unique dans le dico
     else: 
         idd = list_of_freed_id[-1]
+        list_of_freed_id.remove(idd)
     return idd
     
 def add_healthy(nb_sains = NB_SAINS):
@@ -38,6 +39,8 @@ def add_healthy(nb_sains = NB_SAINS):
             if temp not in dico_id.keys():
                 list_of_healhies.append(Healthy([randint(0, CONTAINER_WIDTH),randint(0, CONTAINER_HEIGHT)], [x , MAX_VELOCITY- x], temp))
                 dico_id[temp] = list_of_healhies[-1]
+            else :
+                print temp, 'exists in ', dico_id.keys(), "in add_healthy function"
         except: 
             print "could not add health: ID problem"
             
@@ -48,8 +51,10 @@ def add_parazite(nb_parasite=NB_PARASITE):
         try:
             temp = create_id()
             if temp not in dico_id.keys():
-                list_of_parazites.append(Parazite([randint(0, CONTAINER_WIDTH),randint(0, CONTAINER_HEIGHT)],randint(0,MAX_VELOCITY), randint(0, MAX_VIRULANCE),1,1, temp))    #changer attributs
+                list_of_parazites.append(Parazite([randint(0, CONTAINER_WIDTH),randint(0, CONTAINER_HEIGHT)],randint(0,MAX_VELOCITY), uniform(0, MAX_VIRULANCE),0,0, temp))    #changer attributs
                 dico_id[temp] = list_of_parazites[-1]
+            else :
+                print temp, 'exists in ', dico_id.keys(), "in add_parazite function"
         except: 
             print "could not add parazite: ID problem"
             
@@ -57,14 +62,6 @@ def add_parazite(nb_parasite=NB_PARASITE):
 def start(nb_sains=NB_SAINS, nb_parasite=NB_PARASITE):
     add_healthy()
     add_parazite()
-
-def actions_when_collision(p1,p2):
-    possible_classes = [Healthy, Parazite]
-    if isinstance(p1, tuple(possible_classes)) :        # si c'est l'un des deux
-        possible_classes.remove(type(p1))               #on l'enlève
-        if isinstance(p2, tuple(possible_classes)):     #si c'est l'autre
-            if random.randrange(0,100) < INFECT_CHANCE:
-                nb_parasite    # à faire
 
 def kill(p):
     if not isinstance(p, Individual): 
@@ -86,13 +83,58 @@ def guerison(p):
     if not isinstance(p, Individual): 
         print "%s doit être un individu pour être tué" % str(p)
     if isinstance(p, Parazite):
-        speed = p.getSpeed()
-        pos = p.getPosition()
-        idd = p.getIdd()
-        hourglass = p.getHourglass()
-        list_of_healhies.append(Healthy(pos, speed, idd, hourglass))
+        list_of_healhies.append(Healthy(p.getPosition(), p.getSpeed(), p.getIdd()))
         list_of_parazites.remove(p)
         del p
+
+def cure_the_lucky_ones(dt) :
+    for i in iter(list_of_parazites):
+        if uniform(0,1) > i.getRecovProb() :    #! RecovProb = 1 --> aucune chance de recover
+            guerison(i)
+
+def kill_those_who_have_to_die(dt) :
+    for i in enumerate(list_of_healhies):
+        if uniform(0,1) > DYING_PROB :    #! RecovProb = 1 --> aucune chance de recover
+            kill(i)
+    for i in enumerate(list_of_parazites):
+        if uniform(0,1) > DYING_PROB*(1 + p.getVir()) :    #! RecovProb = 1 --> aucune chance de recover
+            kill(i)
+
+def random_mutation_on_infection(para_i, heal_i) :
+    old_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
+    attribute_functions = {'0':para_i.set_New_Vir, '1':para_i.set_New_TransmRate, '2':para_i.set_New_RecovProb}
+
+    if uniform(0,1) < CHANCE_OF_MUTATION_ON_INFECTION :      #prob. de mutation
+        rand_mod = (randint(0,1)*2-1)*(1+uniform(0, MAX_FITNESS_CHANGE_ON_REPRODUCTION))    #modificateur valant au max 1+0.2 (p. ex)
+        rand_index = randint(0,2)
+        new_value = max(min(old_attributes[rand_index] * rand_mod, 1),-1)   #new attribute = 1.2*old attribute (au max)
+        attribute_functions[str(rand_index)](new_value)                     #on appelle la fonction correspondante
+
+def actions_when_collision(p1,p2):
+    possible_classes = [Healthy, Parazite]
+    if isinstance(p1, tuple(possible_classes)) :        # si c'est l'un des deux
+        possible_classes.remove(type(p1))               #on l'enlève
+        if isinstance(p2, tuple(possible_classes)):     #si c'est l'autre
+            if uniform(0,1) < INFECT_CHANCE:
+                nb_parasite    # à faire
+
+def infect_him(heal_i,para_i) :
+    random_mutation_on_infection(para_i, heal_i)
+
+
+    try:
+        temp = create_id()
+        if temp not in dico_id.keys():
+            list_of_parazites.append(Parazite(heal_i.getPosition(),heal_i.getSpeed(), randint(0, MAX_VIRULANCE),1,1, temp))    #changer attributs
+            dico_id[temp] = list_of_parazites[-1]
+            list_of_healhies.remove(heal_i)
+        else :
+            print temp, 'exists in ', dico_id.keys(), "in infect_him function"
+    except: 
+        print para_i, " could not infect ", heal_i
+
+    
+    
 
 #-----------------------main --------------------------
     
@@ -160,19 +202,21 @@ class BallsContainer(Widget):
 
 # -------------------- balls container--------------------
 
-add_healthy(2)
-print "A" + str(list_of_healhies[0].getIdd())
-print "B" + str(list_of_freed_id)
-print "C" + str(dico_id)
-
-kill(list_of_healhies[1])
-print "D" + str(list_of_healhies)
-print "E" + str(list_of_freed_id)
-print "F" + str(dico_id)
+#print "A" + str(list_of_healhies[0].getIdd())
+#print "B" + str(list_of_freed_id)
+#print "C" + str(dico_id)
+#
+#kill(list_of_healhies[1])
+#print "D" + str(list_of_healhies)
+#print "E" + str(list_of_freed_id)
+#print "F" + str(dico_id)
 
 #actions_when_collision(list_of_parazites[1],list_of_healhies[2])    #test
 
+add_healthy(2)
+add_parazite(2)
 
+random_mutation_on_infection(list_of_parazites[0],list_of_healhies[0])
 #-----------------------------Kivy GUI-----------------------------------------------
 if __name__ == '__main__':  
     mainApp().run()

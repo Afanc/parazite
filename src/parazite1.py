@@ -17,7 +17,7 @@ class Parazite(Individual):
     def __str__(self) :
         return 'ID : ' +str(self.idd) + '\nposition : '+str(self.position)+'\ncouleur : '+str(self.color)\
             +'\nvirulance : '+str(1-self.virulance) + '\ntransmission rate : '+str(self.transm_rate)\
-            +'\nrecovery prob : '+str(1-self.recovery_prob)+'\nTotal Fitness :'+str(self.getTotalFitness())
+            +'\nrecovery prob : '+str(1-self.recovery_prob)+'\nTotal Fitness : '+str(self.getTotalFitness())
 
     def getVir(self):
         return self.virulance
@@ -128,7 +128,7 @@ class Parazite(Individual):
     def getTotalFitness(self) :
         return self.getVir() + self.getRecovProb() + self.getTransmRate()
 
-
+"""
 test = Parazite(1,1, 0.7, 0.1, 0, 'ID23')
 print 'before'
 print test
@@ -159,3 +159,4 @@ print test.getTotalFitness()
 
     #idées
     #survie après mort/prob_transm/def_anti_para/taille/prob_manip/
+"""
