@@ -100,7 +100,7 @@ def kill_those_who_have_to_die(dt) :
         if uniform(0,1) > DYING_PROB*(1 + p.getVir()) :    #! RecovProb = 1 --> aucune chance de recover
             kill(i)
 
-def random_mutation_on_infection(para_i, heal_i) :
+def random_mutation_on_infection(para_i) :
     old_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
     attribute_functions = {'0':para_i.set_New_Vir, '1':para_i.set_New_TransmRate, '2':para_i.set_New_RecovProb}
 
@@ -115,26 +115,30 @@ def actions_when_collision(p1,p2):
     if isinstance(p1, tuple(possible_classes)) :        # si c'est l'un des deux
         possible_classes.remove(type(p1))               #on l'enlève
         if isinstance(p2, tuple(possible_classes)):     #si c'est l'autre
-            if uniform(0,1) < INFECT_CHANCE:
-                nb_parasite    # à faire
+            if isinstance(p2, Parazite) :
+                p1,p2 = p2,p1                           #on veut que p1 soit le parazite (lisibilité)
+            if uniform(0,1) < INFECTION_CHANCE *(1+p1.getTransmRate()) :    #là aussi, infection chance cap at 0.5
+                infect_him(p1,p2)
 
-def infect_him(heal_i,para_i) :
-    random_mutation_on_infection(para_i, heal_i)
-
+def infect_him(para_i,heal_i) :
+    random_mutation_on_infection(para_i)
 
     try:
         temp = create_id()
         if temp not in dico_id.keys():
-            list_of_parazites.append(Parazite(heal_i.getPosition(),heal_i.getSpeed(), randint(0, MAX_VIRULANCE),1,1, temp))    #changer attributs
+            list_of_parazites.append(Parazite(heal_i.getPosition(),heal_i.getSpeed(), para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), temp))
             dico_id[temp] = list_of_parazites[-1]
             list_of_healhies.remove(heal_i)
+
+            random_mutation_on_infection(list_of_parazites[-1])
         else :
             print temp, 'exists in ', dico_id.keys(), "in infect_him function"
     except: 
         print para_i, " could not infect ", heal_i
 
-    
-    
+
+
+
 
 #-----------------------main --------------------------
     
@@ -216,7 +220,16 @@ class BallsContainer(Widget):
 add_healthy(2)
 add_parazite(2)
 
-random_mutation_on_infection(list_of_parazites[0],list_of_healhies[0])
+print 'all para'
+print list_of_parazites
+print 'healthy'
+print list_of_healhies[-1]
+print 'parazite'
+print list_of_parazites[-1]
+infect_him(list_of_parazites[-1],list_of_healhies[-1])
+print 'all para - after'
+print list_of_parazites
+print list_of_parazites[-1]
 #-----------------------------Kivy GUI-----------------------------------------------
 if __name__ == '__main__':  
     mainApp().run()
