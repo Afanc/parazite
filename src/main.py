@@ -166,7 +166,7 @@ class mainApp(App):
     def build(self):
         """Entry point for creating app's UI."""
         root = BallsContainer()
-        Clock.schedule_once(root.start_balls,4)         #on attend que la fenêtre soit lancée
+        Clock.schedule_once(root.start_balls,1)         #on attend que la fenêtre soit lancée
         Clock.schedule_interval(root.update, DELTA_TIME)
         Clock.schedule_interval(test, 60*DELTA_TIME)    #ça ça marche
         return root
@@ -181,7 +181,7 @@ def test(dt):
 class BallsContainer(Widget):
     """Class for balls container, a main widget."""
     def start_balls(self,dt):
-        for i in range(0,100):
+        for i in range(0,500):
             ball = Ball()
             ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
             ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
