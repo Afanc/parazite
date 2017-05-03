@@ -18,7 +18,7 @@ class Individual(object):   #object afin d'avoir des 'nouvelles' classes
         return 'ID : ' +str(self.idd) + '\nposition : '+str(self.position)+'\ncouleur : '+str(self.color)
     
     def __del__(self):
-        print "Individual détruit"
+        #print "Individual détruit"
         
     def getPosition(self):  #oui, en python il faut spécifier dans la méthode que l'on se prend soi-même comme objet...
         return self.position
