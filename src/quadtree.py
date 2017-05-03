@@ -7,6 +7,7 @@
 """
 
 import math
+from random import *
 from datetime import datetime
 from collision import *
 
@@ -123,6 +124,17 @@ class Quadtree:
 
 
 # ---------------- testing -----------------------
+"""
+def random_balls(n) :
+    dic = {}
+    letter = 'a'
+    for i in range(0,n) :
+        x = uniform(0, 10)
+        y = uniform(0,10)
+        dic[letter]=[x, x+1, y, y+1]
+        letter = chr(ord(letter) + 1)
+    
+    return dic
 
 test_quad = Quadtree(0, [0,10,0,10])              #on crée un quadtree au niveau 0, limites : [0,10,0,10]
 #lui peut rester toujours vivant
@@ -148,6 +160,8 @@ r = [7.2,8.2,6.3,7.3]
 s = [4.0,5.0, 3.0,4.0]
 t = [3.3,4.3,5.6,6.6]
 test_obj = {'a':a,'b':b,'c':c,'d':d, 'e':e,'f':f,'g':g,'h':h,'i':i,'j':j,'k':k,'l':l,'m':m,'n':n,'o':o,'p':p, 'q':q, 'r':r,'s':s,'t':t}
+seed(30)
+test_obj = random_balls(150)
 #et à chaque dt :
 for i in test_obj.keys() :         #donc là ça fait n
     test_quad.insert(test_obj[i],i)
@@ -177,3 +191,4 @@ for i in test_obj.keys():
 print b
 
 
+"""

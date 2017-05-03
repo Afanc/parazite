@@ -19,6 +19,7 @@ class Ball(Widget):
     
     def update(self, dt):
         self.pos = Vector(*self.velocity) * dt + self.pos
+        #print 'test', self.pos
 
     def get_col(self):
         return self.col

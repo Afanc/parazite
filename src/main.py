@@ -34,7 +34,7 @@ def create_id():
     
 def add_healthy(nb_sains = NB_SAINS):
     for i in range(nb_sains):
-        x = randint(0, MAX_VELOCITY)
+        x = uniform(0, MAX_VELOCITY)
         try:
         
             temp = create_id()
@@ -64,7 +64,7 @@ def add_one_healthy() :
       
 def add_parazite(nb_parasite=NB_PARASITE):
     for i in range(nb_parasite):
-        x = randint(0, MAX_VELOCITY)
+        x = uniform(0, MAX_VELOCITY)
         try:
             temp = create_id()
             if temp not in dico_id.keys():
@@ -181,7 +181,7 @@ def test(dt):
 class BallsContainer(Widget):
     """Class for balls container, a main widget."""
     def start_balls(self,dt):
-        for i in range(0,5):
+        for i in range(0,100):
             ball = Ball()
             ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
             ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
@@ -199,6 +199,9 @@ class BallsContainer(Widget):
         for i in balls_dictionnary.keys() :
             if balls_dictionnary[i][0].get_col() != BASE_COLOR :
                 balls_dictionnary[i][0].set_col(BASE_COLOR)
+
+            pos = balls_dictionnary[i][0]
+            balls_dictionnary[i][2] = [pos.x, pos.x + pos.width, pos.y, pos.y + pos.height]
 
             quad.insert(balls_dictionnary[i][2], i)
 
