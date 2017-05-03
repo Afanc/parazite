@@ -13,7 +13,7 @@ from collision import *
 
 class Quadtree:
     
-    MAX_SIZE = 2
+    MAX_SIZE = 5
     MAX_LEVEL = 4
 
     objects = []               #ce qu'il contient
