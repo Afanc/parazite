@@ -56,7 +56,6 @@ def add_one_healthy() :
     except: 
         print "could not add health: ID problem"
             
-      
 def add_parazite(nb_parasite=NB_PARASITE):
     for i in range(nb_parasite):
         x = uniform(0, MAX_VELOCITY)
@@ -69,8 +68,31 @@ def add_parazite(nb_parasite=NB_PARASITE):
                 print temp, 'exists in ', dico_id.keys(), "in add_parazite function"
         except: 
             print "could not add parazite: ID problem"
-            
-            
+
+def add_one_parazite(p = None) :
+    try:
+        temp = create_id()
+        if p != None :      #si pas par défaut, on reprend
+            temp_vir = p.getVir()
+            temp_trans = p.getTransmRate()
+            temp_recov = p.getRecovProb()
+        else :              #sinon on crée
+            temp_vir = uniform(0,1)
+            temp_trans = uniform(0,1)
+            temp_recov = uniform(0,1)
+            norm = BASE_FITNESS/(temp_vir + temp_trans + temp_recov)
+            temp_vir *= temp_vir
+            temp_trans *= temp_trans
+            temp_recov *= temp_recov
+
+        if temp not in dico_id.keys():
+            list_of_parazites.append(Parazite(temp_vir, temp_trans, temp_recov, temp))
+            dico_id[temp] = list_of_parazites[-1]
+        else :
+            print temp, 'exists in ', dico_id.keys(), "in add_healthy function"
+    except: 
+        print "could not add health: ID problem"
+                 
 def start(nb_sains=NB_SAINS, nb_parasite=NB_PARASITE):
     add_healthy()
     add_parazite()
@@ -91,6 +113,21 @@ def kill(root,p):
     del balls_dictionnary[p.getIdd()]                       #on tue l'entrée dans le dico
     del p                                                   #et enfin on tue l'objet
 
+def reproduce(root,p):
+    if not isinstance(p, Individual): 
+        print "%s doit être un individu pour être tué" % str(p)
+        return
+    ball = Ball()
+    x = uniform(0,1)
+    ball.center = (balls_dictionnary[p.getIdd()][0].center[0] + x, balls_dictionnary[p.getIdd()][0].center[1] + (1-x))
+    ball.velocity = balls_dictionnary[p.getIdd()][0].velocity
+    root.add_widget(ball)
+
+    healthy = add_one_healthy()
+    balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+    if isinstance(p, Parazite):
+        infect_him(p, balls_dictionnary)
+
 def guerison(p):
     if not isinstance(p, Individual): 
         print "%s doit être un individu pour être tué" % str(p)
@@ -109,8 +146,17 @@ def kill_those_who_have_to_die(root,dt) :
         if uniform(0,1) < DYING_PROB :    #! RecovProb = 1 --> aucune chance de recover
             kill(root,i)
     for i in list_of_parazites:
-        if uniform(0,1) > DYING_PROB*(1 + p.getVir()) :    #! RecovProb = 1 --> aucune chance de recover
+        if uniform(0,1) < DYING_PROB*(1 + p.getVir()) :    #! RecovProb = 1 --> aucune chance de recover
             kill(root,i)
+
+def reproduce_those_you_have_to(root,dt) :
+    for i in list_of_healhies:
+        if uniform(0,1) < REPRODUCTION_PROB :    #! RecovProb = 1 --> aucune chance de recover
+            reproduce(root, i)
+    for i in list_of_parazites:
+        if uniform(0,1) < REPRODUCTION_PROB :    #! RecovProb = 1 --> aucune chance de recover
+            reproduce(root,i)
+
 
 def random_mutation_on_infection(para_i) :
     old_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
@@ -217,6 +263,7 @@ class BallsContainer(Widget):
    
     def update_life_and_death(self,dt):
         kill_those_who_have_to_die(self,dt)
+        reproduce_those_you_have_to(self,dt)
 
 # -------------------- balls container--------------------
 
