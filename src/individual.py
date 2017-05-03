@@ -7,10 +7,7 @@ from CONSTANTES import *
 class Individual(object):   #object afin d'avoir des 'nouvelles' classes
 
     #Constructeur, s'utilise : 'johnny = Individual(pos, vit, etc.)'
-    def __init__(self, pos, speed, idd, color = [0,0,0]):    #si color n'est pas donné : par défaut !
-        self.position = pos 
-        self.speed = speed 
-        #self.hourglass = hourglass
+    def __init__(self, idd, color = [0,0,0]):    #si color n'est pas donné : par défaut !
         self.color = color #pas besoin de tout définir à la main (on peut aussi mettre par défaut...)
         self.idd = idd
 

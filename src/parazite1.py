@@ -8,8 +8,8 @@ from numpy import *
 class Parazite(Individual): 
        
     #Constructeur
-    def __init__(self,pos,speed, vir, rate, rec, idd):
-        Individual.__init__(self,pos,speed, idd) 
+    def __init__(self, vir, rate, rec, idd):
+        Individual.__init__(self, idd) 
         self.virulance = vir        #high is bad    -> we sum 1-x
         self.transm_rate = rate     #high is good   -> we sum x
         self.recovery_prob = rec    #high is bad    -> we sum 1-x

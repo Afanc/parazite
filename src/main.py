@@ -21,7 +21,7 @@ list_of_freed_id = [] # on ajoute les id des mort à cette liste
 list_of_healhies = []
 list_of_parazites = []
 
-balls_dictionnary = {}
+balls_dictionnary = {}  #key:[widget_ball,individual, position]
 
 def create_id():
     if len(list_of_freed_id) == 0:
@@ -34,12 +34,10 @@ def create_id():
     
 def add_healthy(nb_sains = NB_SAINS):
     for i in range(nb_sains):
-        x = uniform(0, MAX_VELOCITY)
         try:
-        
             temp = create_id()
             if temp not in dico_id.keys():
-                list_of_healhies.append(Healthy([randint(0, CONTAINER_WIDTH),randint(0, CONTAINER_HEIGHT)], [x , MAX_VELOCITY- x], temp))
+                list_of_healhies.append(Healthy(temp))
                 dico_id[temp] = list_of_healhies[-1]
             else :
                 print temp, 'exists in ', dico_id.keys(), "in add_healthy function"
@@ -47,15 +45,12 @@ def add_healthy(nb_sains = NB_SAINS):
             print "could not add health: ID problem"
             
 def add_one_healthy() :
-    x = randint(0, MAX_VELOCITY)
     try:
-    
         temp = create_id()
         if temp not in dico_id.keys():
-            list_of_healhies.append(Healthy([randint(0, CONTAINER_WIDTH),randint(0, CONTAINER_HEIGHT)], [x , MAX_VELOCITY- x], temp))
+            list_of_healhies.append(Healthy(temp))
             dico_id[temp] = list_of_healhies[-1]
             return list_of_healhies[-1]
-
         else :
             print temp, 'exists in ', dico_id.keys(), "in add_healthy function"
     except: 
@@ -80,21 +75,21 @@ def start(nb_sains=NB_SAINS, nb_parasite=NB_PARASITE):
     add_healthy()
     add_parazite()
 
-def kill(p):
+def kill(root,p):
     if not isinstance(p, Individual): 
         print "%s doit être un individu pour être tué" % str(p)
         return
     elif isinstance(p, Healthy):
-        list_of_healhies.remove(p)
-        list_of_freed_id.append(p.getIdd())
-        del dico_id[p.getIdd()]
-        del p
+        list_of_healhies.remove(p)              #d'abord on gère les idd
     elif isinstance(p, Parazite):
         list_of_parazites.remove(p)
-        list_of_freed_id.append(p.getIdd())
-        del dico_id[p.getIdd()] 
-        del p
 
+    list_of_freed_id.append(p.getIdd())     
+    del dico_id[p.getIdd()]
+    root.remove_widget(balls_dictionnary[p.getIdd()][0])    #puis on enlève la widget (gui)
+    del balls_dictionnary[p.getIdd()][0]                    #puis on gère le dico, on tue l'objet
+    del balls_dictionnary[p.getIdd()]                       #on tue l'entrée dans le dico
+    del p                                                   #et enfin on tue l'objet
 
 def guerison(p):
     if not isinstance(p, Individual): 
@@ -109,13 +104,13 @@ def cure_the_lucky_ones(dt) :
         if uniform(0,1) > i.getRecovProb() :    #! RecovProb = 1 --> aucune chance de recover
             guerison(i)
 
-def kill_those_who_have_to_die(dt) :
-    for i in enumerate(list_of_healhies):
-        if uniform(0,1) > DYING_PROB :    #! RecovProb = 1 --> aucune chance de recover
-            kill(i)
-    for i in enumerate(list_of_parazites):
+def kill_those_who_have_to_die(root,dt) :
+    for i in list_of_healhies:
+        if uniform(0,1) < DYING_PROB :    #! RecovProb = 1 --> aucune chance de recover
+            kill(root,i)
+    for i in list_of_parazites:
         if uniform(0,1) > DYING_PROB*(1 + p.getVir()) :    #! RecovProb = 1 --> aucune chance de recover
-            kill(i)
+            kill(root,i)
 
 def random_mutation_on_infection(para_i) :
     old_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
@@ -168,11 +163,9 @@ class mainApp(App):
         root = BallsContainer()
         Clock.schedule_once(root.start_balls,1)         #on attend que la fenêtre soit lancée
         Clock.schedule_interval(root.update, DELTA_TIME)
-        Clock.schedule_interval(test, 60*DELTA_TIME)    #ça ça marche
+        Clock.schedule_interval(root.update_life_and_death, 60*DELTA_TIME)    #ça ça marche
         return root
 
-def test(dt):
-    pass
 
 #-----------------------Main--------------------------------------
 
@@ -181,7 +174,7 @@ def test(dt):
 class BallsContainer(Widget):
     """Class for balls container, a main widget."""
     def start_balls(self,dt):
-        for i in range(0,500):
+        for i in range(0,300):
             ball = Ball()
             ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
             ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
@@ -222,33 +215,11 @@ class BallsContainer(Widget):
             balls_dictionnary[i][0].update(dt)
             #-------------- update balls here -----------------
    
+    def update_life_and_death(self,dt):
+        kill_those_who_have_to_die(self,dt)
 
 # -------------------- balls container--------------------
 
-#print "A" + str(list_of_healhies[0].getIdd())
-#print "B" + str(list_of_freed_id)
-#print "C" + str(dico_id)
-#
-#kill(list_of_healhies[1])
-#print "D" + str(list_of_healhies)
-#print "E" + str(list_of_freed_id)
-#print "F" + str(dico_id)
-
-#actions_when_collision(list_of_parazites[1],list_of_healhies[2])    #test
-
-add_healthy(2)
-add_parazite(2)
-
-print 'all para'
-print list_of_parazites
-print 'healthy'
-print list_of_healhies[-1]
-print 'parazite'
-print list_of_parazites[-1]
-infect_him(list_of_parazites[-1],list_of_healhies[-1])
-print 'all para - after'
-print list_of_parazites
-print list_of_parazites[-1]
 #-----------------------------Kivy GUI-----------------------------------------------
 if __name__ == '__main__':  
     mainApp().run()
