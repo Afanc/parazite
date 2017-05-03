@@ -4,8 +4,8 @@ MAX_BALL_SPEED = 100
 BASE_COLOR = [0,0,1]
 
 #MAIN
-NB_SAINS = 5                                                                                                           
-NB_PARASITE = 3
+NB_SAINS = 100
+NB_PARASITE = 10
 INFECTION_CHANCE = 0.3  #max 0.5 ! else : troubles
 CONTAINER_HEIGHT= 200
 CONTAINER_WIDTH= 300

@@ -88,6 +88,9 @@ def add_one_parazite(p = None) :
         if temp not in dico_id.keys():
             list_of_parazites.append(Parazite(temp_vir, temp_trans, temp_recov, temp))
             dico_id[temp] = list_of_parazites[-1]
+
+            return list_of_parazites[-1]
+
         else :
             print temp, 'exists in ', dico_id.keys(), "in add_healthy function"
     except: 
@@ -125,8 +128,9 @@ def reproduce(root,p):
 
     healthy = add_one_healthy()
     balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+
     if isinstance(p, Parazite):
-        infect_him(p, balls_dictionnary)
+        infect_him(p, balls_dictionnary[healthy.getIdd()][1])
 
 def guerison(p):
     if not isinstance(p, Individual): 
@@ -146,7 +150,7 @@ def kill_those_who_have_to_die(root,dt) :
         if uniform(0,1) < DYING_PROB :    #! RecovProb = 1 --> aucune chance de recover
             kill(root,i)
     for i in list_of_parazites:
-        if uniform(0,1) < DYING_PROB*(1 + p.getVir()) :    #! RecovProb = 1 --> aucune chance de recover
+        if uniform(0,1) < DYING_PROB*(1 + balls_dictionnary[i.getIdd()][1].getVir()) :    #! RecovProb = 1 --> aucune chance de recover
             kill(root,i)
 
 def reproduce_those_you_have_to(root,dt) :
@@ -156,7 +160,6 @@ def reproduce_those_you_have_to(root,dt) :
     for i in list_of_parazites:
         if uniform(0,1) < REPRODUCTION_PROB :    #! RecovProb = 1 --> aucune chance de recover
             reproduce(root,i)
-
 
 def random_mutation_on_infection(para_i) :
     old_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
@@ -168,17 +171,25 @@ def random_mutation_on_infection(para_i) :
         new_value = max(min(old_attributes[rand_index] * rand_mod, 1),-1)   #new attribute = 1.2*old attribute (au max)
         attribute_functions[str(rand_index)](new_value)                     #on appelle la fonction correspondante
 
+        return True
+    return False
+
 def infect_him(para_i,heal_i) :
     random_mutation_on_infection(para_i)
 
     try:
         temp = create_id()
         if temp not in dico_id.keys():
-            list_of_parazites.append(Parazite(heal_i.getPosition(),heal_i.getSpeed(), para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), temp))
+            print temp  #here problem
+            list_of_parazites.append(Parazite(para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), temp))
             dico_id[temp] = list_of_parazites[-1]
             list_of_healhies.remove(heal_i)
 
-            random_mutation_on_infection(list_of_parazites[-1])
+            if random_mutation_on_infection(list_of_parazites[-1]) :
+                x = randint(0,2)
+                random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
+                random_color[x] = min(uniform(0,1)*uniform(0,1), 1)
+                balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(tuple(random_color))
         else :
             print temp, 'exists in ', dico_id.keys(), "in infect_him function"
     except: 
@@ -220,7 +231,7 @@ class mainApp(App):
 class BallsContainer(Widget):
     """Class for balls container, a main widget."""
     def start_balls(self,dt):
-        for i in range(0,300):
+        for i in range(0,NB_SAINS):
             ball = Ball()
             ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
             ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
@@ -229,6 +240,15 @@ class BallsContainer(Widget):
 
             healthy = add_one_healthy()
             balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+        for i in range(0,NB_PARASITE):
+            ball = Ball()
+            ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
+            ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
+                             -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
+            self.add_widget(ball)
+
+            parazite = add_one_parazite()
+            balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
 
     #@profile
     def update(self,dt):

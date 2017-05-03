@@ -15,7 +15,7 @@ class Parazite(Individual):
         self.recovery_prob = rec    #high is bad    -> we sum 1-x
 
     def __str__(self) :
-        return 'ID : ' +str(self.idd) + '\nposition : '+str(self.position)+'\ncouleur : '+str(self.color)\
+        return 'ID : ' +str(self.idd) +'\ncouleur : '+str(self.color)\
             +'\nvirulance : '+str(1-self.virulance) + '\ntransmission rate : '+str(self.transm_rate)\
             +'\nrecovery prob : '+str(1-self.recovery_prob)+'\nTotal Fitness : '+str(self.getTotalFitness())
 
