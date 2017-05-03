@@ -8,10 +8,11 @@
 
 import math
 from datetime import datetime
+from collision import *
 
 class Quadtree:
     
-    MAX_SIZE = 5
+    MAX_SIZE = 2
     MAX_LEVEL = 4
 
     objects = []               #ce qu'il contient
@@ -25,8 +26,11 @@ class Quadtree:
         self.objects = []
         self.box = []
 
-    def add_object(self,obj):
-        self.objects.append(obj)
+    def add_object(self,obj,idd):
+        self.objects.append([obj,idd])
+
+    def remove_object(self, obj, idd): 
+        self.objects.remove([obj,idd])
 
     def reset(self):
         try :
@@ -71,15 +75,15 @@ class Quadtree:
 
         return object_level
 
-    def insert(self,obj):
+    def insert(self,obj,idd):
         object_level = self.index(obj)
 
         try :
             if self.box and object_level != -1:                 #s'il y a un gosse et que ça fit
-                self.box[object_level].insert(obj)              #on descend encore
+                self.box[object_level].insert(obj,idd)              #on descend encore
                 return                                          #jusqu'au max, puis on sort
 
-            self.add_object(obj)                                #on met l'objet - c'est bien le seul moment où on n'utilise pas la récursive !
+            self.add_object(obj,idd)                                #on met l'objet - c'est bien le seul moment où on n'utilise pas la récursive !
             
         except :
             print "could not fit object in quadtree"
@@ -89,42 +93,44 @@ class Quadtree:
                 if not self.box :
                     self.split()
                 for child in list(self.objects) :                             #et dans cec cas, faut mettre tous les enfants dans leurs cases aussi - aussi : on fait une copie !
-                    child_level = self.index(child)
+                    child_level = self.index(child[0])
                     if child_level != -1 :                              #s'ils fittent plus bas
-                        self.box[child_level].insert(child)             #on les place plus bas
-                        self.objects.remove(child)                      #et pas oublier de les enlever du parent (à la liste originale, on itère sur une copie !)
+                        self.box[child_level].insert(child[0],child[1])             #on les place plus bas
+                        #self.objects.remove([child[0],child[1]])                      
+                        self.remove_object(child[0], child[1])#et pas oublier de les enlever du parent (à la liste originale, on itère sur une copie !)
 
         except :
             print "could not split and fit children"
 
 
-    def fetch(self,obj):
+    def fetch(self,obj,idd):
 
         object_level = self.index(obj)
         potential_collisions = []
 
         if object_level != -1 and self.box :                           #s'il y a enfant ! sinon, c'est moi
-            potential_collisions = self.box[object_level].fetch(obj)
+            potential_collisions = self.box[object_level].fetch(obj,idd)
         
         potential_collisions.extend(self.objects)                      #arrivé au bon niveau, on charge
 
-        if obj in potential_collisions :
-            potential_collisions.remove(obj)                               #on en profite pour enlever l'objet lui-même
+        for pairs in potential_collisions:
+            if pairs[1] == idd :
+                potential_collisions.remove([obj,idd])                               #on en profite pour enlever l'objet lui-même
+        #if idd in potential_collisions :
 
         return potential_collisions                                    #pas trouvé de méthode sans créer de nouvelle variable :S
 
 
 
 # ---------------- testing -----------------------
-"""
-startTime = datetime.now()
+
 test_quad = Quadtree(0, [0,10,0,10])              #on crée un quadtree au niveau 0, limites : [0,10,0,10]
 #lui peut rester toujours vivant
 #on mets quelques objets tests (leurs tailles) : (ils sont tous dans le 1e cadran)
-a = [6.8,7.8,2.7,3.7]
-b = [8.0,9.0,5.2,6.2]
-c = [8.5,9.5,3.2,4.2]
-d = [4.7,5.7,7.1,8.1]
+a = [8.8,9.8,3.7,4.7]
+b = [8.0,9.0,4.2,5.2]
+c = [8.5,9.5,8.2,9.2]
+d = [1.7,2.7,8.1,9.1]
 e = [7.2,8.2,4.5,5.5]
 f = [3.5,4.5,7.0,8.0]
 g = [9.0,10.0,1.2,2.2]
@@ -141,44 +147,33 @@ q = [2.0,3.0,7.3,8.3]
 r = [7.2,8.2,6.3,7.3]
 s = [4.0,5.0, 3.0,4.0]
 t = [3.3,4.3,5.6,6.6]
-test_obj = [a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t]
+test_obj = {'a':a,'b':b,'c':c,'d':d, 'e':e,'f':f,'g':g,'h':h,'i':i,'j':j,'k':k,'l':l,'m':m,'n':n,'o':o,'p':p, 'q':q, 'r':r,'s':s,'t':t}
 #et à chaque dt :
-test_quad.reset()
-for i in test_obj :         #donc là ça fait n
-    test_quad.insert(i)   
+for i in test_obj.keys() :         #donc là ça fait n
+    test_quad.insert(test_obj[i],i)
 
-#print 'au niveau 0, on a ', test_quad.objects
-#print '\nau niveau 1, on a', test_quad.box[0].objects,'\n',test_quad.box[1].objects,'\n',test_quad.box[2].objects,'\n',test_quad.box[3].objects
+print 'au niveau 0, on a ', test_quad.objects
+print '\nau niveau 1, on a', test_quad.box[0].objects,'\n',test_quad.box[1].objects,'\n',test_quad.box[2].objects,'\n',test_quad.box[3].objects
 
-for i in test_obj:          #eh oui, faut attendre que chaque objet ait été inséré, on n'a pas tous les index sinon ! Donc on a encore n
-    potential_collisions = test_quad.fetch(i)
+b = 0
 
-    print '\n ------ On teste ', i, 'contre ', potential_collisions, '\n'
-    for j in potential_collisions:                          #et là ça fait m = min(MAX_SIZE,len(potential_collisions))
-        
-        #calcul de la distance entre le centre des particules
-        dx = i[0] - j[0]
-        dy = i[2] - j[2]
+for i in test_obj.keys():  
+    temp_balls = test_quad.fetch(test_obj[i],i)
+    temp_keys = [k[1] for k in temp_balls]
+    potential_collisions = {key:test_obj[key] for key in temp_keys}
+
+
+    #print '\n ------ On teste ', i, test_obj[i], 'contre ', potential_collisions, '\n'
+
+    for j in potential_collisions.keys() :
+        dx = test_obj[i][0] - potential_collisions[j][0]
+        dy = test_obj[i][2] - potential_collisions[j][2]
+
         dist = math.hypot(dx, dy)
-    
-    # comportement physique des particules en cas de collision
-        if dist <= float(i[1]-i[0])/2 + float(j[1] - j[0])/2 :             #on suppose que c'est sphérique ici
-            print "collision ! entre ", i, j
-             Et après on détermine le rest
-            tangent = math.atan2(dy, dx)
-            angle = 0.5 * math.pi + tangent
+        if dist < (test_obj[i][1]-test_obj[i][0])/2 + (potential_collisions[j][1] - potential_collisions[j][0])/2 :
+            print 'boom', test_obj[i], 'contre', potential_collisions[j]
+            b += 1
 
-            self.angle -= 2 * tangent
-            p2.angle -= 2 * tangent
+print b
 
-            angle = 0.5 * math.pi + tangent
 
-            #self.x += math.sin(angle)
-            #self.y -= math.cos(angle)
-            self.velocity_x += math.sin(angle)
-            self.velocity_y -= math.cos(angle)
-            p2.velocity_x -= math.sin(angle)                                                                           
-            p2.velocity_y += math.cos(angle)
-            
-print datetime.now() - startTime
-"""

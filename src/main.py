@@ -21,6 +21,8 @@ list_of_freed_id = [] # on ajoute les id des mort à cette liste
 list_of_healhies = []
 list_of_parazites = []
 
+balls_dictionnary = {}
+
 def create_id():
     if len(list_of_freed_id) == 0:
         idd = "ID" + str(len(dico_id))
@@ -43,6 +45,21 @@ def add_healthy(nb_sains = NB_SAINS):
                 print temp, 'exists in ', dico_id.keys(), "in add_healthy function"
         except: 
             print "could not add health: ID problem"
+            
+def add_one_healthy() :
+    x = randint(0, MAX_VELOCITY)
+    try:
+    
+        temp = create_id()
+        if temp not in dico_id.keys():
+            list_of_healhies.append(Healthy([randint(0, CONTAINER_WIDTH),randint(0, CONTAINER_HEIGHT)], [x , MAX_VELOCITY- x], temp))
+            dico_id[temp] = list_of_healhies[-1]
+            return list_of_healhies[-1]
+
+        else :
+            print temp, 'exists in ', dico_id.keys(), "in add_healthy function"
+    except: 
+        print "could not add health: ID problem"
             
       
 def add_parazite(nb_parasite=NB_PARASITE):
@@ -110,16 +127,6 @@ def random_mutation_on_infection(para_i) :
         new_value = max(min(old_attributes[rand_index] * rand_mod, 1),-1)   #new attribute = 1.2*old attribute (au max)
         attribute_functions[str(rand_index)](new_value)                     #on appelle la fonction correspondante
 
-def actions_when_collision(p1,p2):
-    possible_classes = [Healthy, Parazite]
-    if isinstance(p1, tuple(possible_classes)) :        # si c'est l'un des deux
-        possible_classes.remove(type(p1))               #on l'enlève
-        if isinstance(p2, tuple(possible_classes)):     #si c'est l'autre
-            if isinstance(p2, Parazite) :
-                p1,p2 = p2,p1                           #on veut que p1 soit le parazite (lisibilité)
-            if uniform(0,1) < INFECTION_CHANCE *(1+p1.getTransmRate()) :    #là aussi, infection chance cap at 0.5
-                infect_him(p1,p2)
-
 def infect_him(para_i,heal_i) :
     random_mutation_on_infection(para_i)
 
@@ -136,6 +143,15 @@ def infect_him(para_i,heal_i) :
     except: 
         print para_i, " could not infect ", heal_i
 
+def actions_when_collision(p1,p2):
+    possible_classes = [Healthy, Parazite]
+    if isinstance(p1, tuple(possible_classes)) :        # si c'est l'un des deux
+        possible_classes.remove(type(p1))               #on l'enlève
+        if isinstance(p2, tuple(possible_classes)):     #si c'est l'autre
+            if isinstance(p2, Parazite) :
+                p1,p2 = p2,p1                           #on veut que p1 soit le parazite (lisibilité)
+            if uniform(0,1) < INFECTION_CHANCE *(1+p1.getTransmRate()) :    #là aussi, infection chance cap at 0.5
+                infect_him(p1,p2)
 
 
 
@@ -150,13 +166,13 @@ class mainApp(App):
     def build(self):
         """Entry point for creating app's UI."""
         root = BallsContainer()
-        Clock.schedule_once(root.start_balls,1)         #on attend que la fenêtre soit lancée
+        Clock.schedule_once(root.start_balls,4)         #on attend que la fenêtre soit lancée
         Clock.schedule_interval(root.update, DELTA_TIME)
         Clock.schedule_interval(test, 60*DELTA_TIME)    #ça ça marche
         return root
 
 def test(dt):
-    print 'youpila'
+    pass
 
 #-----------------------Main--------------------------------------
 
@@ -165,42 +181,42 @@ def test(dt):
 class BallsContainer(Widget):
     """Class for balls container, a main widget."""
     def start_balls(self,dt):
-        for i in range(0,50):
+        for i in range(0,5):
             ball = Ball()
             ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
             ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
                              -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
             self.add_widget(ball)
 
+            healthy = add_one_healthy()
+            balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+
     #@profile
     def update(self,dt):
         quad = Quadtree(0,[self.x,self.x + self.width, self.y, self.y + self.height])
         quad.reset()    #est-ce que ça sert à rien ?
-        balls = {}
 
-        for c in self.children: 
-            if isinstance(c,Ball) :
-                balls[(c.x, c.x + c.width, c.y, c.y + c.height)] = c   #key : position, access : ball
+        for i in balls_dictionnary.keys() :
+            if balls_dictionnary[i][0].get_col() != BASE_COLOR :
+                balls_dictionnary[i][0].set_col(BASE_COLOR)
 
-        for i in balls :                                        #obligés de faire un 1e boucle pour toutes les placer
-            if balls[i].get_col() != BASE_COLOR:                #petit hack pour les couleurs, on profite des boucles
-                balls[i].set_col(BASE_COLOR)
+            quad.insert(balls_dictionnary[i][2], i)
 
-            quad.insert(i)                                      #préparer le quad
+        for i in balls_dictionnary.keys() :
 
-        for i in balls:                                         #for each key (=position)
-            temp_keys = quad.fetch(i)                           #on fetch les collisions
-            other_balls = {key:balls[key] for key in temp_keys} #on crée un nouveau dico avec que les collisions
+            temp_balls = quad.fetch(balls_dictionnary[i][2],i)
+            temp_keys = [k[1] for k in temp_balls]
+            other_balls = {key:balls_dictionnary[key] for key in temp_keys}
 
-            for j in other_balls:
+            for j in other_balls.keys():
                 
-                if physical_collision(balls, other_balls, i, j):
+                if physical_collision2(balls_dictionnary[i][0], other_balls[j][0]):
                     pass
 
-            physical_wall_collisions(balls, i, self)
+            physical_wall_collisions2(balls_dictionnary[i][0], self)
 
             #-------------- update balls here -----------------
-            balls[i].update(dt)
+            balls_dictionnary[i][0].update(dt)
             #-------------- update balls here -----------------
    
 

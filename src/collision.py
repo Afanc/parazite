@@ -25,6 +25,45 @@ class Ball(Widget):
     def set_col(self, a):
         self.col = a
 
+def physical_collision2(ball, other_ball) :
+    i = [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]
+    j = [other_ball.x, other_ball.x + other_ball.width, other_ball.y, other_ball.y + other_ball.height]
+    dx = i[0] - j[0]
+    dy = i[2] - j[2]
+
+    dist = math.hypot(dx, dy)
+    if dist < (i[1]-i[0])/2 + (j[1] - j[0])/2 :
+        tangent = math.atan2(dy, dx)
+        angle = 0.5 * math.pi + tangent
+        
+        ball.angle = 2 * tangent - ball.angle
+        other_ball.angle = 2 * tangent - other_ball.angle
+
+        ball.x += math.sin(angle)
+        ball.y -= math.cos(angle)
+        other_ball.x -= math.sin(angle)
+        other_ball.y += math.cos(angle)
+
+        b_vel = math.sqrt(ball.velocity_x**2 + ball.velocity_y**2)
+        o_vel = math.sqrt(other_ball.velocity_x**2 + other_ball.velocity_y**2)
+                                                                                                           
+        ball.velocity_x = math.sin(angle)*b_vel
+        ball.velocity_y = -math.cos(angle)*b_vel
+        other_ball.velocity_x = -math.sin(angle)*o_vel
+        other_ball.velocity_y = math.cos(angle)*o_vel
+
+        ball.set_col((1,0,1))
+        other_ball.set_col((1,0,1))
+        
+        return True
+
+def physical_wall_collisions2(ball, wall) :
+    if (ball.x < wall.x and ball.velocity_x < 0) or (ball.right > wall.right and ball.velocity_x > 0):
+        ball.velocity_x *= -1
+    if (ball.y < wall.y and ball.velocity_y < 0) or (ball.top > wall.top and ball.velocity_y > 0):
+        ball.velocity_y *= -1
+
+
 def physical_collision(balls, other_balls, i, j) :
     dx = i[0] - j[0]
     dy = i[2] - j[2]
