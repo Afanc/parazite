@@ -101,9 +101,6 @@ def kill(root,p):
     del p                                                   #et enfin on tue l'objet
 
 def reproduce(root,p):
-    if not isinstance(p, Individual): 
-        print "%s doit être un individu pour être tué" % str(p)
-        return
     ball = Ball()
     x = uniform(0,1)
     ball.center = (balls_dictionnary[p.getIdd()][0].center[0] + x, balls_dictionnary[p.getIdd()][0].center[1] + (1-x))
@@ -112,12 +109,14 @@ def reproduce(root,p):
 
     healthy = add_one_healthy()
     balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
-
+    
     if isinstance(p, Parazite):
         infect_him(p, balls_dictionnary[healthy.getIdd()][1])
     if isinstance(p, Healthy) :
         for i in p.getResistances() :
             list_of_healthies[-1].setResistance(i)
+            #if len(list_of_healthies[-1].getResistances()) > 1 :
+             #   ball.set_col(SPEC_BASE_COLOR)
         
 
 def guerison(p):
@@ -130,7 +129,7 @@ def guerison(p):
 
         list_of_parazites.remove(p)
         balls_dictionnary[p.getIdd()][1] = list_of_healthies[-1]
-        balls_dictionnary[p.getIdd()][0].set_col(BASE_COLOR)
+        #balls_dictionnary[p.getIdd()][0].set_col(SPEC_BASE_COLOR)
 
 def cure_the_lucky_ones(dt) :
     for i in iter(list_of_parazites):
