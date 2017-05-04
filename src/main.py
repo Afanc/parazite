@@ -132,7 +132,7 @@ def guerison(p):
 
 def cure_the_lucky_ones(dt) :
     for i in iter(list_of_parazites):
-        if uniform(0,1) > BASE_CHANCE_OF_HEALING*(1+i.getRecovProb()) :    #! RecovProb = 1 --> aucune chance de recover
+        if uniform(0,1) > (1-BASE_CHANCE_OF_HEALING)*(1+i.getRecovProb()) :    #! RecovProb = 1 --> aucune chance de recover
             pass
             guerison(i)
 
