@@ -162,10 +162,13 @@ def random_mutation_on_infection(para_i) :
 
 def infect_him(para_i,heal_i) :
 #   random_mutation_on_infection(para_i)
-    temp = para_i.getPar()
+    print para_i.getIdd(), "infect", heal_i.getIdd()
+    print "parente: ", para_i.getPar()
+    temp_par = para_i.getPar()
     if para_i.getIdd() not in para_i.getPar():
-        temp.append(para_i.getIdd())
-    list_of_parazites.append(Parazite(para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), heal_i.getIdd(), temp))
+        temp_par.append(para_i.getIdd())
+    print temp_par
+    list_of_parazites.append(Parazite(para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), heal_i.getIdd(), temp_par))
     list_of_healhies.remove(heal_i)
     balls_dictionnary[heal_i.getIdd()][1] = list_of_parazites[-1]
     balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(balls_dictionnary[para_i.getIdd()][0].get_col())
