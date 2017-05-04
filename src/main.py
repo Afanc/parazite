@@ -111,7 +111,7 @@ def reproduce(root,p):
     balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
     
     if isinstance(p, Parazite):
-        infect_him(p, balls_dictionnary[healthy.getIdd()][1])
+        infect_him(p, balls_dictionnary[healthy.getIdd()][1], parazites_reproducing=True)
     if isinstance(p, Healthy) :
         for i in p.getResistances() :
             list_of_healthies[-1].setResistance(i)
@@ -131,6 +131,7 @@ def guerison(p):
 
 def cure_the_lucky_ones(dt) :
     for i in iter(list_of_parazites):
+        pass
         if uniform(0,1) > i.getRecovProb() :    #! RecovProb = 1 --> aucune chance de recover
             guerison(i)
 
@@ -163,25 +164,24 @@ def random_mutation_on_infection(para_i) :
         return True
     return False
 
-def infect_him(para_i,heal_i) :
-    #resistant = False 
-    #testing_par = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
-    #for i in heal_i.getResistances() :
-    #    if i == testing_par :
-    #        resistant = True
-    #if not resistant or parazites_reproducing:
-    temp_par = list(para_i.getPar())
-    temp_par.append(para_i.getIdd())
-    list_of_parazites.append(Parazite(para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), heal_i.getIdd(), temp_par))
-    list_of_healthies.remove(heal_i)
-    balls_dictionnary[heal_i.getIdd()][1] = list_of_parazites[-1]
-    balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(balls_dictionnary[para_i.getIdd()][0].get_col())
+def infect_him(para_i,heal_i, parazites_reproducing=False) :
+    resistant = False 
+    testing_par = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
+    if testing_par in heal_i.getResistances() :
+            resistant = True
+    if not resistant :
+        temp_par = list(para_i.getPar())
+        temp_par.append(para_i.getIdd())
+        list_of_parazites.append(Parazite(para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), heal_i.getIdd(), temp_par))
+        list_of_healthies.remove(heal_i)
+        balls_dictionnary[heal_i.getIdd()][1] = list_of_parazites[-1]
+        balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(balls_dictionnary[para_i.getIdd()][0].get_col())
 
-    if random_mutation_on_infection(list_of_parazites[-1]) :
-        x = randint(0,2)
-        random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
-        random_color[x] = min(uniform(0,1)*uniform(0,1), 1)
-        balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(tuple(random_color))
+        if random_mutation_on_infection(list_of_parazites[-1]) :
+            x = randint(0,2)
+            random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
+            random_color[x] = min(uniform(0,1)*uniform(0,1), 1)
+            balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(tuple(random_color))
 
 def actions_when_collision(p1,p2):
     possible_classes = [Healthy, Parazite]

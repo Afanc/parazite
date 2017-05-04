@@ -133,7 +133,7 @@ class Parazite(Individual):
 
     def getTotalFitness(self) :
         return self.getVir() + self.getRecovProb() + self.getTransmRate()
-"""       
+
 test = Parazite(0.7, 0.1, 0, 'ID23')
 print 'before'
 print test
@@ -147,4 +147,3 @@ print test
 
     #idées
     #survie après mort/prob_transm/def_anti_para/taille/prob_manip/
-"""
