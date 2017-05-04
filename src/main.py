@@ -180,11 +180,11 @@ def infect_him(para_i,heal_i) :
     list_of_healhies.remove(heal_i)
     balls_dictionnary[heal_i.getIdd()][1] = list_of_parazites[-1]
     print "ma bite"
+    balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(balls_dictionnary[para_i.getIdd()][0].get_col())
     if random_mutation_on_infection(list_of_parazites[-1]) :
         x = randint(0,2)
         random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
         random_color[x] = min(uniform(0,1)*uniform(0,1), 1)
-        balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(balls_dictionnary[para_i.getIdd()][0].get_col())
         balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(tuple(random_color))
 #    else :
 #           print temp, 'exists in ', dico_id.keys(), "in infect_him function"
