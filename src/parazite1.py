@@ -8,16 +8,18 @@ from numpy import *
 class Parazite(Individual): 
        
     #Constructeur
-    def __init__(self, vir, rate, rec, idd):
+    def __init__(self, vir, rate, rec, idd, par=[]):
         Individual.__init__(self, idd) 
         self.virulance = vir        #high is bad    -> we sum 1-x
         self.transm_rate = rate     #high is good   -> we sum x
         self.recovery_prob = rec    #high is bad    -> we sum 1-x
-
+        self.parenty = par
+        
     def __str__(self) :
         return 'ID : ' +str(self.idd) +'\ncouleur : '+str(self.color)\
             +'\nvirulance : '+str(1-self.virulance) + '\ntransmission rate : '+str(self.transm_rate)\
-            +'\nrecovery prob : '+str(1-self.recovery_prob)+'\nTotal Fitness : '+str(self.getTotalFitness())
+            +'\nrecovery prob : '+str(1-self.recovery_prob)+'\nTotal Fitness : '+str(self.getTotalFitness())\
+            +'\nparenty : ' + str(self.parenty)
 
     def getVir(self):
         return self.virulance
@@ -37,6 +39,10 @@ class Parazite(Individual):
     def setRecovProb(self,r) :
         self.recovery_prob = r
 
+    def getPar(self):
+        return self.parenty
+        
+        
     #if vir goes up, transm rate goes up, recov goes down
     def set_New_Vir(self,r) : 
         new_fitness = self.getTransmRate() + self.getRecovProb() + r
@@ -128,6 +134,7 @@ class Parazite(Individual):
     def getTotalFitness(self) :
         return self.getVir() + self.getRecovProb() + self.getTransmRate()
 
+        
 """
 test = Parazite(1,1, 0.7, 0.1, 0, 'ID23')
 print 'before'

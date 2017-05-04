@@ -13,7 +13,7 @@ from datetime import datetime
 from quadtree import Quadtree
 from collision import *
 
-seed(42)
+seed(45)
 
 dico_id = {}    #on ajoute les id de individu dans le dico
 list_of_freed_id = [] # on ajoute les id des mort à cette liste
@@ -56,19 +56,6 @@ def add_one_healthy() :
     except: 
         print "could not add health: ID problem"
             
-def add_parazite(nb_parasite=NB_PARASITE):
-    for i in range(nb_parasite):
-        x = uniform(0, MAX_VELOCITY)
-        try:
-            temp = create_id()
-            if temp not in dico_id.keys():
-                list_of_parazites.append(Parazite([randint(0, CONTAINER_WIDTH),randint(0, CONTAINER_HEIGHT)],randint(0,MAX_VELOCITY), uniform(0, MAX_VIRULANCE),0,0, temp))    #changer attributs
-                dico_id[temp] = list_of_parazites[-1]
-            else :
-                print temp, 'exists in ', dico_id.keys(), "in add_parazite function"
-        except: 
-            print "could not add parazite: ID problem"
-
 def add_one_parazite(p = None) :
     try:
         temp = create_id()
@@ -96,9 +83,6 @@ def add_one_parazite(p = None) :
     except: 
         print "could not add health: ID problem"
                  
-def start(nb_sains=NB_SAINS, nb_parasite=NB_PARASITE):
-    add_healthy()
-    add_parazite()
 
 def kill(root,p):
     if not isinstance(p, Individual): 
@@ -131,6 +115,7 @@ def reproduce(root,p):
 
     if isinstance(p, Parazite):
         infect_him(p, balls_dictionnary[healthy.getIdd()][1])
+        print balls_dictionnary[healthy.getIdd()][1].getPar()
 
 def guerison(p):
     if not isinstance(p, Individual): 
@@ -176,7 +161,10 @@ def random_mutation_on_infection(para_i) :
 
 def infect_him(para_i,heal_i) :
 #   random_mutation_on_infection(para_i)
-    list_of_parazites.append(Parazite(para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), heal_i.getIdd()))
+    temp = para_i.getPar()
+    if para_i.getIdd() not in para_i.getPar():
+        temp.append(para_i.getIdd())
+    list_of_parazites.append(Parazite(para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), heal_i.getIdd(), temp))
     list_of_healhies.remove(heal_i)
     balls_dictionnary[heal_i.getIdd()][1] = list_of_parazites[-1]
     balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(balls_dictionnary[para_i.getIdd()][0].get_col())
@@ -270,7 +258,7 @@ class BallsContainer(Widget):
             for j in other_balls.keys():
                 
                 if physical_collision2(balls_dictionnary[i][0], other_balls[j][0]):
-                    pass
+                    actions_when_collision(balls_dictionnary[i][1], other_balls[j][1])
 
             physical_wall_collisions2(balls_dictionnary[i][0], self)
 
