@@ -175,25 +175,20 @@ def random_mutation_on_infection(para_i) :
     return False
 
 def infect_him(para_i,heal_i) :
-    random_mutation_on_infection(para_i)
-
-    try:
-        temp = create_id()
-        if temp not in dico_id.keys():
-            print temp  #here problem
-            list_of_parazites.append(Parazite(para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), temp))
-            dico_id[temp] = list_of_parazites[-1]
-            list_of_healhies.remove(heal_i)
-
-            if random_mutation_on_infection(list_of_parazites[-1]) :
-                x = randint(0,2)
-                random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
-                random_color[x] = min(uniform(0,1)*uniform(0,1), 1)
-                balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(tuple(random_color))
-        else :
-            print temp, 'exists in ', dico_id.keys(), "in infect_him function"
-    except: 
-        print para_i, " could not infect ", heal_i
+#   random_mutation_on_infection(para_i)
+    list_of_parazites.append(Parazite(para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), heal_i.getIdd()))
+    list_of_healhies.remove(heal_i)
+    balls_dictionnary[heal_i.getIdd()][1] = list_of_parazites[-1]
+    print "ma bite"
+    if random_mutation_on_infection(list_of_parazites[-1]) :
+        x = randint(0,2)
+        random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
+        random_color[x] = min(uniform(0,1)*uniform(0,1), 1)
+        balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(tuple(random_color))
+#    else :
+#           print temp, 'exists in ', dico_id.keys(), "in infect_him function"
+     
+#        print para_i, " could not infect ", heal_i
 
 def actions_when_collision(p1,p2):
     possible_classes = [Healthy, Parazite]
@@ -246,9 +241,12 @@ class BallsContainer(Widget):
             ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
                              -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
             self.add_widget(ball)
+            ball.set_col((0.7,0,0))
+            
 
             parazite = add_one_parazite()
             balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+            
 
     #@profile
     def update(self,dt):
@@ -256,9 +254,8 @@ class BallsContainer(Widget):
         quad.reset()    #est-ce que ça sert à rien ?
 
         for i in balls_dictionnary.keys() :
-            if balls_dictionnary[i][0].get_col() != BASE_COLOR :
-                balls_dictionnary[i][0].set_col(BASE_COLOR)
-
+#            if balls_dictionnary[i][0].get_col() != BASE_COLOR and isinstance(balls_dictionnary[i][1], Healthy):
+#                balls_dictionnary[i][0].set_col(BASE_COLOR)
             pos = balls_dictionnary[i][0]
             balls_dictionnary[i][2] = [pos.x, pos.x + pos.width, pos.y, pos.y + pos.height]
 

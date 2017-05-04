@@ -53,8 +53,8 @@ def physical_collision2(ball, other_ball) :
         other_ball.velocity_x = -math.sin(angle)*o_vel
         other_ball.velocity_y = math.cos(angle)*o_vel
 
-        ball.set_col((1,0,1))
-        other_ball.set_col((1,0,1))
+#        ball.set_col((1,0,1))
+#        other_ball.set_col((1,0,1))
         
         return True
 
@@ -90,8 +90,8 @@ def physical_collision(balls, other_balls, i, j) :
         other_balls[j].velocity_x = -math.sin(angle)*o_vel
         other_balls[j].velocity_y = math.cos(angle)*o_vel
 
-        balls[i].set_col((1,0,1))
-        other_balls[j].set_col((1,0,1))
+#        balls[i].set_col((1,0,1))
+#        other_balls[j].set_col((1,0,1))
         
         return True
 
