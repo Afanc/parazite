@@ -47,22 +47,21 @@ class Parazite(Individual):
     def set_New_Vir(self,r) : 
         new_fitness = self.getTransmRate() + self.getRecovProb() + r
 
-        diff = r - self.getVir()
-        s = sign(diff)
+        diff = r - self.getVir()    #vir monte, diff > 0
+        s = sign(diff)              #et donc s = 1
 
         x = 0
         y = 0
-
         for i in range(0,5) :
             if(new_fitness > MAX_FITNESS):
        
-                max_x = (1 - s)/2 + s*self.getTransmRate()
-                max_y = (1 - s)/2 + s*self.getRecovProb()
+                max_x = (1 - s)/2 + s*self.getTransmRate()      #et donc max_x = getTransmRate
+                max_y = (1 - s)/2 + s*self.getRecovProb()       #et max_y= getRec
 
                 x = uniform(0, max_x) 	#on définit des pertes/gains aléatoires
                 y = uniform(0, max_y) 
 
-                new_fitness = r + self.getTransmRate()-x + self.getRecovProb()-y
+                new_fitness = r + self.getTransmRate()-x + self.getRecovProb()-y    #et on perd les 2
             else :
                 break
 
@@ -70,8 +69,9 @@ class Parazite(Individual):
             return
 	self.setVir(r)
 
-        self.setTransmRate(self.getTransmRate() - x)
-        self.setRecovProb(self.getRecovProb() - y)
+        self.setTransmRate(max(min(self.getTransmRate() - x, 1),0))
+        self.setRecovProb(max(min(self.getRecovProb() - y, 1),0))
+
     #if transm rate goes up, vir goes up, recov goes down
     def set_New_TransmRate(self, r) :
         new_fitness = self.getVir() + self.getRecovProb() + r
@@ -98,8 +98,8 @@ class Parazite(Individual):
             return
 	self.setTransmRate(r)
 
-        self.setVir(self.getVir() - x)
-        self.setRecovProb(self.getRecovProb() - y)
+        self.setVir(max(min(self.getVir() - x,1),0))
+        self.setRecovProb(max(min(self.getRecovProb() - y,1),0))
 
     #if recov rate goes up, vir goes down, transm rate goes down
     def set_New_RecovProb(self, r) :
@@ -128,22 +128,23 @@ class Parazite(Individual):
             return 
 	self.setRecovProb(r)
 
-        self.setVir(self.getVir() - x)
-        self.setTransmRate(self.getTransmRate() - y)
+        self.setVir(max(min(self.getVir() - x,1),0))
+        self.setTransmRate(max(min(self.getTransmRate() - y,1),0))
 
     def getTotalFitness(self) :
         return self.getVir() + self.getRecovProb() + self.getTransmRate()
 
+"""
 test = Parazite(0.7, 0.1, 0, 'ID23')
 print 'before'
 print test
-print test.getTotalFitness()
 for i in range(0,500) :
-    test.setVir(uniform(0,1))
-    test.setTransmRate(uniform(0,1))
-    test.setRecovProb(uniform(0,1))
+    test.set_New_Vir(uniform(0,1))
+    test.set_New_RecovProb(uniform(0,1))
+    test.set_New_TransmRate(uniform(0,1))
 print test
 
 
     #idées
     #survie après mort/prob_transm/def_anti_para/taille/prob_manip/
+"""
