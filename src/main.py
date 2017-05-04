@@ -121,15 +121,13 @@ def reproduce(root,p):
 
 def guerison(p):
     if isinstance(p, Parazite):
+        list_of_healthies.append(Healthy(p.getIdd()))
         if uniform(0,1) < TRANSMISSION_OF_RESISTANCE_PROB:
-            list_of_healthies.append(Healthy(p.getIdd()))
             list_of_healthies[-1].setResistance([p.getVir(), p.getTransmRate(),p.getRecovProb()])
-        else :
-            list_of_healthies.append(Healthy(p.getIdd()))
 
         list_of_parazites.remove(p)
         balls_dictionnary[p.getIdd()][1] = list_of_healthies[-1]
-        #balls_dictionnary[p.getIdd()][0].set_col(SPEC_BASE_COLOR)
+        balls_dictionnary[p.getIdd()][0].set_col(BASE_COLOR)
 
 def cure_the_lucky_ones(dt) :
     for i in iter(list_of_parazites):
@@ -166,6 +164,12 @@ def random_mutation_on_infection(para_i) :
     return False
 
 def infect_him(para_i,heal_i) :
+    #resistant = False 
+    #testing_par = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
+    #for i in heal_i.getResistances() :
+    #    if i == testing_par :
+    #        resistant = True
+    #if not resistant or parazites_reproducing:
     temp_par = list(para_i.getPar())
     temp_par.append(para_i.getIdd())
     list_of_parazites.append(Parazite(para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), heal_i.getIdd(), temp_par))
@@ -173,13 +177,7 @@ def infect_him(para_i,heal_i) :
     balls_dictionnary[heal_i.getIdd()][1] = list_of_parazites[-1]
     balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(balls_dictionnary[para_i.getIdd()][0].get_col())
 
-    resistant = False
-    testing_par = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
-    for i in heal_i.getResistances() :
-        if i == testing_par :
-            resistant = True
-
-    if random_mutation_on_infection(list_of_parazites[-1]) and not resistant :
+    if random_mutation_on_infection(list_of_parazites[-1]) :
         x = randint(0,2)
         random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
         random_color[x] = min(uniform(0,1)*uniform(0,1), 1)
