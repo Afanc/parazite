@@ -9,18 +9,19 @@ class Healthy(Individual):  #est de type Individual
     #Constructeur
     def __init__(self,idd, res = []):
         Individual.__init__(self, idd)     #et donc quand je crée un healthy, je crée un individu
-        self.resistances = res             #c'est un attribut que seuls les healthys ont uniquement
+        self.resistances = res
 
     def __str__(self) :
         return 'ID : ' +str(self.idd) +'\nresistance : '+str(self.resistances)\
 
 
     def addResistance(self, idd) :
-        if idd not in self.Resistances:
+        if idd not in self.resistances:
             resistances.append(idd)
 
-    def setResistances(self, res) :
-        self.resistances = res
+    def setResistance(self, res) :
+        if res != [] and res not in self.resistances:
+            self.resistances.append(res)
 
     def getResistances(self) :
         return self.resistances

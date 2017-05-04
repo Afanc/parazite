@@ -62,19 +62,16 @@ class Parazite(Individual):
                 x = uniform(0, max_x) 	#on définit des pertes/gains aléatoires
                 y = uniform(0, max_y) 
 
-                if r + self.getTransmRate()-s*x + self.getRecovProb()-s*y > MAX_FITNESS : 
-                    norm = r/(x + y) 	#on essaie de normaliser
-                    x = min(norm*x, max_x) 	#au cas où on dépasse la valeur max avec la normalisation
-                    y = min(norm*y, max_y)
-
-                new_fitness = r + self.getTransmRate()-x*s + self.getRecovProb()-y*s
+                new_fitness = r + self.getTransmRate()-x + self.getRecovProb()-y
+            else :
+                break
 
         if new_fitness > MAX_FITNESS:
             return
 	self.setVir(r)
-        self.setTransmRate(self.getTransmRate() - s*x)
-        self.setRecovProb(self.getRecovProb() - s*y)
 
+        self.setTransmRate(self.getTransmRate() - x)
+        self.setRecovProb(self.getRecovProb() - y)
     #if transm rate goes up, vir goes up, recov goes down
     def set_New_TransmRate(self, r) :
         new_fitness = self.getVir() + self.getRecovProb() + r
@@ -93,19 +90,16 @@ class Parazite(Individual):
                 x = uniform(0, max_x) 	#on définit des pertes/gains aléatoires
                 y = uniform(0, max_y) 
 
-                if r + self.getVir()-s*x + self.getRecovProb()-s*y > MAX_FITNESS : 
-                    norm = r/(x + y) 	#on essaie de normaliser
-                    x = min(norm*x, max_x) 	#au cas où on dépasse la valeur max avec la normalisation
-                    y = min(norm*y, max_y)
-
-                new_fitness = r + self.getVir()-x*s + self.getRecovProb()-y*s
+                new_fitness = r + self.getVir()-x + self.getRecovProb()-y
+            else :
+                break
 
         if new_fitness > MAX_FITNESS: 
             return
 	self.setTransmRate(r)
-        self.setVir(self.getVir() - s*x)
-        self.setRecovProb(self.getRecovProb() - s*y)
 
+        self.setVir(self.getVir() - x)
+        self.setRecovProb(self.getRecovProb() - y)
 
     #if recov rate goes up, vir goes down, transm rate goes down
     def set_New_RecovProb(self, r) :
@@ -126,52 +120,29 @@ class Parazite(Individual):
                 x = uniform(0, max_x) 	#on définit des pertes/gains aléatoires
                 y = uniform(0, max_y) 
 
-                if r + self.getVir()-s*x + self.getTransmRate()-s*y > MAX_FITNESS : #si on ne compense pas le gain de fitness
-                    norm = r/(x + y) 	#on essaie de normaliser
-                    x = min(norm*x, max_x) 	#au cas où on dépasse la valeur max avec la normalisation
-                    y = min(norm*y, max_y)
-
-                new_fitness = r + self.getVir()-x*s + self.getTransmRate()-y*s
+                new_fitness = r + self.getVir()-x + self.getTransmRate()-y
             else :
                 break
 
         if new_fitness > MAX_FITNESS :
             return 
 	self.setRecovProb(r)
-        self.setVir(self.getVir() - s*x)
-        self.setTransmRate(self.getTransmRate() - s*y)
+
+        self.setVir(self.getVir() - x)
+        self.setTransmRate(self.getTransmRate() - y)
 
     def getTotalFitness(self) :
         return self.getVir() + self.getRecovProb() + self.getTransmRate()
-
-        
-"""
-test = Parazite(1,1, 0.7, 0.1, 0, 'ID23')
+"""       
+test = Parazite(0.7, 0.1, 0, 'ID23')
 print 'before'
 print test
 print test.getTotalFitness()
-test.set_New_RecovProb(0.9)
+for i in range(0,500) :
+    test.setVir(uniform(0,1))
+    test.setTransmRate(uniform(0,1))
+    test.setRecovProb(uniform(0,1))
 print test
-print test.getTotalFitness()
-test.set_New_RecovProb(0.2)
-test.set_New_RecovProb(0.3)
-test.set_New_RecovProb(0.4)
-test.set_New_RecovProb(0.5)
-print test
-print test.getTotalFitness()
-
-test.set_New_TransmRate(0.2)
-test.set_New_TransmRate(0.3)
-test.set_New_TransmRate(0.4)
-test.set_New_TransmRate(0.5)
-test.set_New_TransmRate(0.6)
-test.set_New_Vir(0.5)
-test.set_New_Vir(0.4)
-test.set_New_Vir(0.3)
-test.set_New_Vir(0.2)
-test.set_New_Vir(0.1)
-print test
-print test.getTotalFitness()
 
 
     #idées

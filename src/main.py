@@ -18,7 +18,7 @@ seed(45)
 dico_id = {}    #on ajoute les id de individu dans le dico
 list_of_freed_id = [] # on ajoute les id des mort à cette liste
 
-list_of_healhies = []
+list_of_healthies = []
 list_of_parazites = []
 
 balls_dictionnary = {}  #key:[widget_ball,individual, position]
@@ -37,8 +37,8 @@ def add_healthy(nb_sains = NB_SAINS):
         try:
             temp = create_id()
             if temp not in dico_id.keys():
-                list_of_healhies.append(Healthy(temp))
-                dico_id[temp] = list_of_healhies[-1]
+                list_of_healthies.append(Healthy(temp))
+                dico_id[temp] = list_of_healthies[-1]
             else :
                 print temp, 'exists in ', dico_id.keys(), "in add_healthy function"
         except: 
@@ -48,9 +48,9 @@ def add_one_healthy(res=[]) :
     try:
         temp = create_id()
         if temp not in dico_id.keys():
-            list_of_healhies.append(Healthy(temp,res))
-            dico_id[temp] = list_of_healhies[-1]
-            return list_of_healhies[-1]
+            list_of_healthies.append(Healthy(temp,res))
+            dico_id[temp] = list_of_healthies[-1]
+            return list_of_healthies[-1]
         else :
             print temp, 'exists in ', dico_id.keys(), "in add_healthy function"
     except: 
@@ -89,7 +89,7 @@ def kill(root,p):
         print "%s doit être un individu pour être tué" % str(p)
         return
     elif isinstance(p, Healthy):
-        list_of_healhies.remove(p)              #d'abord on gère les idd
+        list_of_healthies.remove(p)              #d'abord on gère les idd
     elif isinstance(p, Parazite):
         list_of_parazites.remove(p)
 
@@ -115,20 +115,21 @@ def reproduce(root,p):
 
     if isinstance(p, Parazite):
         infect_him(p, balls_dictionnary[healthy.getIdd()][1])
-    if isinstance(p, Healthy):
-        list_of_healhies[-1].setResistances(p.getResistances())
+    if isinstance(p, Healthy) :
+        for i in p.getResistances() :
+            list_of_healthies[-1].setResistance(i)
         
 
 def guerison(p):
     if isinstance(p, Parazite):
         if uniform(0,1) < TRANSMISSION_OF_RESISTANCE_PROB:
-            list_of_healhies.append(Healthy(p.getIdd(), [p.getVir(), p.getTransmRate(),p.getRecovProb()]))
-            print list_of_healhies[-1]
+            list_of_healthies.append(Healthy(p.getIdd()))
+            list_of_healthies[-1].setResistance([p.getVir(), p.getTransmRate(),p.getRecovProb()])
         else :
-            list_of_healhies.append(Healthy(p.getIdd()))
+            list_of_healthies.append(Healthy(p.getIdd()))
 
         list_of_parazites.remove(p)
-        balls_dictionnary[p.getIdd()][1] = list_of_healhies[-1]
+        balls_dictionnary[p.getIdd()][1] = list_of_healthies[-1]
         balls_dictionnary[p.getIdd()][0].set_col(BASE_COLOR)
 
 def cure_the_lucky_ones(dt) :
@@ -137,7 +138,7 @@ def cure_the_lucky_ones(dt) :
             guerison(i)
 
 def kill_those_who_have_to_die(root,dt) :
-    for i in list_of_healhies:
+    for i in list_of_healthies:
         if uniform(0,1) < DYING_PROB :    #! RecovProb = 1 --> aucune chance de recover
             kill(root,i)
     for i in list_of_parazites:
@@ -145,7 +146,7 @@ def kill_those_who_have_to_die(root,dt) :
             kill(root,i)
 
 def reproduce_those_you_have_to(root,dt) :
-    for i in list_of_healhies:
+    for i in list_of_healthies:
         if uniform(0,1) < REPRODUCTION_PROB :    #! RecovProb = 1 --> aucune chance de recover
             reproduce(root, i)
     for i in list_of_parazites:
@@ -169,18 +170,15 @@ def infect_him(para_i,heal_i) :
     temp_par = list(para_i.getPar())
     temp_par.append(para_i.getIdd())
     list_of_parazites.append(Parazite(para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), heal_i.getIdd(), temp_par))
-    list_of_healhies.remove(heal_i)
+    list_of_healthies.remove(heal_i)
     balls_dictionnary[heal_i.getIdd()][1] = list_of_parazites[-1]
     balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(balls_dictionnary[para_i.getIdd()][0].get_col())
 
     resistant = False
     testing_par = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
-    print '------------------'
-    print testing_par
-    print heal_i.getResistances()
-    if (testing_par in heal_i.getResistances()) :
-        resistant = True
-        print heal_i.getResistances()
+    for i in heal_i.getResistances() :
+        if i == testing_par :
+            resistant = True
 
     if random_mutation_on_infection(list_of_parazites[-1]) and not resistant :
         x = randint(0,2)
