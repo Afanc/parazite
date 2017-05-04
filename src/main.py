@@ -112,7 +112,7 @@ def reproduce(root,p):
     
     if isinstance(p, Parazite):
         infect_him(p, balls_dictionnary[healthy.getIdd()][1], parazites_reproducing=True)
-        random_mutation_on_reproduction(balls_dictionnary[list_of_parazites[-1].getIdd()][1])
+        random_mutation_on(balls_dictionnary[list_of_parazites[-1].getIdd()][1], 'reproduction')
     if isinstance(p, Healthy) :
         for i in p.getResistances() :
             list_of_healthies[-1].setResistance(i)
@@ -139,7 +139,7 @@ def cure_the_lucky_ones(dt) :
 def mutate_those_who_wish(dt) :
     for i in iter(list_of_parazites) :
         if uniform(0,1) < CHANCE_OF_MUTATION_ON_NOTHING :
-            random_mutation_on_nothing(i)
+            random_mutation_on(i,'living')
 
 def kill_those_who_have_to_die(root,dt) :
     for i in list_of_healthies:
@@ -157,41 +157,24 @@ def reproduce_those_you_have_to(root,dt) :
         if uniform(0,1) < REPRODUCTION_PROB :    #! RecovProb = 1 --> aucune chance de recover
             reproduce(root,i)
 
-def random_mutation_on_infection(para_i) :
-    old_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
-    attribute_functions = {'0':para_i.set_New_Vir, '1':para_i.set_New_TransmRate, '2':para_i.set_New_RecovProb}
+def random_mutation_on(para_i, what) :
+    chance = 0
+    fit_change = 0
+    if what == 'infection' :
+        chance = CHANCE_OF_MUTATION_ON_INFECTION
+        fit_change = MAX_FITNESS_CHANGE_ON_INFECTION
+    elif what == 'reproduction' :
+        chance = CHANCE_OF_MUTATION_ON_REPRODUCTION
+        fit_change = MAX_FITNESS_CHANGE_ON_REPRODUCTION
+    elif what == 'living' :
+        chance = CHANCE_OF_MUTATION_ON_NOTHING
+        fit_change = MAX_FITNESS_CHANGE_ON_NOTHING
 
-    if uniform(0,1) < CHANCE_OF_MUTATION_ON_INFECTION :      #prob. de mutation
-        rand_mod = (randint(0,1)*2-1)*(1+uniform(0, MAX_FITNESS_CHANGE_ON_INFECTION))    #modificateur valant au max 1+0.2 (p. ex)
-        rand_index = randint(0,2)
-        new_value = max(min(old_attributes[rand_index] * rand_mod, 1),-1)   #new attribute = 1.2*old attribute (au max)
-        attribute_functions[str(rand_index)](new_value)                     #on appelle la fonction correspondante
-
-        return True
-    return False
-
-def random_mutation_on_nothing(para_i) :
-    if uniform(0,1) < CHANCE_OF_MUTATION_ON_NOTHING :      #prob. de mutation
-        print 'yay !'
+    if uniform(0,1) < chance:      #prob. de mutation
         old_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
         attribute_functions = {'0':para_i.set_New_Vir, '1':para_i.set_New_TransmRate, '2':para_i.set_New_RecovProb}
 
-        rand_mod = (randint(0,1)*2-1)*(1+uniform(0, MAX_FITNESS_CHANGE_ON_NOTHING))    #modificateur valant au max 1+0.2 (p. ex)
-        rand_index = randint(0,2)
-        new_value = max(min(old_attributes[rand_index] * rand_mod, 1),-1)   #new attribute = 1.2*old attribute (au max)
-        attribute_functions[str(rand_index)](new_value)                     #on appelle la fonction correspondante
-
-        x = randint(0,2)
-        random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
-        random_color[x] = min(uniform(0,1)*uniform(0,1), 1)
-        balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(tuple(random_color))
-
-def random_mutation_on_reproduction(para_i) :
-    old_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
-    attribute_functions = {'0':para_i.set_New_Vir, '1':para_i.set_New_TransmRate, '2':para_i.set_New_RecovProb}
-
-    if uniform(0,1) < CHANCE_OF_MUTATION_ON_REPRODUCTION :      #prob. de mutation
-        rand_mod = (randint(0,1)*2-1)*(1+uniform(0, MAX_FITNESS_CHANGE_ON_REPRODUCTION))    #modificateur valant au max 1+0.2 (p. ex)
+        rand_mod = (randint(0,1)*2-1)*(1+uniform(0, fit_change))    #modificateur valant au max 1+0.2 (p. ex)
         rand_index = randint(0,2)
         new_value = max(min(old_attributes[rand_index] * rand_mod, 1),-1)   #new attribute = 1.2*old attribute (au max)
         attribute_functions[str(rand_index)](new_value)                     #on appelle la fonction correspondante
@@ -214,7 +197,7 @@ def infect_him(para_i,heal_i, parazites_reproducing=False) :
         balls_dictionnary[heal_i.getIdd()][1] = list_of_parazites[-1]
         balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(balls_dictionnary[para_i.getIdd()][0].get_col())
 
-        if random_mutation_on_infection(list_of_parazites[-1]) :
+        if random_mutation_on(list_of_parazites[-1], 'infection') :
             x = randint(0,2)
             random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
             random_color[x] = min(uniform(0,1)*uniform(0,1), 1)
