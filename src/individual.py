@@ -12,7 +12,7 @@ class Individual(object):   #object afin d'avoir des 'nouvelles' classes
         self.idd = idd
 
     def __str__(self):  #pseudo-overload
-        return 'ID : ' +str(self.idd) + '\ncouleur : '+str(self.color)
+        return 'ID : ' +str(self.idd)
     
     def __del__(self):
         pass

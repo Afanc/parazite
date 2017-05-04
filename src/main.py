@@ -44,11 +44,11 @@ def add_healthy(nb_sains = NB_SAINS):
         except: 
             print "could not add health: ID problem"
             
-def add_one_healthy() :
+def add_one_healthy(res=[]) :
     try:
         temp = create_id()
         if temp not in dico_id.keys():
-            list_of_healhies.append(Healthy(temp))
+            list_of_healhies.append(Healthy(temp,res))
             dico_id[temp] = list_of_healhies[-1]
             return list_of_healhies[-1]
         else :
@@ -115,12 +115,15 @@ def reproduce(root,p):
 
     if isinstance(p, Parazite):
         infect_him(p, balls_dictionnary[healthy.getIdd()][1])
-        #print balls_dictionnary[healthy.getIdd()][1].getPar()
+    if isinstance(p, Healthy):
+        list_of_healhies[-1].setResistances(p.getResistances())
+        
 
 def guerison(p):
     if isinstance(p, Parazite):
         if uniform(0,1) < TRANSMISSION_OF_RESISTANCE_PROB:
             list_of_healhies.append(Healthy(p.getIdd(), [p.getVir(), p.getTransmRate(),p.getRecovProb()]))
+            print list_of_healhies[-1]
         else :
             list_of_healhies.append(Healthy(p.getIdd()))
 
@@ -169,15 +172,21 @@ def infect_him(para_i,heal_i) :
     list_of_healhies.remove(heal_i)
     balls_dictionnary[heal_i.getIdd()][1] = list_of_parazites[-1]
     balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(balls_dictionnary[para_i.getIdd()][0].get_col())
-    if random_mutation_on_infection(list_of_parazites[-1]) :
+
+    resistant = False
+    testing_par = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
+    print '------------------'
+    print testing_par
+    print heal_i.getResistances()
+    if (testing_par in heal_i.getResistances()) :
+        resistant = True
+        print heal_i.getResistances()
+
+    if random_mutation_on_infection(list_of_parazites[-1]) and not resistant :
         x = randint(0,2)
         random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
         random_color[x] = min(uniform(0,1)*uniform(0,1), 1)
         balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(tuple(random_color))
-#    else :
-#           print temp, 'exists in ', dico_id.keys(), "in infect_him function"
-     
-#        print para_i, " could not infect ", heal_i
 
 def actions_when_collision(p1,p2):
     possible_classes = [Healthy, Parazite]
