@@ -119,8 +119,11 @@ def reproduce(root,p):
 
 def guerison(p):
     if isinstance(p, Parazite):
-        #resistance here 
-        list_of_healhies.append(Healthy(p.getIdd()))
+        if uniform(0,1) < TRANSMISSION_OF_RESISTANCE_PROB:
+            list_of_healhies.append(Healthy(p.getIdd(), [p.getVir(), p.getTransmRate(),p.RecovProb()]))
+        else :
+            list_of_healhies.append(Healthy(p.getIdd()))
+
         list_of_parazites.remove(p)
         balls_dictionnary[p.getIdd()][1] = list_of_healhies[-1]
         balls_dictionnary[p.getIdd()][0].set_col(BASE_COLOR)
@@ -128,7 +131,6 @@ def guerison(p):
 def cure_the_lucky_ones(dt) :
     for i in iter(list_of_parazites):
         if uniform(0,1) > i.getRecovProb() :    #! RecovProb = 1 --> aucune chance de recover
-            print 'happy'
             guerison(i)
 
 def kill_those_who_have_to_die(root,dt) :
@@ -161,12 +163,8 @@ def random_mutation_on_infection(para_i) :
     return False
 
 def infect_him(para_i,heal_i) :
-#   random_mutation_on_infection(para_i)
-    print para_i.getIdd(), "infect", heal_i.getIdd()
-    print "parente: ", para_i.getPar()
     temp_par = list(para_i.getPar())
     temp_par.append(para_i.getIdd())
-    print temp_par
     list_of_parazites.append(Parazite(para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), heal_i.getIdd(), temp_par))
     list_of_healhies.remove(heal_i)
     balls_dictionnary[heal_i.getIdd()][1] = list_of_parazites[-1]
