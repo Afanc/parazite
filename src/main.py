@@ -269,7 +269,7 @@ class BallsContainer(Widget):
     def update_life_and_death(self,dt):
         kill_those_who_have_to_die(self,dt)
         reproduce_those_you_have_to(self,dt)
-        cure_the_lucky_ones(dt)
+        #cure_the_lucky_ones(dt)
 
 # -------------------- balls container--------------------
 
