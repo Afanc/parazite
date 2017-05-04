@@ -69,6 +69,8 @@ class Parazite(Individual):
 
                 new_fitness = r + self.getTransmRate()-x*s + self.getRecovProb()-y*s
 
+        if new_fitness > MAX_FITNESS:
+            return
 	self.setVir(r)
         self.setTransmRate(self.getTransmRate() - s*x)
         self.setRecovProb(self.getRecovProb() - s*y)
@@ -98,6 +100,8 @@ class Parazite(Individual):
 
                 new_fitness = r + self.getVir()-x*s + self.getRecovProb()-y*s
 
+        if new_fitness > MAX_FITNESS: 
+            return
 	self.setTransmRate(r)
         self.setVir(self.getVir() - s*x)
         self.setRecovProb(self.getRecovProb() - s*y)
@@ -131,6 +135,8 @@ class Parazite(Individual):
             else :
                 break
 
+        if new_fitness > MAX_FITNESS :
+            return 
 	self.setRecovProb(r)
         self.setVir(self.getVir() - s*x)
         self.setTransmRate(self.getTransmRate() - s*y)
