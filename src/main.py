@@ -118,12 +118,12 @@ def reproduce(root,p):
         #print balls_dictionnary[healthy.getIdd()][1].getPar()
 
 def guerison(p):
-    if not isinstance(p, Individual): 
-        print "%s doit être un individu pour être tué" % str(p)
     if isinstance(p, Parazite):
+        #resistance here 
         list_of_healhies.append(Healthy(p.getIdd()))
         list_of_parazites.remove(p)
-        del p
+        balls_dictionnary[p.getIdd()][1] = list_of_healhies[-1]
+        balls_dictionnary[p.getIdd()][0].set_col(BASE_COLOR)
 
 def cure_the_lucky_ones(dt) :
     for i in iter(list_of_parazites):
@@ -272,7 +272,7 @@ class BallsContainer(Widget):
     def update_life_and_death(self,dt):
         kill_those_who_have_to_die(self,dt)
         reproduce_those_you_have_to(self,dt)
-        #cure_the_lucky_ones(dt)
+        cure_the_lucky_ones(dt)
 
 # -------------------- balls container--------------------
 
