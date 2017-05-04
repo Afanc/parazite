@@ -53,20 +53,21 @@ class Parazite(Individual):
         x = 0
         y = 0
 
-        while(new_fitness > MAX_FITNESS) :
-	    
-	    max_x = (1 - s)/2 + s*self.getTransmRate()
-	    max_y = (1 - s)/2 + s*self.getRecovProb()
+        for i in range(0,5) :
+            if(new_fitness > MAX_FITNESS):
+       
+                max_x = (1 - s)/2 + s*self.getTransmRate()
+                max_y = (1 - s)/2 + s*self.getRecovProb()
 
-            x = uniform(0, max_x) 	#on définit des pertes/gains aléatoires
-            y = uniform(0, max_y) 
+                x = uniform(0, max_x) 	#on définit des pertes/gains aléatoires
+                y = uniform(0, max_y) 
 
-	    if r + self.getTransmRate()-s*x + self.getRecovProb()-s*y > MAX_FITNESS : 
-		norm = r/(x + y) 	#on essaie de normaliser
-		x = min(norm*x, max_x) 	#au cas où on dépasse la valeur max avec la normalisation
-		y = min(norm*y, max_y)
+                if r + self.getTransmRate()-s*x + self.getRecovProb()-s*y > MAX_FITNESS : 
+                    norm = r/(x + y) 	#on essaie de normaliser
+                    x = min(norm*x, max_x) 	#au cas où on dépasse la valeur max avec la normalisation
+                    y = min(norm*y, max_y)
 
-	    new_fitness = r + self.getTransmRate()-x*s + self.getRecovProb()-y*s
+                new_fitness = r + self.getTransmRate()-x*s + self.getRecovProb()-y*s
 
 	self.setVir(r)
         self.setTransmRate(self.getTransmRate() - s*x)
@@ -82,20 +83,20 @@ class Parazite(Individual):
         x = 0
         y = 0
 
-        while(new_fitness > MAX_FITNESS) :
-	    
-	    max_x = (1 - s)/2 + s*self.getVir()
-	    max_y = (1 - s)/2 + s*self.getRecovProb()
+        for i in range(0,5) :
+            if(new_fitness > MAX_FITNESS):
+                max_x = (1 - s)/2 + s*self.getVir()
+                max_y = (1 - s)/2 + s*self.getRecovProb()
 
-            x = uniform(0, max_x) 	#on définit des pertes/gains aléatoires
-            y = uniform(0, max_y) 
+                x = uniform(0, max_x) 	#on définit des pertes/gains aléatoires
+                y = uniform(0, max_y) 
 
-	    if r + self.getVir()-s*x + self.getRecovProb()-s*y > MAX_FITNESS : 
-		norm = r/(x + y) 	#on essaie de normaliser
-		x = min(norm*x, max_x) 	#au cas où on dépasse la valeur max avec la normalisation
-		y = min(norm*y, max_y)
+                if r + self.getVir()-s*x + self.getRecovProb()-s*y > MAX_FITNESS : 
+                    norm = r/(x + y) 	#on essaie de normaliser
+                    x = min(norm*x, max_x) 	#au cas où on dépasse la valeur max avec la normalisation
+                    y = min(norm*y, max_y)
 
-	    new_fitness = r + self.getVir()-x*s + self.getRecovProb()-y*s
+                new_fitness = r + self.getVir()-x*s + self.getRecovProb()-y*s
 
 	self.setTransmRate(r)
         self.setVir(self.getVir() - s*x)
@@ -112,20 +113,23 @@ class Parazite(Individual):
         x = 0
         y = 0
 
-        while(new_fitness > MAX_FITNESS) :
-	    
-	    max_x = (1 - s)/2 + s*self.getVir()
-	    max_y = (1 - s)/2 + s*self.getTransmRate()
+        #while(new_fitness > MAX_FITNESS) :
+        for i in range(0,5) :
+            if(new_fitness > MAX_FITNESS):
+                max_x = (1 - s)/2 + s*self.getVir()
+                max_y = (1 - s)/2 + s*self.getTransmRate()
 
-            x = uniform(0, max_x) 	#on définit des pertes/gains aléatoires
-            y = uniform(0, max_y) 
+                x = uniform(0, max_x) 	#on définit des pertes/gains aléatoires
+                y = uniform(0, max_y) 
 
-	    if r + self.getVir()-s*x + self.getTransmRate()-s*y > MAX_FITNESS : #si on ne compense pas le gain de fitness
-		norm = r/(x + y) 	#on essaie de normaliser
-		x = min(norm*x, max_x) 	#au cas où on dépasse la valeur max avec la normalisation
-		y = min(norm*y, max_y)
+                if r + self.getVir()-s*x + self.getTransmRate()-s*y > MAX_FITNESS : #si on ne compense pas le gain de fitness
+                    norm = r/(x + y) 	#on essaie de normaliser
+                    x = min(norm*x, max_x) 	#au cas où on dépasse la valeur max avec la normalisation
+                    y = min(norm*y, max_y)
 
-	    new_fitness = r + self.getVir()-x*s + self.getTransmRate()-y*s
+                new_fitness = r + self.getVir()-x*s + self.getTransmRate()-y*s
+            else :
+                break
 
 	self.setRecovProb(r)
         self.setVir(self.getVir() - s*x)

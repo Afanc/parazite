@@ -115,19 +115,20 @@ def reproduce(root,p):
 
     if isinstance(p, Parazite):
         infect_him(p, balls_dictionnary[healthy.getIdd()][1])
-        print balls_dictionnary[healthy.getIdd()][1].getPar()
+        #print balls_dictionnary[healthy.getIdd()][1].getPar()
 
 def guerison(p):
     if not isinstance(p, Individual): 
         print "%s doit être un individu pour être tué" % str(p)
     if isinstance(p, Parazite):
-        list_of_healhies.append(Healthy(p.getPosition(), p.getSpeed(), p.getIdd()))
+        list_of_healhies.append(Healthy(p.getIdd()))
         list_of_parazites.remove(p)
         del p
 
 def cure_the_lucky_ones(dt) :
     for i in iter(list_of_parazites):
         if uniform(0,1) > i.getRecovProb() :    #! RecovProb = 1 --> aucune chance de recover
+            print 'happy'
             guerison(i)
 
 def kill_those_who_have_to_die(root,dt) :
@@ -229,8 +230,7 @@ class BallsContainer(Widget):
             ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
                              -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
             self.add_widget(ball)
-            ball.set_col((0.7,0,0))
-            
+            ball.set_col((uniform(0,1),uniform(0,1),0))
 
             parazite = add_one_parazite()
             balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
@@ -269,6 +269,7 @@ class BallsContainer(Widget):
     def update_life_and_death(self,dt):
         kill_those_who_have_to_die(self,dt)
         reproduce_those_you_have_to(self,dt)
+        cure_the_lucky_ones(dt)
 
 # -------------------- balls container--------------------
 
