@@ -120,7 +120,7 @@ def reproduce(root,p):
 def guerison(p):
     if isinstance(p, Parazite):
         if uniform(0,1) < TRANSMISSION_OF_RESISTANCE_PROB:
-            list_of_healhies.append(Healthy(p.getIdd(), [p.getVir(), p.getTransmRate(),p.RecovProb()]))
+            list_of_healhies.append(Healthy(p.getIdd(), [p.getVir(), p.getTransmRate(),p.getRecovProb()]))
         else :
             list_of_healhies.append(Healthy(p.getIdd()))
 
