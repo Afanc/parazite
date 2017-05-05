@@ -107,9 +107,7 @@ def kill(root,p):
         list_of_parazites.remove(p)
     
     #list_of_freed_id.append(p.getIdd())
-    #print "---------------------------------", type(p)
     del dico_id[p.getIdd()]
-    #print "---------------------------------", p.getIdd()
     #if p.getIdd() != 'ID0': #pourquoi ID0 bugge? je ne sais pas...
     root.remove_widget(balls_dictionnary[p.getIdd()][0])    #puis on enlève la widget (gui)
     del balls_dictionnary[p.getIdd()][0]                    #puis on gère le dico, on tue l'objet
@@ -138,7 +136,6 @@ def reproduce(root,p):
             list_of_healthies[-1].addResistance(i)
             #if len(list_of_healthies[-1].getResistances()) > 1 :
              #   ball.set_col(SPEC_BASE_COLOR)
-    #print "REPRODUCTION", p ,"\ndonne naissance a ",  healthy.getIdd(), "qui a ", balls_dictionnary[healthy.getIdd()][1] 
 
 def guerison(p):
     if isinstance(p, Parazite):
@@ -156,7 +153,6 @@ def guerison(p):
 def cure_the_lucky_ones(dt) :
     for i in iter(list_of_parazites):
         if uniform(0,1) > (1-BASE_CHANCE_OF_HEALING)*(1+i.getRecovProb()) :    #! RecovProb = 1 --> aucune chance de recover
-            pass
             guerison(i)
 
 def mutate_those_who_wish(dt) :
@@ -218,7 +214,8 @@ def infect_him(para_i,heal_i, parazites_reproducing=False) :
     #testing_par = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
     testing_par = para_i.getStrain()
     if testing_par in heal_i.getResistances() :
-            resistant = True
+        resistant = True
+        print "------------------- I RESISTED", heal_i.getResistances()
     if not resistant :
         temp_par = list(para_i.getPar())
         temp_par.append(para_i.getIdd())
@@ -227,9 +224,7 @@ def infect_him(para_i,heal_i, parazites_reproducing=False) :
         for i in heal_i.getResistances() :
             list_of_parazites[-1].addResistance(i)
         if heal_i.getResistances() != []:
-            print "____________________________________________________________________________________________________"
-            print "yey", list_of_parazites[-1].getResistances()
-        print " INFECTION", para_i.getIdd(),"infecte :  ", heal_i.getIdd(), "souche : ", list_of_parazites[-1].getStrain()
+            print " INFECTION", para_i.getIdd(),"infecte :  ", heal_i.getIdd(), "souche : ", list_of_parazites[-1].getStrain()
         list_of_healthies.remove(heal_i)
         balls_dictionnary[heal_i.getIdd()][1] = list_of_parazites[-1]
         balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(balls_dictionnary[para_i.getIdd()][0].get_col())
@@ -240,15 +235,31 @@ def infect_him(para_i,heal_i, parazites_reproducing=False) :
             random_color[x] = min(uniform(0,1)*uniform(0,1), 1)
             balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(tuple(random_color))
 
+def parazite_against_parazite(p1,p2) :
+    if p1.getVir() > p2.getVir() :
+        p2.setVir(p1.getVir())
+        p2.setTransmRate(p1.getTransmRate())
+        p2.setRecovProb(p1.getRecovProb())
+        balls_dictionnary[p2.getIdd()][0].set_col(balls_dictionnary[p1.getIdd()][0].get_col())
+    elif p2.getVir() > p1.getVir() :
+        p1.setVir(p2.getVir())
+        p1.setTransmRate(p2.getTransmRate())
+        p1.setRecovProb(p2.getRecovProb())
+        balls_dictionnary[p1.getIdd()][0].set_col(balls_dictionnary[p2.getIdd()][0].get_col())
+
 def actions_when_collision(p1,p2):
-    possible_classes = [Healthy, Parazite]
+    possible_classes = [Healthy, Parazite, Parazite]
     if isinstance(p1, tuple(possible_classes)) :        # si c'est l'un des deux
         possible_classes.remove(type(p1))               #on l'enlève
         if isinstance(p2, tuple(possible_classes)):     #si c'est l'autre
-            if isinstance(p2, Parazite) :
-                p1,p2 = p2,p1                           #on veut que p1 soit le parazite (lisibilité)
-            if uniform(0,1) < INFECTION_CHANCE *(1+p1.getTransmRate()) :    #là aussi, infection chance cap at 0.5
-                infect_him(p1,p2)
+            if type(p2) == type(p1) :                   #si ce sont deux parazites
+                if uniform(0,1) < PARAZITE_FIGHT_CHANCE :
+                    parazite_against_parazite(p1,p2)
+            else :
+                if isinstance(p2, Parazite) :
+                    p1,p2 = p2,p1                           #on veut que p1 soit le parazite (lisibilité)
+                if uniform(0,1) < INFECTION_CHANCE *(1+p1.getTransmRate()) :    #là aussi, infection chance cap at 0.5
+                    infect_him(p1,p2)
 
 
 
