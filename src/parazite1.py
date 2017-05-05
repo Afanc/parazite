@@ -62,8 +62,8 @@ class Parazite(Individual):
         for i in range(0,5) :
             if(new_fitness > MAX_FITNESS):
        
-                max_x = (1 - s)/2 + s*self.getTransmRate()      #et donc max_x = getTransmRate
-                max_y = (1 - s)/2 + s*self.getRecovProb()       #et max_y= getRec
+                max_x = MAX_FITNESS*(1 - s)/2 + s*self.getTransmRate()      #et donc max_x = getTransmRate
+                max_y = MAX_FITNESS*(1 - s)/2 + s*self.getRecovProb()       #et max_y= getRec
 
                 x = uniform(0, max_x) 	#on définit des pertes/gains aléatoires
                 y = uniform(0, max_y) 
@@ -91,8 +91,8 @@ class Parazite(Individual):
 
         for i in range(0,5) :
             if(new_fitness > MAX_FITNESS):
-                max_x = (1 - s)/2 + s*self.getVir()
-                max_y = (1 - s)/2 + s*self.getRecovProb()
+                max_x = MAX_FITNESS*(1 - s)/2 + s*self.getVir()
+                max_y = MAX_FITNESS*(1 - s)/2 + s*self.getRecovProb()
 
                 x = uniform(0, max_x) 	#on définit des pertes/gains aléatoires
                 y = uniform(0, max_y) 
@@ -121,8 +121,8 @@ class Parazite(Individual):
         #while(new_fitness > MAX_FITNESS) :
         for i in range(0,5) :
             if(new_fitness > MAX_FITNESS):
-                max_x = (1 - s)/2 + s*self.getVir()
-                max_y = (1 - s)/2 + s*self.getTransmRate()
+                max_x = MAX_FITNESS*(1 - s)/2 + s*self.getVir()
+                max_y = MAX_FITNESS*(1 - s)/2 + s*self.getTransmRate()
 
                 x = uniform(0, max_x) 	#on définit des pertes/gains aléatoires
                 y = uniform(0, max_y) 
