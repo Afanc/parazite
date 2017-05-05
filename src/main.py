@@ -211,8 +211,10 @@ def random_mutation_on(para_i, what) :
         
 
 def infect_him(para_i,heal_i, parazites_reproducing=False) :
+
+    if len(heal_i.getResistances()) > 0 :
+        print "^^^^^^^^^^^^^^",heal_i.getResistances()
     resistant = False 
-    #testing_par = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
     testing_par = para_i.getStrain()
     if testing_par in heal_i.getResistances() :
         resistant = True
