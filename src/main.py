@@ -16,7 +16,7 @@ from collision import *
 seed(45)
 
 dico_id = {}    #on ajoute les id de individu dans le dico
-list_of_freed_id = [] # on ajoute les id des mort à cette liste
+#list_of_freed_id = [] # on ajoute les id des mort à cette liste
 compteur_id = 1
 list_of_healthies = []
 list_of_parazites = []
@@ -144,12 +144,15 @@ def guerison(p):
     if isinstance(p, Parazite):
         list_of_healthies.append(Healthy(p.getIdd()))
         if uniform(0,1) < TRANSMISSION_OF_RESISTANCE_PROB:
+            for i in p.getResistances() :
+                list_of_healthies[-1].addResistance(i)
             list_of_healthies[-1].addResistance(p.getStrain())
             print "GUERISON de ",list_of_healthies[-1].getIdd(), " ----------------------  resistances:" , list_of_healthies[-1].getResistances()
         list_of_parazites.remove(p)
         balls_dictionnary[p.getIdd()][1] = list_of_healthies[-1]
         balls_dictionnary[p.getIdd()][0].set_col(BASE_COLOR)
-
+    else : print "pas parazite"
+    
 def cure_the_lucky_ones(dt) :
     for i in iter(list_of_parazites):
         if uniform(0,1) > (1-BASE_CHANCE_OF_HEALING)*(1+i.getRecovProb()) :    #! RecovProb = 1 --> aucune chance de recover
@@ -220,10 +223,6 @@ def infect_him(para_i,heal_i, parazites_reproducing=False) :
         temp_par = list(para_i.getPar())
         temp_par.append(para_i.getIdd())
         temp_strain = list(para_i.getStrain())
-        #print temp_strain
-        #print list_of_parazites[-1].getIdd()
-        #temp_strain.append(heal_i.getIdd())
-        #print temp_strain
         list_of_parazites.append(Parazite(para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), heal_i.getIdd(), temp_par, temp_strain))
         for i in heal_i.getResistances() :
             list_of_parazites[-1].addResistance(i)
@@ -336,8 +335,6 @@ class BallsContainer(Widget):
         mutate_those_who_wish(dt)
 
 # -------------------- balls container--------------------
-for i in range(1,10):
-    print create_id()
 
 
 
@@ -347,3 +344,34 @@ if __name__ == '__main__':
 #-----------------------------Kivy GUI-----------------------------------------------
 
 
+#test pour les résistances
+'''
+h = add_one_healthy()
+ball = Ball()
+balls_dictionnary[h.getIdd()] = [ball, h, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+p = add_one_parazite()
+balls_dictionnary[p.getIdd()] = [ball, p, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+h1 = list_of_healthies[-1]
+p1 = list_of_parazites[-1]
+
+infect_him(p1,h1)
+
+guerison(list_of_parazites[-1])
+
+print list_of_healthies[-1].getResistances()
+
+infect_him(p1, list_of_healthies[-1])
+
+print"doit etre la", list_of_healthies[-1]
+
+p2 = add_one_parazite()
+balls_dictionnary[p2.getIdd()] = [ball, p2, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+
+infect_him(p2, list_of_healthies[-1])
+print "encore par", list_of_parazites[-1].getResistances()
+
+guerison(list_of_parazites[-1])
+
+print list_of_healthies[-1].getResistances()
+
+'''

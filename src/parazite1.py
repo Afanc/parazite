@@ -20,8 +20,9 @@ class Parazite(Individual):
         return 'ID : ' +str(self.idd) +'\ncouleur : '+str(self.color)\
             +'\nvirulance : '+str(1-self.virulance) + '\ntransmission rate : '+str(self.transm_rate)\
             +'\nrecovery prob : '+str(1-self.recovery_prob)+'\nTotal Fitness : '+str(self.getTotalFitness())\
-            +'\nparenty : ' + str(self.parenty)
-
+            +'\nparenty : ' + str(self.parenty)\
+            +'\nresistances' + str(self.resistance)
+            
     def getVir(self):
         return self.virulance
 
