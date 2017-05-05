@@ -74,6 +74,13 @@ def add_one_parazite(p = None) :
 
         if temp not in dico_id.keys():
             list_of_parazites.append(Parazite(temp_vir, temp_trans, temp_recov, temp))
+            temp_strain = list(list_of_parazites[-1].getStrain())
+            #print temp_strain
+            #print list_of_parazites[-1].getIdd()
+            temp_strain.append(list_of_parazites[-1].getIdd())
+            #print temp_strain
+            list_of_parazites[-1].setStrain(temp_strain)
+            #print "bis :   ", list_of_parazites[-1].getStrain()
             dico_id[temp] = list_of_parazites[-1]
 
             return list_of_parazites[-1]
@@ -124,8 +131,8 @@ def guerison(p):
     if isinstance(p, Parazite):
         list_of_healthies.append(Healthy(p.getIdd()))
         if uniform(0,1) < TRANSMISSION_OF_RESISTANCE_PROB:
-            list_of_healthies[-1].setResistance([p.getVir(), p.getTransmRate(),p.getRecovProb()])
-
+            list_of_healthies[-1].addResistance(p.getStrain())
+            print "guerison de ",list_of_healthies[-1].getIdd(), " ----------------------  resistances:" , list_of_healthies[-1].getResistances()
         list_of_parazites.remove(p)
         balls_dictionnary[p.getIdd()][1] = list_of_healthies[-1]
         balls_dictionnary[p.getIdd()][0].set_col(BASE_COLOR)
@@ -172,27 +179,40 @@ def random_mutation_on(para_i, what) :
 
     if uniform(0,1) < chance:      #prob. de mutation
         old_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
-        attribute_functions = {'0':para_i.set_New_Vir, '1':para_i.set_New_TransmRate, '2':para_i.set_New_RecovProb}
-
+        attribute_functions = {'0':para_i.set_New_Vir, '1':para_i.set_New_TransmRate, '2':para_i.set_New_RecovProb, '3': para_i.setStrain([])}
+        
+        
         rand_mod = (randint(0,1)*2-1)*(1+uniform(0, fit_change))    #modificateur valant au max 1+0.2 (p. ex)
         rand_index = randint(0,2)
         new_value = max(min(old_attributes[rand_index] * rand_mod, 1),-1)   #new attribute = 1.2*old attribute (au max)
         attribute_functions[str(rand_index)](new_value)                     #on appelle la fonction correspondante
-
+        print "mutation ----------------- nouvelle souche: ", para_i.getIdd()
+        new_strain = para_i.getIdd()        
+        para_i.setStrain([new_strain])
+        
+        
         x = randint(0,2)
         random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
         random_color[x] = min(uniform(0,1)*uniform(0,1), 1)
         balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(tuple(random_color))
+        
 
 def infect_him(para_i,heal_i, parazites_reproducing=False) :
     resistant = False 
-    testing_par = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
+    #testing_par = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
+    testing_par = para_i.getStrain()
     if testing_par in heal_i.getResistances() :
             resistant = True
     if not resistant :
         temp_par = list(para_i.getPar())
         temp_par.append(para_i.getIdd())
-        list_of_parazites.append(Parazite(para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), heal_i.getIdd(), temp_par))
+        temp_strain = list(para_i.getStrain())
+        #print temp_strain
+        #print list_of_parazites[-1].getIdd()
+        #temp_strain.append(heal_i.getIdd())
+        #print temp_strain
+        list_of_parazites.append(Parazite(para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), heal_i.getIdd(), temp_par, temp_strain))
+        print para_i.getIdd(),"infecte :  ", heal_i.getIdd(), "souche : ", list_of_parazites[-1].getStrain()
         list_of_healthies.remove(heal_i)
         balls_dictionnary[heal_i.getIdd()][1] = list_of_parazites[-1]
         balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(balls_dictionnary[para_i.getIdd()][0].get_col())

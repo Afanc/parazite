@@ -17,7 +17,9 @@ class Healthy(Individual):  #est de type Individual
 
     def addResistance(self, idd) :
         if idd not in self.resistances:
-            resistances.append(idd)
+            temp_res = list(self.resistances)
+            temp_res.append(idd)
+            self.resistances = temp_res
 
     def setResistance(self, res) :
         if res != [] and res not in self.resistances:

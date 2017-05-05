@@ -8,12 +8,13 @@ from numpy import *
 class Parazite(Individual): 
        
     #Constructeur
-    def __init__(self, vir, rate, rec, idd, par=[]):
+    def __init__(self, vir, rate, rec, idd, par=[], strain = []):
         Individual.__init__(self, idd) 
         self.virulance = vir        #high is bad    -> we sum 1-x
         self.transm_rate = rate     #high is good   -> we sum x
         self.recovery_prob = rec    #high is bad    -> we sum 1-x
         self.parenty = par
+        self.strain = strain
         
     def __str__(self) :
         return 'ID : ' +str(self.idd) +'\ncouleur : '+str(self.color)\
@@ -42,7 +43,12 @@ class Parazite(Individual):
     def getPar(self):
         return self.parenty
         
+    def getStrain(self):
+        return self.strain
         
+    def setStrain(self, a):
+        self.strain = a
+       
     #if vir goes up, transm rate goes up, recov goes down
     def set_New_Vir(self,r) : 
         new_fitness = self.getTransmRate() + self.getRecovProb() + r
