@@ -196,9 +196,10 @@ def random_mutation_on(para_i, what) :
         
         rand_mod = (randint(0,1)*2-1)*(1+uniform(0, fit_change))    #modificateur valant au max 1+0.2 (p. ex)
         rand_index = randint(0,2)
-        new_value = max(min(old_attributes[rand_index] * rand_mod, 1),-1)   #new attribute = 1.2*old attribute (au max)
+        new_value = max(min(old_attributes[rand_index] * rand_mod, 1),0)   #new attribute = 1.2*old attribute (au max)
         attribute_functions[str(rand_index)](new_value)                     #on appelle la fonction correspondante
-        print "MUTATION ----------------- nouvelle souche: ", para_i.getIdd()
+        new_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
+        print "MUTATION ----------------- nouvelle souche: ", para_i.getIdd(), 'avant ', old_attributes, 'après', new_attributes
         new_strain = para_i.getIdd()        
         para_i.setStrain([new_strain])
         
