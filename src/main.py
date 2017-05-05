@@ -131,12 +131,14 @@ def reproduce(root,p):
     if isinstance(p, Parazite):
         infect_him(p, balls_dictionnary[healthy.getIdd()][1], parazites_reproducing=True)
         random_mutation_on(balls_dictionnary[list_of_parazites[-1].getIdd()][1], 'reproduction')
+        for i in p.getResistances() :
+            list_of_healthies[-1].addResistance(i)
     if isinstance(p, Healthy) :
         for i in p.getResistances() :
             list_of_healthies[-1].addResistance(i)
             #if len(list_of_healthies[-1].getResistances()) > 1 :
              #   ball.set_col(SPEC_BASE_COLOR)
-    print "REPRODUCTION", p ,"\ndonne naissance a ",  healthy.getIdd(), "qui a ", balls_dictionnary[healthy.getIdd()][1] 
+    #print "REPRODUCTION", p ,"\ndonne naissance a ",  healthy.getIdd(), "qui a ", balls_dictionnary[healthy.getIdd()][1] 
 
 def guerison(p):
     if isinstance(p, Parazite):
@@ -223,6 +225,11 @@ def infect_him(para_i,heal_i, parazites_reproducing=False) :
         #temp_strain.append(heal_i.getIdd())
         #print temp_strain
         list_of_parazites.append(Parazite(para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), heal_i.getIdd(), temp_par, temp_strain))
+        for i in heal_i.getResistances() :
+            list_of_parazites[-1].addResistance(i)
+        if heal_i.getResistances() != []:
+            print "____________________________________________________________________________________________________"
+            print "yey", list_of_parazites[-1].getResistances()
         print " INFECTION", para_i.getIdd(),"infecte :  ", heal_i.getIdd(), "souche : ", list_of_parazites[-1].getStrain()
         list_of_healthies.remove(heal_i)
         balls_dictionnary[heal_i.getIdd()][1] = list_of_parazites[-1]
