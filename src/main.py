@@ -134,8 +134,6 @@ def reproduce(root,p):
     if isinstance(p, Healthy) :
         for i in p.getResistances() :
             list_of_healthies[-1].addResistance(i)
-            #if len(list_of_healthies[-1].getResistances()) > 1 :
-             #   ball.set_col(SPEC_BASE_COLOR)
 
 def guerison(p):
     if isinstance(p, Parazite):
@@ -212,8 +210,6 @@ def random_mutation_on(para_i, what) :
 
 def infect_him(para_i,heal_i, parazites_reproducing=False) :
 
-    if len(heal_i.getResistances()) > 0 :
-        print "^^^^^^^^^^^^^^",heal_i.getResistances()
     resistant = False 
     testing_par = para_i.getStrain()
     if testing_par in heal_i.getResistances() :
