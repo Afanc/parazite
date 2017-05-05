@@ -7,12 +7,14 @@ from CONSTANTES import *
 class Individual(object):   #object afin d'avoir des 'nouvelles' classes
 
     #Constructeur, s'utilise : 'johnny = Individual(pos, vit, etc.)'
-    def __init__(self, idd, color = [0,0,0]):    #si color n'est pas donné : par défaut !
+    def __init__(self, idd, res = [], color = [0,0,0]):    #si color n'est pas donné : par défaut !
         self.color = color #pas besoin de tout définir à la main (on peut aussi mettre par défaut...)
         self.idd = idd
+        self.resistances = res
 
+        
     def __str__(self):  #pseudo-overload
-        return 'ID : ' +str(self.idd)
+        return 'ID : ' +str(self.idd) + "\n Resistances : " + str(self.resistances)
     
     def __del__(self):
         pass
@@ -26,6 +28,15 @@ class Individual(object):   #object afin d'avoir des 'nouvelles' classes
 
     def getIdd(self):
         return self.idd
+
+    def addResistance(self, idd) :
+        if idd not in self.resistances:
+            temp_res = list(self.resistances)
+            temp_res.append(idd)
+            self.resistances = temp_res
+            
+    def getResistances(self) :
+        return self.resistances
 
     #def setHourglass(self, h):
         #self.hourglass = h
