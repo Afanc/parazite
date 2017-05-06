@@ -16,11 +16,13 @@ from collision import *
 seed(42)
 
 dico_id = {}    #on ajoute les id de individu dans le dico
-compteur_id = 1
+balls_dictionnary = {}  #key:[widget_ball,individual, position]
+strain_dictionary = {} #souche:[liste des infectés]
+
 list_of_healthies = []
 list_of_parazites = []
 
-balls_dictionnary = {}  #key:[widget_ball,individual, position]
+compteur_id = 1
 
 def create_id():
     '''crée un nouvel id pour chaque nouveau parasite'''
@@ -45,38 +47,36 @@ def add_one_healthy() :
             
 def add_one_parazite(p = None) :
     '''ajoute un parasite'''
-    try:
-        temp = create_id()
-        if p != None :      #si pas par défaut, on reprend
-            temp_vir = p.getVir()
-            temp_trans = p.getTransmRate()
-            temp_recov = p.getRecovProb()
-        else :              #sinon on crée
-            temp_vir = uniform(0,1)
-            temp_trans = uniform(0,1)
-            temp_recov = uniform(0,1)
-            norm = BASE_FITNESS/(temp_vir + temp_trans + temp_recov)
-            temp_vir *= norm
-            temp_trans *= norm
-            temp_recov *= norm
+ #   try:
+    temp_id = create_id()
+    if p != None :      #si pas par défaut, on reprend
+        temp_vir = p.getVir()
+        temp_trans = p.getTransmRate()
+        temp_recov = p.getRecovProb()
+    else :              #sinon on crée
+        temp_vir = uniform(0,1)
+        temp_trans = uniform(0,1)
+        temp_recov = uniform(0,1)
+        norm = BASE_FITNESS/(temp_vir + temp_trans + temp_recov)
+        temp_vir *= norm
+        temp_trans *= norm
+        temp_recov *= norm
 
-        if temp not in dico_id.keys():
-            list_of_parazites.append(Parazite(temp_vir, temp_trans, temp_recov, temp))
-            temp_strain = list(list_of_parazites[-1].getStrain())
-            #print temp_strain
-            #print list_of_parazites[-1].getIdd()
-            temp_strain.append(list_of_parazites[-1].getIdd())
-            #print temp_strain
-            list_of_parazites[-1].setStrain(temp_strain)
-            #print "bis :   ", list_of_parazites[-1].getStrain()
-            dico_id[temp] = list_of_parazites[-1]
+    if temp_id not in dico_id.keys():
+        list_of_parazites.append(Parazite(temp_vir, temp_trans, temp_recov, temp_id))
+        temp_strain = list(list_of_parazites[-1].getStrain())
+        temp_strain.append(list_of_parazites[-1].getIdd())
+        temp_strain = str('Souche:' + temp_strain[0][2:])
+        list_of_parazites[-1].setStrain(temp_strain)
+        strain_dictionary[temp_strain] = [str(temp_id)]
+        
+        dico_id[temp_id] = list_of_parazites[-1]
+        return list_of_parazites[-1]
 
-            return list_of_parazites[-1]
-
-        else :
-            print temp, 'exists in ', dico_id.keys(), "in add_healthy function"
-    except: 
-        print "could not add health: ID problem"
+    else :
+        print temp, 'exists in ', dico_id.keys(), "in add_healthy function"
+   # except: 
+    #    print "could not add parazite: ID problem"
                  
 
 def kill(root,p):
@@ -91,7 +91,6 @@ def kill(root,p):
     
     #list_of_freed_id.append(p.getIdd())
     del dico_id[p.getIdd()]
-    #if p.getIdd() != 'ID0': #pourquoi ID0 bugge? je ne sais pas...
     root.remove_widget(balls_dictionnary[p.getIdd()][0])    #puis on enlève la widget (gui)
     del balls_dictionnary[p.getIdd()][0]                    #puis on gère le dico, on tue l'objet
     del balls_dictionnary[p.getIdd()]                       #on tue l'entrée dans le dico
@@ -115,6 +114,7 @@ def reproduce(root,p):
         random_mutation_on(balls_dictionnary[list_of_parazites[-1].getIdd()][1], 'reproduction')
         for i in p.getResistances() :
             list_of_healthies[-1].addResistance(i)
+        
     if isinstance(p, Healthy) :
         for i in p.getResistances() :
             list_of_healthies[-1].addResistance(i)
@@ -172,7 +172,8 @@ def random_mutation_on(para_i, what) :
     elif what == 'living' :
         chance = CHANCE_OF_MUTATION_ON_NOTHING
         fit_change = MAX_FITNESS_CHANGE_ON_NOTHING
-
+    
+        
     if uniform(0,1) < chance:      #prob. de mutation
         old_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
         attribute_functions = {'0':para_i.set_New_Vir, '1':para_i.set_New_TransmRate, '2':para_i.set_New_RecovProb, '3': para_i.setStrain([])}
@@ -184,18 +185,25 @@ def random_mutation_on(para_i, what) :
         attribute_functions[str(rand_index)](new_value)                     #on appelle la fonction correspondante
         new_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
         print "MUTATION ----------------- nouvelle souche: ", para_i.getIdd(), 'avant ', old_attributes, 'après', new_attributes
-        new_strain = para_i.getIdd()        
-        para_i.setStrain([new_strain])
-        
+        #print "souche parent", para_i.getStrain(), "  :" , para_i.getPar()
+        new_strain = para_i.getIdd()
+        new_strain = 'Souche:' + new_strain[2:]
+        para_i.setStrain(new_strain)
+        strain_dictionary[new_strain] = [para_i.getIdd()]
+        #print "souche nouvelle", para_i.getStrain(), "  :" , strain_dictionary[para_i.getStrain()]
         
         x = randint(0,2)
         random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
         random_color[x] = min(uniform(0,1)*uniform(0,1), 1)
         balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(tuple(random_color))
-        
+    
+    else:
+        #if para_i.getIdd() not in strain_dictionary[para_i.getStrain()]:
+        strain_dictionary[para_i.getStrain()].append(para_i.getIdd())
+        #print "infectes par la souche ",para_i.getStrain(), "  :" , strain_dictionary[para_i.getStrain()]
+    
 
 def infect_him(para_i,heal_i, parazites_reproducing=False) :
-
     resistant = False 
     testing_par = para_i.getStrain()
     if testing_par in heal_i.getResistances() :
@@ -204,16 +212,19 @@ def infect_him(para_i,heal_i, parazites_reproducing=False) :
     if not resistant :
         temp_par = list(para_i.getPar())
         temp_par.append(para_i.getIdd())
-        temp_strain = list(para_i.getStrain())
+        temp_strain = para_i.getStrain()
         list_of_parazites.append(Parazite(para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb(), heal_i.getIdd(), temp_par, temp_strain))
         for i in heal_i.getResistances() :
             list_of_parazites[-1].addResistance(i)
-        if heal_i.getResistances() != []:
+        if True:
             print " INFECTION", para_i.getIdd(),"infecte :  ", heal_i.getIdd(), "souche : ", list_of_parazites[-1].getStrain()
         list_of_healthies.remove(heal_i)
         balls_dictionnary[heal_i.getIdd()][1] = list_of_parazites[-1]
         balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(balls_dictionnary[para_i.getIdd()][0].get_col())
 
+        if parazites_reproducing == True:
+            #print "parasite repro!!!", para_i.getIdd(), ": ", heal_i.getIdd()
+            pass
         if random_mutation_on(list_of_parazites[-1], 'infection') :
             x = randint(0,2)
             random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
@@ -226,11 +237,16 @@ def parazite_against_parazite(p1,p2) :
         p2.setTransmRate(p1.getTransmRate())
         p2.setRecovProb(p1.getRecovProb())
         balls_dictionnary[p2.getIdd()][0].set_col(balls_dictionnary[p1.getIdd()][0].get_col())
+        p2.setStrain(p1.getStrain())
+        strain_dictionary[p1.getStrain()].append(p2.getIdd())
     elif p2.getVir() > p1.getVir() :
         p1.setVir(p2.getVir())
         p1.setTransmRate(p2.getTransmRate())
         p1.setRecovProb(p2.getRecovProb())
         balls_dictionnary[p1.getIdd()][0].set_col(balls_dictionnary[p2.getIdd()][0].get_col())
+        p1.setStrain(p2.getStrain())
+        strain_dictionary[p2.getStrain()].append(p1.getIdd())
+        
 
 def actions_when_collision(p1,p2):
     possible_classes = [Healthy, Parazite, Parazite]
@@ -378,5 +394,33 @@ print "encore par", list_of_parazites[-1].getResistances()
 guerison(list_of_parazites[-1])
 
 print list_of_healthies[-1].getResistances()
+'''
 
+#test pour le dico de souches
+'''
+#infection
+h = add_one_healthy() #ID1
+ball = Ball()
+balls_dictionnary['ID1'] = [ball, h, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+p = add_one_parazite()
+balls_dictionnary[p.getIdd()] = [ball, p, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+p1 = balls_dictionnary['ID2'][1]
+h1 = balls_dictionnary['ID1'][1]
+print p1.getStrain()
+infect_him(p1, h1)
+h1 = balls_dictionnary['ID1'][1]
+
+print type(h1)
+print len(list_of_parazites)
+print len(list_of_healthies)
+
+p2 = add_one_parazite()
+balls_dictionnary[p2.getIdd()] = [ball, p2, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+list_of_parazites[-1].setVir(0)
+print list_of_parazites[-1].getStrain()
+parazite_against_parazite(balls_dictionnary['ID2'][1], balls_dictionnary['ID3'][1])
+print list_of_parazites[-1].getStrain()
+print strain_dictionary[balls_dictionnary['ID2'][1].getStrain()]
+
+reproduce(dt, balls_dictionnary['ID2'][1])
 '''
