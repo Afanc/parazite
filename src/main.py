@@ -13,7 +13,7 @@ from datetime import datetime
 from quadtree import Quadtree
 from collision import *
 
-seed(45)
+seed(42)
 
 dico_id = {}    #on ajoute les id de individu dans le dico
 #list_of_freed_id = [] # on ajoute les id des mort à cette liste
