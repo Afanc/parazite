@@ -11,7 +11,15 @@
         color: 0, 0, 0, 1
         top: root.top
         font_size: 36
-        text: str(len(root.children) - 1)
+        text: str(root.num_healthies)
+
+    Label:
+        color: 0, 0, 0, 1
+        right: root.right
+        top: root.top
+        font_size: 36
+        text: str(root.num_parazites)
+
 
 <Ball>:
     size: 15, 15

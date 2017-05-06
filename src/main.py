@@ -285,6 +285,8 @@ class mainApp(App):
 
 class BallsContainer(Widget):
     """Class for balls container, a main widget."""
+    num_healthies = NumericProperty(0)
+    num_parazites = NumericProperty(0)
     def start_balls(self,dt):
         for i in range(0,NB_SAINS):
             ball = Ball()
@@ -343,6 +345,13 @@ class BallsContainer(Widget):
         reproduce_those_you_have_to(self,dt)
         cure_the_lucky_ones(dt)
         mutate_those_who_wish(dt)
+        self.update_numbers()
+
+    def update_numbers(self) :
+        self.num_parazites = len(list_of_parazites)
+        self.num_healthies = len(list_of_healthies)
+
+
 
 # -------------------- balls container--------------------
 
