@@ -16,7 +16,6 @@ from collision import *
 seed(42)
 
 dico_id = {}    #on ajoute les id de individu dans le dico
-#list_of_freed_id = [] # on ajoute les id des mort à cette liste
 compteur_id = 1
 list_of_healthies = []
 list_of_parazites = []
@@ -24,33 +23,15 @@ list_of_parazites = []
 balls_dictionnary = {}  #key:[widget_ball,individual, position]
 
 def create_id():
+    '''crée un nouvel id pour chaque nouveau parasite'''
     global compteur_id
     idd = "ID" + str(compteur_id)
     compteur_id += 1
-    '''
-    if len(list_of_freed_id) == 0:
-        idd = "ID" + str(compteur_id)
-        compteur_id += 1
-        #regarder si la clé idd est unique dans le dico
-    else: 
-        idd = list_of_freed_id[-1]
-        list_of_freed_id.remove(idd)'''
+    
     return idd
     
-def add_healthy(nb_sains = NB_SAINS):
-    for i in range(nb_sains):
-        try:
-            temp = create_id()
-            if temp not in dico_id.keys():
-                list_of_healthies.append(Healthy(temp))
-                #print list_of_healthies[-1]
-                dico_id[temp] = list_of_healthies[-1]
-            else :
-                print temp, 'exists in ', dico_id.keys(), "in add_healthy function"
-        except: 
-            print "could not add health: ID problem"
-            
 def add_one_healthy() :
+    '''ajoute une individu sain'''
     try:
         temp = create_id()
         if temp not in dico_id.keys():
@@ -63,6 +44,7 @@ def add_one_healthy() :
         print "could not add health: ID problem"
             
 def add_one_parazite(p = None) :
+    '''ajoute un parasite'''
     try:
         temp = create_id()
         if p != None :      #si pas par défaut, on reprend
@@ -98,6 +80,7 @@ def add_one_parazite(p = None) :
                  
 
 def kill(root,p):
+    '''tue un individu'''
     if not isinstance(p, Individual): 
         print "%s doit être un individu pour être tué" % str(p)
         return
@@ -115,6 +98,7 @@ def kill(root,p):
     del p                                                   #et enfin on tue l'objet
 
 def reproduce(root,p):
+    '''duplique un individu'''
     ball = Ball()
     x = uniform(0,1)
     ball.center = (balls_dictionnary[p.getIdd()][0].center[0] + x, balls_dictionnary[p.getIdd()][0].center[1] + (1-x))
@@ -136,6 +120,7 @@ def reproduce(root,p):
             list_of_healthies[-1].addResistance(i)
 
 def guerison(p):
+    '''gueris un parasite'''
     if isinstance(p, Parazite):
         list_of_healthies.append(Healthy(p.getIdd()))
         if uniform(0,1) < TRANSMISSION_OF_RESISTANCE_PROB:
@@ -149,6 +134,7 @@ def guerison(p):
     else : print "pas parazite"
     
 def cure_the_lucky_ones(dt) :
+
     for i in iter(list_of_parazites):
         if uniform(0,1) > (1-BASE_CHANCE_OF_HEALING)*(1+i.getRecovProb()) :    #! RecovProb = 1 --> aucune chance de recover
             guerison(i)
