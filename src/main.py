@@ -113,8 +113,11 @@ def reproduce(root,p):
     if isinstance(p, Parazite):
         infect_him(p, balls_dictionnary[healthy.getIdd()][1], parazites_reproducing=True)
         random_mutation_on(balls_dictionnary[list_of_parazites[-1].getIdd()][1], 'reproduction')
-        for i in p.getResistances() :
-            list_of_healthies[-1].addResistance(i)
+        try :
+            for i in p.getResistances() :
+                list_of_healthies[-1].addResistance(i)
+        except :
+            print "\n _________________________________________________\nl'erreur ligne 116 !\n______________________________________________\n"
         
     if isinstance(p, Healthy):
         if uniform(0,1) > GENERATION_RESISTANCE:
@@ -129,7 +132,7 @@ def guerison(p):
             for i in p.getResistances() :
                 list_of_healthies[-1].addResistance(i)
             list_of_healthies[-1].addResistance(p.getStrain())
-            print "GUERISON de ",list_of_healthies[-1].getIdd(), " ----------------------  resistances:" , list_of_healthies[-1].getResistances()
+            #print "GUERISON de ",list_of_healthies[-1].getIdd(), " ----------------------  resistances:" , list_of_healthies[-1].getResistances()
         list_of_parazites.remove(p)
         balls_dictionnary[p.getIdd()][1] = list_of_healthies[-1]
         balls_dictionnary[p.getIdd()][0].set_col(BASE_COLOR)
@@ -192,7 +195,7 @@ def random_mutation_on(para_i, what) :
             dico_id[temp_idd] = dico_id[para_i.getIdd()]            
             del dico_id[para_i.getIdd()]
             para_i.setIdd(temp_idd)
-            print "---------------------------------------------------LIVING MUTATION", para_i.getIdd()
+            #print "---------------------------------------------------LIVING MUTATION", para_i.getIdd()
             
         #nouvelle souche
         new_strain = para_i.getIdd()
@@ -204,13 +207,15 @@ def random_mutation_on(para_i, what) :
         
         x = randint(0,2)
         random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
-        random_color[x] = min(uniform(0,1)*uniform(0,1), 1)
+        random_color[x] = max(min(uniform(-1,1)+random_color[x], 1),0)
         balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(tuple(random_color))
     
     else:
         if what == 'infection':
-            print "ajoute ", para_i.getIdd(),"dans", para_i.getStrain(), " car ", what
-            strain_dictionary[para_i.getStrain()][1].append(para_i.getIdd())
+
+            #print "ajoute ", para_i.getIdd(),"dans", para_i.getStrain(), " car ", what
+            strain_dictionary[para_i.getStrain()[1].append(para_i.getIdd())
+
         
 
 def infect_him(para_i,heal_i, parazites_reproducing=False) :
@@ -227,7 +232,7 @@ def infect_him(para_i,heal_i, parazites_reproducing=False) :
         for i in heal_i.getResistances() :
             list_of_parazites[-1].addResistance(i)
         
-        print " INFECTION", para_i.getIdd(),"infecte :  ", heal_i.getIdd(), "souche : ", list_of_parazites[-1].getStrain()
+        #print " INFECTION", para_i.getIdd(),"infecte :  ", heal_i.getIdd(), "souche : ", list_of_parazites[-1].getStrain()
         list_of_healthies.remove(heal_i)
         balls_dictionnary[heal_i.getIdd()][1] = list_of_parazites[-1]
         balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(balls_dictionnary[para_i.getIdd()][0].get_col())
