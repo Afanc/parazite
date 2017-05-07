@@ -213,10 +213,8 @@ def random_mutation_on(para_i, what) :
     else:
         if what == 'infection':
 
-            #print "ajoute ", para_i.getIdd(),"dans", para_i.getStrain(), " car ", what
             strain_dictionary[para_i.getStrain()][1].append(para_i.getIdd())
 
-        
 
 def infect_him(para_i,heal_i, parazites_reproducing=False) :
     resistant = False 
