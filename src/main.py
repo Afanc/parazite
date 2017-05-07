@@ -9,6 +9,7 @@ from kivy.clock import Clock
 from kivy.properties import NumericProperty, ReferenceListProperty, ListProperty
 from kivy.vector import Vector
 from kivy.uix.widget import Widget
+from kivy.core.window import Window
 from datetime import datetime
 from quadtree import Quadtree
 from collision import *
@@ -290,8 +291,8 @@ class mainApp(App):
         Clock.schedule_once(root.start_balls,1)         #on attend que la fenêtre soit lancée
         Clock.schedule_interval(root.update, DELTA_TIME)
         Clock.schedule_interval(root.update_life_and_death, 60*DELTA_TIME)    #ça ça marche
+        Window.bind(on_key_down=root.KeyboardShortcut)                      #pour le clavier
         return root
-
 
 #-----------------------Main--------------------------------------
 
@@ -299,6 +300,7 @@ class mainApp(App):
 
 class BallsContainer(Widget):
     """Class for balls container, a main widget."""
+    pause = False
     num_healthies = NumericProperty(0)
     num_parazites = NumericProperty(0)
     def start_balls(self,dt):
@@ -367,8 +369,18 @@ class BallsContainer(Widget):
         self.num_parazites = len(list_of_parazites)
         self.num_healthies = len(list_of_healthies)
 
+    def on_pause(self):
+        Clock.unschedule(self.update)
+        Clock.unschedule(self.update_life_and_death)
+        return True
+
+    def on_resume(self):
+        Clock.schedule_interval(self.update, DELTA_TIME)
+        Clock.schedule_interval(self.update_life_and_death, 60*DELTA_TIME)
+
     def on_touch_down(self, touch):
-        print "salut"
+        if not self.pause :
+            return
         listx = []
         listy = []
         for i in strain_dictionary.keys():
@@ -378,6 +390,16 @@ class BallsContainer(Widget):
         plt.ylabel('virulence')
         plt.show()
         return 
+
+    def KeyboardShortcut(self, window, keycode, *args) :
+        if keycode == 32 and not self.pause:              #SPACE - pour ça je rajoute un print keycode avant et check le int
+            self.on_pause()
+            self.pause = True
+
+        elif keycode == 32 and self.pause :
+            self.on_resume()
+            self.pause = False
+
 
 # -------------------- balls container--------------------
 
