@@ -214,7 +214,7 @@ def random_mutation_on(para_i, what) :
         if what == 'infection':
 
             #print "ajoute ", para_i.getIdd(),"dans", para_i.getStrain(), " car ", what
-            strain_dictionary[para_i.getStrain()[1].append(para_i.getIdd())
+            strain_dictionary[para_i.getStrain()][1].append(para_i.getIdd())
 
         
 
