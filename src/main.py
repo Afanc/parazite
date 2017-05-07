@@ -301,6 +301,7 @@ class mainApp(App):
 class BallsContainer(Widget):
     """Class for balls container, a main widget."""
     pause = False
+    faster_events = []
     num_healthies = NumericProperty(0)
     num_parazites = NumericProperty(0)
     def start_balls(self,dt):
@@ -399,6 +400,16 @@ class BallsContainer(Widget):
         elif keycode == 32 and self.pause :
             self.on_resume()
             self.pause = False
+
+        elif keycode == 275 :           #right
+            self.faster_events.append([Clock.schedule_interval(self.update, DELTA_TIME), Clock.schedule_interval(self.update_life_and_death, 60*DELTA_TIME)])
+
+        elif keycode == 276 :
+            if len(self.faster_events)>0 :
+                self.faster_events[-1][0].cancel()
+                self.faster_events[-1][1].cancel()
+                self.faster_events.pop()
+          
 
 
 # -------------------- balls container--------------------
