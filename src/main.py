@@ -12,12 +12,13 @@ from kivy.uix.widget import Widget
 from datetime import datetime
 from quadtree import Quadtree
 from collision import *
+import matplotlib.pyplot as plt
 
 seed(42)
 
 dico_id = {}    #on ajoute les id de individu dans le dico
 balls_dictionnary = {}  #key:[widget_ball,individual, position]
-strain_dictionary = {} #souche:[liste des infectés]
+strain_dictionary = {} #{souche:[vir,transmission, guérison][liste des infectés]}
 
 list_of_healthies = []
 list_of_parazites = []
@@ -68,7 +69,7 @@ def add_one_parazite(p = None) :
             temp_strain.append(list_of_parazites[-1].getIdd())
             temp_strain = str('Souche:' + temp_strain[0][2:])
             list_of_parazites[-1].setStrain(temp_strain)
-            strain_dictionary[temp_strain] = [str(temp_id)]
+            strain_dictionary[temp_strain] = [[temp_vir, temp_trans, temp_recov],[str(temp_id)]]
         
             dico_id[temp_id] = list_of_parazites[-1]
             return list_of_parazites[-1]
@@ -115,9 +116,10 @@ def reproduce(root,p):
         for i in p.getResistances() :
             list_of_healthies[-1].addResistance(i)
         
-    if isinstance(p, Healthy) :
-        for i in p.getResistances() :
-            list_of_healthies[-1].addResistance(i)
+    if isinstance(p, Healthy):
+        if uniform(0,1) > GENERATION_RESISTANCE:
+            for i in p.getResistances():
+                list_of_healthies[-1].addResistance(i)
 
 def guerison(p):
     '''gueris un parasite'''
@@ -196,7 +198,7 @@ def random_mutation_on(para_i, what) :
         new_strain = para_i.getIdd()
         new_strain = 'Souche:' + new_strain[2:]
         para_i.setStrain(new_strain)
-        strain_dictionary[new_strain] = [para_i.getIdd()]
+        strain_dictionary[new_strain] = [[para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb],[para_i.getIdd()]]
         if what == 'living':
             print  "________________ bug?", para_i.getIdd(),"  ", para_i.getStrain()
         
@@ -208,7 +210,7 @@ def random_mutation_on(para_i, what) :
     else:
         if what == 'infection':
             print "ajoute ", para_i.getIdd(),"dans", para_i.getStrain(), " car ", what
-            strain_dictionary[para_i.getStrain()].append(para_i.getIdd())
+            strain_dictionary[para_i.getStrain()][1].append(para_i.getIdd())
         
 
 def infect_him(para_i,heal_i, parazites_reproducing=False) :
@@ -243,15 +245,17 @@ def parazite_against_parazite(p1,p2) :
         p2.setRecovProb(p1.getRecovProb())
         balls_dictionnary[p2.getIdd()][0].set_col(balls_dictionnary[p1.getIdd()][0].get_col())
         p2.setStrain(p1.getStrain())
-        strain_dictionary[p1.getStrain()].append(p2.getIdd())
+        strain_dictionary[p1.getStrain()][1].append(p2.getIdd())
+        print "-------------------combat d'infirmes", p1.getIdd(), " infecte ", p2.getIdd()
+        print p2.getStrain()
     elif p2.getVir() > p1.getVir() :
         p1.setVir(p2.getVir())
         p1.setTransmRate(p2.getTransmRate())
         p1.setRecovProb(p2.getRecovProb())
         balls_dictionnary[p1.getIdd()][0].set_col(balls_dictionnary[p2.getIdd()][0].get_col())
         p1.setStrain(p2.getStrain())
-        strain_dictionary[p2.getStrain()].append(p1.getIdd())
-        
+        strain_dictionary[p2.getStrain()][1].append(p1.getIdd())
+        print "combat d'infirmes", p1.getIdd(), " infecte ", p2.getIdd()
 
 def actions_when_collision(p1,p2):
     possible_classes = [Healthy, Parazite, Parazite]
@@ -321,7 +325,8 @@ class BallsContainer(Widget):
     def update(self,dt):
         quad = Quadtree(0,[self.x,self.x + self.width, self.y, self.y + self.height])
         quad.reset()    #est-ce que ça sert à rien ?
-
+        
+        
         for i in balls_dictionnary.keys() :
 #            if balls_dictionnary[i][0].get_col() != BASE_COLOR and isinstance(balls_dictionnary[i][1], Healthy):
 #                balls_dictionnary[i][0].set_col(BASE_COLOR)
@@ -329,7 +334,8 @@ class BallsContainer(Widget):
             balls_dictionnary[i][2] = [pos.x, pos.x + pos.width, pos.y, pos.y + pos.height]
 
             quad.insert(balls_dictionnary[i][2], i)
-
+            
+            
         for i in balls_dictionnary.keys() :
 
             temp_balls = quad.fetch(balls_dictionnary[i][2],i)
@@ -346,7 +352,7 @@ class BallsContainer(Widget):
             #-------------- update balls here -----------------
             balls_dictionnary[i][0].update(dt)
             #-------------- update balls here -----------------
-
+        
     def update_life_and_death(self,dt):
         kill_those_who_have_to_die(self,dt)
         reproduce_those_you_have_to(self,dt)
@@ -358,7 +364,17 @@ class BallsContainer(Widget):
         self.num_parazites = len(list_of_parazites)
         self.num_healthies = len(list_of_healthies)
 
-
+    def on_touch_down(self, touch):
+        print "salut"
+        listx = []
+        listy = []
+        for i in strain_dictionary.keys():
+            listx.append(strain_dictionary[i][0][0])
+            listy.append(len(strain_dictionary[i][1]))
+        plt.scatter(listx, listy)
+        plt.ylabel('virulence')
+        plt.show()
+        return 
 
 # -------------------- balls container--------------------
 
