@@ -388,7 +388,7 @@ class BallsContainer(Widget):
             listx.append(strain_dictionary[i][0][0])
             listy.append(len(strain_dictionary[i][1]))
         plt.scatter(listx, listy)
-        plt.ylabel('virulence')
+        plt.ylabel('frequency')
         plt.show()
         return 
 
@@ -404,7 +404,7 @@ class BallsContainer(Widget):
         elif keycode == 275 :           #right
             self.faster_events.append([Clock.schedule_interval(self.update, DELTA_TIME), Clock.schedule_interval(self.update_life_and_death, 60*DELTA_TIME)])
 
-        elif keycode == 276 :
+        elif keycode == 276 :           #left
             if len(self.faster_events)>0 :
                 self.faster_events[-1][0].cancel()
                 self.faster_events[-1][1].cancel()
