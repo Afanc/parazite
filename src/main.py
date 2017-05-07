@@ -205,7 +205,7 @@ def random_mutation_on(para_i, what) :
         
         x = randint(0,2)
         random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
-        random_color[x] = min(uniform(0,1)*uniform(0,1), 1)
+        random_color[x] = max(min(uniform(-1,1)+random_color[x], 1),0)
         balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(tuple(random_color))
     
     else:
