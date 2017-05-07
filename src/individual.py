@@ -28,6 +28,10 @@ class Individual(object):   #object afin d'avoir des 'nouvelles' classes
 
     def getIdd(self):
         return self.idd
+     
+    def setIdd(self, a):
+        self.idd = a
+        
 
     def addResistance(self, idd) :
         if idd not in self.resistances:
