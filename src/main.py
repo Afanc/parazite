@@ -425,7 +425,7 @@ class BallsContainer(Widget):
         plt.scatter(listx, listy)
         plt.ylabel('Secondary infections')
         plt.plot((mean_vir, mean_vir), (0,len(listy)), 'k-',color = 'r')
-        plt.title('Nb of sec. infections following virulance at time = ' + str(clock()) + 'sec')
+        plt.title('Nb of sec. infections following virulance at time = ' + str(int(clock())) + 'sec')
         plt.show()
         return 
 
