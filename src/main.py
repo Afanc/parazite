@@ -424,6 +424,7 @@ class BallsContainer(Widget):
             listy.append(len(strain_dictionary[i][1]))
         plt.scatter(listx, listy)
         plt.ylabel('Secondary infections')
+        plt.plot((mean_vir, mean_vir), (0,len(listy)), 'k-',color = 'r')
         plt.title('Nb of sec. infections following virulance at : ' + str(clock()))
         plt.show()
         return 
