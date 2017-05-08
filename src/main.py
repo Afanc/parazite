@@ -14,7 +14,7 @@ from datetime import datetime
 from quadtree import Quadtree
 from collision import *
 import matplotlib.pyplot as plt
-
+from time import clock
 seed(42)
 
 dico_id = {}    #on ajoute les id de individu dans le dico
@@ -24,7 +24,7 @@ strain_dictionary = {} #{souche:[vir,transmission, guérison][liste des infecté
 list_of_healthies = []
 list_of_parazites = []
 
-compteur_id = 1
+
 
 def create_id():
     '''crée un nouvel id pour chaque nouveau parasite'''
@@ -329,18 +329,31 @@ class BallsContainer(Widget):
 
     #@profile
     def update(self,dt):
+        global nb_coll, mean_vir, mean_trans, mean_recov
         quad = Quadtree(0,[self.x,self.x + self.width, self.y, self.y + self.height])
         quad.reset()    #est-ce que ça sert à rien ?
         
-        
+        sumvir = 0
+        sumrecov = 0
+        sumtrans = 0
         for i in balls_dictionnary.keys() :
 #            if balls_dictionnary[i][0].get_col() != BASE_COLOR and isinstance(balls_dictionnary[i][1], Healthy):
 #                balls_dictionnary[i][0].set_col(BASE_COLOR)
             pos = balls_dictionnary[i][0]
             balls_dictionnary[i][2] = [pos.x, pos.x + pos.width, pos.y, pos.y + pos.height]
-
+            if str(type(balls_dictionnary[i][1])) == "<class 'parazite1.Parazite'>":
+                sumvir += balls_dictionnary[i][1].getVir()
+                mean_vir = sumvir/len(list_of_parazites)
+                sumvir = 0
+                sumtrans += balls_dictionnary[i][1].getRecovProb()
+                mean_trans = sumtrans/len(list_of_parazites)
+                sumtrans = 0
+                sumrecov +=  balls_dictionnary[i][1].getTransmRate()
+                mean_recov = sumrecov/len(list_of_parazites)
+                sumrecov = 0
+                
             quad.insert(balls_dictionnary[i][2], i)
-            
+           
             
         for i in balls_dictionnary.keys() :
 
@@ -352,7 +365,7 @@ class BallsContainer(Widget):
                 
                 if physical_collision2(balls_dictionnary[i][0], other_balls[j][0]):
                     actions_when_collision(balls_dictionnary[i][1], other_balls[j][1])
-
+                    nb_coll += 1
             physical_wall_collisions2(balls_dictionnary[i][0], self)
 
             #-------------- update balls here -----------------
@@ -388,7 +401,8 @@ class BallsContainer(Widget):
             listx.append(strain_dictionary[i][0][0])
             listy.append(len(strain_dictionary[i][1]))
         plt.scatter(listx, listy)
-        plt.ylabel('frequency')
+        plt.ylabel('Secondary infections')
+        plt.title('Nb of sec. infections following virulance at : ' + str(clock()))
         plt.show()
         return 
 
@@ -410,7 +424,17 @@ class BallsContainer(Widget):
                 self.faster_events[-1][1].cancel()
                 self.faster_events.pop()
           
-
+        elif keycode == 274:#nombre de collision/intervalle de temps
+            global last_clock, nb_coll
+            elapsed = clock() - last_clock
+            mean_col = nb_coll/elapsed
+            print "virulence moyenne: ", mean_vir
+            print "recovery moyenne: ", mean_recov
+            print "transmission moyenne : ", mean_trans
+            last_clock = clock()
+            nb_coll = 0
+            
+            
 
 # -------------------- balls container--------------------
 
