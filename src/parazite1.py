@@ -148,8 +148,12 @@ class Parazite(Individual):
     def getTotalFitness(self) :
         return self.getVir() + self.getRecovProb() + self.getTransmRate()
 
-"""
-test = Parazite(0.7, 0.1, 0, 'ID23')
+
+'''test = Parazite(0.7, 0.1, 0, 'ID23')
+if str(type(test)) == "<class '__main__.Parazite'>":
+    print "oui"
+else:
+    print "non"
 print 'before'
 print test
 for i in range(0,500) :
@@ -159,7 +163,6 @@ for i in range(0,500) :
 print test
 print MAX_FITNESS
 
-"""
-
+'''
     #idées
     #survie après mort/prob_transm/def_anti_para/taille/prob_manip/

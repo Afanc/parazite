@@ -388,6 +388,11 @@ class BallsContainer(Widget):
             DYING_PROB = STOCK_DYING_PROB
         else :
             pass
+        if len(list_of_healthies) + len(list_of_parazites) < 50 and ALL_NIGHT_LONG == 1:
+            REPRODUCTION_PROB = BOTTOM_REPRODUCTION_PROB
+        elif len(list_of_healthies) + len(list_of_parazites) >50 and ALL_NIGHT_LONG==1:
+            REPRODUCTION_PROB = STOCK_REPRODUCTION_PROB
+            
     def update_life_and_death(self,dt):
         kill_those_who_have_to_die(self,dt)
         reproduce_those_you_have_to(self,dt)
