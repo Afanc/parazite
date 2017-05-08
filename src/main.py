@@ -158,7 +158,7 @@ def kill_those_who_have_to_die(root,dt) :
         if uniform(0,1) < DYING_PROB*(1 + balls_dictionnary[i.getIdd()][1].getVir()) :    #! RecovProb = 1 --> aucune chance de recover
             kill(root,i)
 
-def reproduce_those_you_have_to(root,dt) :
+def reproduce_those_who_have_to(root,dt) :
     for i in list_of_healthies:
         if uniform(0,1) < REPRODUCTION_PROB :    #! RecovProb = 1 --> aucune chance de recover
             reproduce(root, i)
@@ -396,7 +396,7 @@ class BallsContainer(Widget):
             
     def update_life_and_death(self,dt):
         kill_those_who_have_to_die(self,dt)
-        reproduce_those_you_have_to(self,dt)
+        reproduce_those_who_have_to(self,dt)
         cure_the_lucky_ones(dt)
         mutate_those_who_wish(dt)
         self.update_numbers()
