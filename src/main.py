@@ -329,7 +329,7 @@ class BallsContainer(Widget):
 
     #@profile
     def update(self,dt):
-        global nb_coll, mean_vir, mean_trans, mean_recov
+        global nb_coll, mean_vir, mean_trans, mean_recov, DYING_PROB,STOCK_DYING_PROB,ROOF_DYING_PROB
         quad = Quadtree(0,[self.x,self.x + self.width, self.y, self.y + self.height])
         quad.reset()    #est-ce que ça sert à rien ?
         
@@ -341,6 +341,8 @@ class BallsContainer(Widget):
 #                balls_dictionnary[i][0].set_col(BASE_COLOR)
             pos = balls_dictionnary[i][0]
             balls_dictionnary[i][2] = [pos.x, pos.x + pos.width, pos.y, pos.y + pos.height]
+            
+                
             if str(type(balls_dictionnary[i][1])) == "<class 'parazite1.Parazite'>":
                 sumvir += balls_dictionnary[i][1].getVir()
                 mean_vir = sumvir/len(list_of_parazites)
@@ -371,7 +373,21 @@ class BallsContainer(Widget):
             #-------------- update balls here -----------------
             balls_dictionnary[i][0].update(dt)
             #-------------- update balls here -----------------
-        
+        if len(list_of_parazites) <1 and ALL_NIGHT_LONG == 1:
+                ball = Ball()
+                ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
+                ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
+                             -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
+                self.add_widget(ball)
+                ball.set_col((uniform(0,1),uniform(0,1),0))
+                parazite = add_one_parazite()
+                balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+        if len(list_of_healthies) > 250 and HEALTHY_ROOF == 1:
+            DYING_PROB = ROOF_DYING_PROB
+        elif len(list_of_healthies)<= 250 and HEALTHY_ROOF == 1:
+            DYING_PROB = STOCK_DYING_PROB
+        else :
+            pass
     def update_life_and_death(self,dt):
         kill_those_who_have_to_die(self,dt)
         reproduce_those_you_have_to(self,dt)
