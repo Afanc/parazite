@@ -374,6 +374,7 @@ class BallsContainer(Widget):
             balls_dictionnary[i][0].update(dt)
             #-------------- update balls here -----------------
         if len(list_of_parazites) <1 and ALL_NIGHT_LONG == 1:
+            for i in range (0,NB_PARASITE):    
                 ball = Ball()
                 ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
                 ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
