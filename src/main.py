@@ -15,6 +15,10 @@ from quadtree import Quadtree
 from collision import *
 import matplotlib.pyplot as plt
 from time import clock
+#Window.toggle_fullscreen()
+Window.size = (1200, 800)
+print Window.size
+
 seed(42)
 
 dico_id = {}    #on ajoute les id de individu dans le dico
@@ -292,6 +296,7 @@ class mainApp(App):
         Clock.schedule_interval(root.update, DELTA_TIME)
         Clock.schedule_interval(root.update_life_and_death, 60*DELTA_TIME)    #ça ça marche
         Window.bind(on_key_down=root.KeyboardShortcut)                      #pour le clavier
+
         return root
 
 #-----------------------Main--------------------------------------
@@ -304,7 +309,9 @@ class BallsContainer(Widget):
     faster_events = []
     num_healthies = NumericProperty(0)
     num_parazites = NumericProperty(0)
+
     def start_balls(self,dt):
+        print 'auesnatehusanotehu',self.width
         for i in range(0,NB_SAINS):
             ball = Ball()
             ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
@@ -457,8 +464,6 @@ class BallsContainer(Widget):
             last_clock = clock()
             nb_coll = 0
             
-            
-
 # -------------------- balls container--------------------
 
 
