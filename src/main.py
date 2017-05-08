@@ -295,7 +295,7 @@ class mainApp(App):
         Clock.schedule_once(root.start_balls,1)         #on attend que la fenêtre soit lancée
         Clock.schedule_interval(root.update, DELTA_TIME)
         Clock.schedule_interval(root.update_life_and_death, 60*DELTA_TIME)    #ça ça marche
-        Window.bind(on_key_down=root.KeyboardShortcut)                      #pour le clavier
+        Window.bind(on_key_down=root.Keyboard)                      #pour le clavier
 
         return root
 
@@ -309,6 +309,7 @@ class BallsContainer(Widget):
     faster_events = []
     num_healthies = NumericProperty(0)
     num_parazites = NumericProperty(0)
+    nb_coll, mean_vir, mean_trans, mean_recov = 0,0,0,0
 
     def start_balls(self,dt):
         print 'auesnatehusanotehu',self.width
@@ -336,7 +337,6 @@ class BallsContainer(Widget):
 
     #@profile
     def update(self,dt):
-        global nb_coll, mean_vir, mean_trans, mean_recov, DYING_PROB,STOCK_DYING_PROB,ROOF_DYING_PROB
         quad = Quadtree(0,[self.x,self.x + self.width, self.y, self.y + self.height])
         quad.reset()    #est-ce que ça sert à rien ?
         
@@ -358,7 +358,7 @@ class BallsContainer(Widget):
                 mean_trans = sumtrans/len(list_of_parazites)
                 sumtrans = 0
                 sumrecov +=  balls_dictionnary[i][1].getTransmRate()
-                mean_recov = sumrecov/len(list_of_parazites)
+                self.mean_recov = sumrecov/len(list_of_parazites)
                 sumrecov = 0
                 
             quad.insert(balls_dictionnary[i][2], i)
@@ -374,12 +374,22 @@ class BallsContainer(Widget):
                 
                 if physical_collision2(balls_dictionnary[i][0], other_balls[j][0]):
                     actions_when_collision(balls_dictionnary[i][1], other_balls[j][1])
-                    nb_coll += 1
+                    self.nb_coll += 1
             physical_wall_collisions2(balls_dictionnary[i][0], self)
 
             #-------------- update balls here -----------------
             balls_dictionnary[i][0].update(dt)
             #-------------- update balls here -----------------
+
+    def update_life_and_death(self,dt):
+        kill_those_who_have_to_die(self,dt)
+        reproduce_those_who_have_to(self,dt)
+        cure_the_lucky_ones(dt)
+        mutate_those_who_wish(dt)
+        self.update_numbers()
+        self.all_nighter()
+
+    def all_nighter(self) :
         if len(list_of_parazites) <1 and ALL_NIGHT_LONG == 1:
             for i in range (0,NB_PARASITE):    
                 ball = Ball()
@@ -400,13 +410,6 @@ class BallsContainer(Widget):
             REPRODUCTION_PROB = BOTTOM_REPRODUCTION_PROB
         elif len(list_of_healthies) + len(list_of_parazites) >50 and ALL_NIGHT_LONG==1:
             REPRODUCTION_PROB = STOCK_REPRODUCTION_PROB
-            
-    def update_life_and_death(self,dt):
-        kill_those_who_have_to_die(self,dt)
-        reproduce_those_who_have_to(self,dt)
-        cure_the_lucky_ones(dt)
-        mutate_those_who_wish(dt)
-        self.update_numbers()
 
     def update_numbers(self) :
         self.num_parazites = len(list_of_parazites)
@@ -436,7 +439,7 @@ class BallsContainer(Widget):
         plt.show()
         return 
 
-    def KeyboardShortcut(self, window, keycode, *args) :
+    def Keyboard(self, window, keycode, *args) :
         if keycode == 32 and not self.pause:              #SPACE - pour ça je rajoute un print keycode avant et check le int
             self.on_pause()
             self.pause = True
