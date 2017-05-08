@@ -7,11 +7,16 @@
         Rectangle:
             pos: self.pos
             size: self.size
+    Button:
+        color: 0,0,0,1
+        size: 100,60
+        top: root.top
     Label:
         color: 0, 0, 0, 1
-        top: root.top
-        font_size: 36
-        text: str(root.num_healthies)
+        pos: -10,root.height-80
+        font_size: 20
+        text: "H : "+str(root.num_healthies)+"\nP : "+str(root.num_parazites)
+        color: 1,1,1,1
 
     Label:
         color: 0, 0, 0, 1
@@ -19,7 +24,18 @@
         top: root.top
         font_size: 36
         text: str(root.num_parazites)
-
+    Button:
+        color: 0,0,0,1
+        size: 110,50
+    Button:
+        color: 0,0,0,1
+        size: 100,100
+        right: root.right
+    Label:
+        color: 1,1,1,1
+        font_size: 12
+        text: "Mean Vir : "+str("%.2f" % root.mean_vir)+"\nMean Trans : "+str("%.2f" % root.mean_trans)+"\nMean Recov : "+str("%.2f" % root.mean_recov)
+        pos: 5,-25
 
 <Ball>:
     size: 15, 15

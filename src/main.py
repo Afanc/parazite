@@ -10,12 +10,13 @@ from kivy.properties import NumericProperty, ReferenceListProperty, ListProperty
 from kivy.vector import Vector
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
+from kivy.graphics import *
 from datetime import datetime
 from quadtree import Quadtree
 from collision import *
 import matplotlib.pyplot as plt
 from time import clock
-Window.size = (1200, 800)
+Window.size = (800, 600)
 
 seed(42)
 
@@ -307,10 +308,9 @@ class BallsContainer(Widget):
     faster_events = []
     num_healthies = NumericProperty(0)
     num_parazites = NumericProperty(0)
-    nb_coll, mean_vir, mean_trans, mean_recov = 0,0,0,0
+    nb_coll, mean_vir, mean_trans, mean_recov = NumericProperty(0),NumericProperty(0),NumericProperty(0),NumericProperty(0)
 
     def start_balls(self,dt):
-        print 'auesnatehusanotehu',self.width
         for i in range(0,NB_SAINS):
             ball = Ball()
             ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
@@ -331,7 +331,6 @@ class BallsContainer(Widget):
 
             parazite = add_one_parazite()
             balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
-            
 
     #@profile
     def update(self,dt):
