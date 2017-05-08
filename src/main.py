@@ -15,9 +15,7 @@ from quadtree import Quadtree
 from collision import *
 import matplotlib.pyplot as plt
 from time import clock
-#Window.toggle_fullscreen()
 Window.size = (1200, 800)
-print Window.size
 
 seed(42)
 
@@ -350,20 +348,16 @@ class BallsContainer(Widget):
             balls_dictionnary[i][2] = [pos.x, pos.x + pos.width, pos.y, pos.y + pos.height]
             
                 
-            if str(type(balls_dictionnary[i][1])) == "<class 'parazite1.Parazite'>":
+            if isinstance(balls_dictionnary[i][1], Parazite) :
                 sumvir += balls_dictionnary[i][1].getVir()
-                mean_vir = sumvir/len(list_of_parazites)
-                sumvir = 0
+                self.mean_vir = sumvir/len(list_of_parazites)
                 sumtrans += balls_dictionnary[i][1].getRecovProb()
-                mean_trans = sumtrans/len(list_of_parazites)
-                sumtrans = 0
+                self.mean_trans = sumtrans/len(list_of_parazites)
                 sumrecov +=  balls_dictionnary[i][1].getTransmRate()
                 self.mean_recov = sumrecov/len(list_of_parazites)
-                sumrecov = 0
                 
             quad.insert(balls_dictionnary[i][2], i)
-           
-            
+
         for i in balls_dictionnary.keys() :
 
             temp_balls = quad.fetch(balls_dictionnary[i][2],i)
@@ -434,7 +428,7 @@ class BallsContainer(Widget):
             listy.append(len(strain_dictionary[i][1]))
         plt.scatter(listx, listy)
         plt.ylabel('Secondary infections')
-        plt.plot((mean_vir, mean_vir), (0,len(listy)), 'k-',color = 'r')
+        plt.plot((self.mean_vir, self.mean_vir), (0,len(listy)), 'k-',color = 'r')
         plt.title('Nb of sec. infections following virulance at time = ' + str(int(clock())) + 'sec')
         plt.show()
         return 
@@ -457,15 +451,14 @@ class BallsContainer(Widget):
                 self.faster_events[-1][1].cancel()
                 self.faster_events.pop()
           
-        elif keycode == 274:#nombre de collision/intervalle de temps
-            global last_clock, nb_coll
+        elif keycode == 274:            #nombre de collision/intervalle de temps
             elapsed = clock() - last_clock
-            mean_col = nb_coll/elapsed
-            print "virulence moyenne: ", mean_vir
-            print "recovery moyenne: ", mean_recov
-            print "transmission moyenne : ", mean_trans
+            mean_col = self.nb_coll/elapsed
+            print "virulence moyenne: ", self.mean_vir
+            print "recovery moyenne: ", self.mean_recov
+            print "transmission moyenne : ", self.mean_trans
             last_clock = clock()
-            nb_coll = 0
+            self.nb_coll = 0
             
 # -------------------- balls container--------------------
 
