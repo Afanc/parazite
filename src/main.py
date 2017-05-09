@@ -10,6 +10,8 @@ from kivy.properties import NumericProperty, ReferenceListProperty, ListProperty
 from kivy.vector import Vector
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
+from kivy.uix.label import Label
+from kivy.uix.button import Button
 from kivy.graphics import *
 from datetime import datetime
 from quadtree import Quadtree
@@ -416,11 +418,20 @@ class BallsContainer(Widget):
         else :
             self.mean_vir, self.mean_trans, self.mean_recov = 0,0,1
 
+        temp_wig = []
         for c in self.children:
-            if not isinstance(c,Ball) :
+            if not isinstance(c, Ball) :
+                temp_wig.append(c)              #pour éviter de trop grosses boucles
+        if isinstance(temp_wig[0], Label) :         #magouille parce que les widgets font n'importe quoi
+            temp_wig = list(reversed(temp_wig))
+        for c in temp_wig :                     #tout ça rien que pour avoir un ordre de widget agréable, pff
+            if isinstance(c,Button) :
                 self.remove_widget(c)
                 self.add_widget(c)
-        print 'done'
+        for c in temp_wig :
+            if isinstance(c,Label) :
+                self.remove_widget(c)
+                self.add_widget(c)
 
     def on_pause(self):
         Clock.unschedule(self.update)
