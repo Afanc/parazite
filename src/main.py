@@ -383,14 +383,24 @@ class BallsContainer(Widget):
         self.num_healthies = len(list_of_healthies)
 
         sumvir, sumrecov, sumtrans = 0,0,0
+
+        testlist = {}
+
         for i in balls_dictionnary.keys() :
             if isinstance(balls_dictionnary[i][1], Parazite) :
                 sumvir += balls_dictionnary[i][1].getVir()
-                self.mean_vir = sumvir/len(list_of_parazites)
                 sumtrans += balls_dictionnary[i][1].getRecovProb()
-                self.mean_trans = sumtrans/len(list_of_parazites)
                 sumrecov +=  balls_dictionnary[i][1].getTransmRate()
-                self.mean_recov = sumrecov/len(list_of_parazites)
+
+                if balls_dictionnary[i][1].getIdd() is in testlist.keys() :
+                    test.list[balls_dictionnary[i][1].getIdd()] += 1
+                else :
+                    test.list[balls_dictionnary[i][1].getIdd()] = 1
+                    
+
+        self.mean_vir = sumvir/len(list_of_parazites)
+        self.mean_trans = sumtrans/len(list_of_parazites)
+        self.mean_recov = sumrecov/len(list_of_parazites)
 
     def on_pause(self):
         Clock.unschedule(self.update)
