@@ -20,112 +20,112 @@ Window.size = (800, 600)
 
 seed(42)
 
-dico_id = {}            #id:objet (pour tous les individus)
-balls_dictionnary = {}  #key:[widget_ball,individual, position]
-strain_dictionary = {} #{souche:[vir,transmission, guérison][liste des infectés]}
+dico_id = {}            #id:objet (pour tous les individus vivant)
+balls_dictionnary = {}  #id:[widget_ball,individual, position] # pour les individus vivants
+strain_dictionary = {} #{souche:[vir,transmission, guérison][liste des infectés]} contient toutes les souches qui ont existé
 
-list_of_healthies = []
-list_of_parazites = []
+list_of_healthies = [] #liste des individus sains vivants
+list_of_parazites = [] #liste des parasites vivants
 
 
-def create_id():
+def create_id(): 
     '''crée un nouvel id pour chaque nouveau parasite'''
-    global compteur_id
-    idd = "ID" + str(compteur_id)
-    compteur_id += 1
+    global compteur_id # on appelle le compteur_id qui permet de créer des ID nouveaux
+    idd = "ID" + str(compteur_id) # les ID sont un string qui composés d'ID + un numéro unique
+    compteur_id += 1 # on incrémente le compteur global
     
-    return idd
+    return idd # la fonction retourne l'idd
     
 def add_one_healthy() :
     '''ajoute une individu sain'''
     try:
-        temp = create_id()
-        if temp not in dico_id.keys():
-            list_of_healthies.append(Healthy(temp))
-            dico_id[temp] = list_of_healthies[-1]
-            return list_of_healthies[-1]
+        temp = create_id() # on commence par lui créer un ID
+        if temp not in dico_id.keys(): # commence par vérifier qu'il n'y a pas l'entrée correspondante dans le dico
+            list_of_healthies.append(Healthy(temp)) # on l'ajoute à la liste des individus vivants
+            dico_id[temp] = list_of_healthies[-1] # On ajoute le "healthy" au dico, avec son id comme clé
+            return list_of_healthies[-1] # la fonction add_one_healthy retourne l'individu crée
         else :
-            print temp, 'exists in ', dico_id.keys(), "in add_healthy function"
+            print temp, 'exists in ', dico_id.keys(), "in add_healthy function" #imprime un message d'erreur si l'entrée dans le dico existe déja
     except: 
-        print "could not add health: ID problem"
+        print "could not add health" # imprime un  message si il n'arrive pas à le créer
             
 def add_one_parazite(p = None) :
     '''ajoute un parasite'''
     try:
-        temp_id = create_id()
-        if p != None :      #si pas par défaut, on reprend
-            temp_vir = p.getVir()
-            temp_trans = p.getTransmRate()
-            temp_recov = p.getRecovProb()
+        temp_id = create_id() #commence par créer un ID
+        if p != None :      #si parasite est donné en argument
+            temp_vir = p.getVir() #sa virulence, 
+            temp_trans = p.getTransmRate() # son taux de transmission, 
+            temp_recov = p.getRecovProb() # et sa probabilité de guérison sont stockées dans des variables temporaires
         else :              #sinon on crée
-            temp_vir = uniform(0,1)
-            temp_trans = uniform(0,1)
-            temp_recov = uniform(0,1)
-            norm = BASE_FITNESS/(temp_vir + temp_trans + temp_recov)
-            temp_vir *= norm
+            temp_vir = uniform(0,1) #une virulance
+            temp_trans = uniform(0,1) # un taux de transmission,
+            temp_recov = uniform(0,1) # une probabilité de guérison
+            norm = BASE_FITNESS/(temp_vir + temp_trans + temp_recov) # on crée une variable pour les normaliser
+            temp_vir *= norm # et on normalise les trois paramètre
             temp_trans *= norm
             temp_recov *= norm
 
-        if temp_id not in dico_id.keys():
-            list_of_parazites.append(Parazite(temp_vir, temp_trans, temp_recov, temp_id))
-            temp_strain = list(list_of_parazites[-1].getStrain())
-            temp_strain.append(list_of_parazites[-1].getIdd())
-            temp_strain = str('Souche:' + temp_strain[0][2:])
-            list_of_parazites[-1].setStrain(temp_strain)
-            strain_dictionary[temp_strain] = [[temp_vir, temp_trans, temp_recov],[str(temp_id)]]
+        if temp_id not in dico_id.keys(): # si l'ID n'est pas dans les ID existants
+            list_of_parazites.append(Parazite(temp_vir, temp_trans, temp_recov, temp_id)) #on ajoute le parasite à la liste
+            temp_strain = list(list_of_parazites[-1].getStrain()) # la souche est pour l'instant "[]" par défaut
+            temp_strain.append(list_of_parazites[-1].getIdd()) # on lui ajoute l'ID dans la liste
+            temp_strain = str('Souche:' + temp_strain[0][2:])# On modifie la variable temporaire pour que les souches et les ID soient bien distincts
+            list_of_parazites[-1].setStrain(temp_strain) #On modifie la souche du parasite pour la souche temporaire
+            strain_dictionary[temp_strain] = [[temp_vir, temp_trans, temp_recov],[str(temp_id)]] #et on stocke la souche et l'individu infecté dans le dico des souches
         
-            dico_id[temp_id] = list_of_parazites[-1]
-            return list_of_parazites[-1]
+            dico_id[temp_id] = list_of_parazites[-1] # on stocke l'individu dans le dico 
+            return list_of_parazites[-1] # la fonction retourne l'individu crée
 
         else :
-            print temp, 'exists in ', dico_id.keys(), "in add_healthy function"
+            print temp, 'exists in ', dico_id.keys(), "in add_healthy function" #message d'erreur
     except: 
-        print "could not add parazite: ID problem"
+        print "could not add parazite: ID problem" #messsge d'erreur
                  
 
 def kill(root,p):
     '''tue un individu'''
-    if not isinstance(p, Individual): 
-        print "%s doit être un individu pour être tué" % str(p)
-        return
-    elif isinstance(p, Healthy):
-        list_of_healthies.remove(p)              #d'abord on gère les idd
-    elif isinstance(p, Parazite):
-        list_of_parazites.remove(p)
+    if not isinstance(p, Individual): # vérifie que l'instance donnée en argument soit un individu
+        print "%s doit être un individu pour être tué" % str(p) # sinon imprime un message d'erreur
+        return # et ne retourne rien
+    elif isinstance(p, Healthy): # si c'est un healthy....
+        list_of_healthies.remove(p)  #il faut le retirer de la bonne liste
+    elif isinstance(p, Parazite): # si c'est un parasite 
+        list_of_parazites.remove(p) # il faut le retirer de la bonne liste
     
-    #list_of_freed_id.append(p.getIdd())
-    del dico_id[p.getIdd()]
+    del dico_id[p.getIdd()] # on suprime son entrée dans le dico des ID
     root.remove_widget(balls_dictionnary[p.getIdd()][0])    #puis on enlève la widget (gui)
-    del balls_dictionnary[p.getIdd()][0]                    #puis on gère le dico, on tue l'objet
+    del balls_dictionnary[p.getIdd()][0]                    #puis on gère le dico des balles, on tue l'objet
     del balls_dictionnary[p.getIdd()]                       #on tue l'entrée dans le dico
     del p                                                   #et enfin on tue l'objet
 
 def reproduce(root,p):
     '''duplique un individu'''
-    ball = Ball()
-    x = uniform(0,1)
-    ball.center = (balls_dictionnary[p.getIdd()][0].center[0] + x, balls_dictionnary[p.getIdd()][0].center[1] + (1-x))
-    ball.velocity = balls_dictionnary[p.getIdd()][0].velocity
-    root.add_widget(ball)
+    ball = Ball() # crée une balle dans la variable ball
+    x = uniform(0,1) # crée une nombre aléatoire entre zéro et un....
+    ball.center = (balls_dictionnary[p.getIdd()][0].center[0] + x, balls_dictionnary[p.getIdd()][0].center[1] + (1-x)) # pour le placement de la boule
+    ball.velocity = balls_dictionnary[p.getIdd()][0].velocity 
+    root.add_widget(ball) #ajoute la balle au container
     
 
     healthy = add_one_healthy()
     balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
     
     
-    if isinstance(p, Parazite):
-        infect_him(p, balls_dictionnary[healthy.getIdd()][1], parazites_reproducing=True)
-        random_mutation_on(balls_dictionnary[list_of_parazites[-1].getIdd()][1], 'reproduction')
+    if isinstance(p, Parazite): # si son parent est parasité 
+        infect_him(p, balls_dictionnary[healthy.getIdd()][1], parazites_reproducing=True) #l'enfant est parasité par la même souche à la naissance...
+        random_mutation_on(balls_dictionnary[list_of_parazites[-1].getIdd()][1], 'reproduction') #si il n'y a pas de mutation
         try :
-            for i in p.getResistances() :
-                list_of_healthies[-1].addResistance(i)
+            if uniform(0,1) > GENERATION_RESISTANCE: #permet de lancer le programme avec ou sans le passage des résistance
+                for i in p.getResistances() : # CHaque resistance du parent
+                    list_of_healthies[-1].addResistance(i) # est passée au jeune
         except :
             print "\n _________________________________________________\nl'erreur ligne 116 !\n______________________________________________\n"
         
-    if isinstance(p, Healthy):
-        if uniform(0,1) > GENERATION_RESISTANCE:
-            for i in p.getResistances():
-                list_of_healthies[-1].addResistance(i)
+    if isinstance(p, Healthy): #si healthy 
+        if uniform(0,1) > GENERATION_RESISTANCE: # si le progrmme est lancé avec GENERATION_RESISTANCE = 1
+            for i in p.getResistances(): # chaque resistance du parent
+                list_of_healthies[-1].addResistance(i) #est passée au jeune
 
 def guerison(p):
     '''gueris un parasite'''
@@ -421,7 +421,6 @@ class BallsContainer(Widget):
                 self.remove_widget(c)
                 self.add_widget(c)
         print 'done'
-
 
     def on_pause(self):
         Clock.unschedule(self.update)
