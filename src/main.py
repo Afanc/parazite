@@ -416,6 +416,13 @@ class BallsContainer(Widget):
         else :
             self.mean_vir, self.mean_trans, self.mean_recov = 0,0,1
 
+        for c in self.children:
+            if not isinstance(c,Ball) :
+                self.remove_widget(c)
+                self.add_widget(c)
+        print 'done'
+
+
     def on_pause(self):
         Clock.unschedule(self.update)
         Clock.unschedule(self.update_life_and_death)
