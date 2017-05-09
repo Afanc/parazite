@@ -277,6 +277,7 @@ class mainApp(App):
         """Entry point for creating app's UI."""
         root = BallsContainer()
         Clock.schedule_once(root.start_balls,1)         #on attend que la fenêtre soit lancée
+        Clock.schedule_once(root.update_life_and_death,1.1)         #on attend que la fenêtre soit lancée
         Clock.schedule_interval(root.update, DELTA_TIME)
         Clock.schedule_interval(root.update_life_and_death, 60*DELTA_TIME)    #ça ça marche
         Window.bind(on_key_down=root.Keyboard)                      #pour le clavier
@@ -294,6 +295,7 @@ class BallsContainer(Widget):
     num_healthies = NumericProperty(0)
     num_parazites = NumericProperty(0)
     nb_coll, mean_vir, mean_trans, mean_recov = NumericProperty(0),NumericProperty(0),NumericProperty(0),NumericProperty(0)
+    top_idds = ListProperty([[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]])
 
     def start_balls(self,dt):
         for i in range(0,NB_SAINS):
@@ -384,7 +386,8 @@ class BallsContainer(Widget):
 
         sumvir, sumrecov, sumtrans = 0,0,0
 
-        testlist = {}
+        tempdic = {}
+        self.top_idds = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
 
         for i in balls_dictionnary.keys() :
             if isinstance(balls_dictionnary[i][1], Parazite) :
@@ -392,15 +395,26 @@ class BallsContainer(Widget):
                 sumtrans += balls_dictionnary[i][1].getRecovProb()
                 sumrecov +=  balls_dictionnary[i][1].getTransmRate()
 
-                if balls_dictionnary[i][1].getIdd() in testlist.keys() :
-                    testlist[balls_dictionnary[i][1].getIdd()] += 1
+                if balls_dictionnary[i][1].getStrain() in tempdic.keys() :
+                    tempdic[balls_dictionnary[i][1].getStrain()][0] += 1
                 else :
-                    testlist[balls_dictionnary[i][1].getIdd()] = 1
-                    
+                    tempdic[balls_dictionnary[i][1].getStrain()] = [1, balls_dictionnary[i][1].getIdd()]
 
-        self.mean_vir = sumvir/len(list_of_parazites)
-        self.mean_trans = sumtrans/len(list_of_parazites)
-        self.mean_recov = sumrecov/len(list_of_parazites)
+        for i in range(0,3) :
+            if len(tempdic) == 0 :
+                self.top_idds[i] = [0,0,0,0,0]
+            else :
+                key = self.idd_max(tempdic)
+                ind = balls_dictionnary[tempdic[key][1]]
+                self.top_idds[i]= ['ID'+key[7:], tempdic[key][0], ind[1].getVir(), ind[1].getTransmRate(), ind[1].getRecovProb(), ind[0].get_col()] #add [souche,number,vir,trans,recov,color]
+                del tempdic[key]
+
+        if len(list_of_parazites) != 0 :
+            self.mean_vir = sumvir/len(list_of_parazites)
+            self.mean_trans = sumtrans/len(list_of_parazites)
+            self.mean_recov = sumrecov/len(list_of_parazites)
+        else :
+            self.mean_vir, self.mean_trans, self.mean_recov = 0,0,1
 
     def on_pause(self):
         Clock.unschedule(self.update)
@@ -452,6 +466,13 @@ class BallsContainer(Widget):
             print "transmission moyenne : ", self.mean_trans
             last_clock = clock()
             self.nb_coll = 0
+
+    def idd_max(self,dico):
+        a = [i[0] for i in dico.values()]
+        b=list(dico.keys())
+        return b[a.index(max(a))]
+
+
             
 # -------------------- balls container--------------------
 
