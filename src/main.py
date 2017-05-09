@@ -234,7 +234,6 @@ def infect_him(para_i,heal_i, parazites_reproducing=False) :
         for i in heal_i.getResistances() :
             list_of_parazites[-1].addResistance(i)
         
-        #print " INFECTION", para_i.getIdd(),"infecte :  ", heal_i.getIdd(), "souche : ", list_of_parazites[-1].getStrain()
         list_of_healthies.remove(heal_i)
         balls_dictionnary[heal_i.getIdd()][1] = list_of_parazites[-1]
         balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(balls_dictionnary[para_i.getIdd()][0].get_col())
@@ -253,17 +252,9 @@ def parazite_against_parazite(p1,p2) :
         balls_dictionnary[p2.getIdd()][0].set_col(balls_dictionnary[p1.getIdd()][0].get_col())
         p2.setStrain(p1.getStrain())
         strain_dictionary[p1.getStrain()][1].append(p2.getIdd())
-        print "-------------------combat d'infirmes", p1.getIdd(), " infecte ", p2.getIdd()
-        print p2.getStrain()
     elif p2.getVir() > p1.getVir() :
-        p1.setVir(p2.getVir())
-        p1.setTransmRate(p2.getTransmRate())
-        p1.setRecovProb(p2.getRecovProb())
-        balls_dictionnary[p1.getIdd()][0].set_col(balls_dictionnary[p2.getIdd()][0].get_col())
-        p1.setStrain(p2.getStrain())
-        strain_dictionary[p2.getStrain()][1].append(p1.getIdd())
-        print "combat d'infirmes", p1.getIdd(), " infecte ", p2.getIdd()
-
+        parazite_against_parazite(p2,p1)
+    
 def actions_when_collision(p1,p2):
     possible_classes = [Healthy, Parazite, Parazite]
     if isinstance(p1, tuple(possible_classes)) :        # si c'est l'un des deux
