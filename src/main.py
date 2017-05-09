@@ -20,13 +20,12 @@ Window.size = (800, 600)
 
 seed(42)
 
-dico_id = {}    #on ajoute les id de individu dans le dico
+dico_id = {}            #id:objet (pour tous les individus)
 balls_dictionnary = {}  #key:[widget_ball,individual, position]
 strain_dictionary = {} #{souche:[vir,transmission, guérison][liste des infectés]}
 
 list_of_healthies = []
 list_of_parazites = []
-
 
 
 def create_id():
@@ -216,9 +215,7 @@ def random_mutation_on(para_i, what) :
     
     else:
         if what == 'infection':
-
             strain_dictionary[para_i.getStrain()][1].append(para_i.getIdd())
-
 
 def infect_him(para_i,heal_i, parazites_reproducing=False) :
     resistant = False 
@@ -274,9 +271,6 @@ def actions_when_collision(p1,p2):
 
 #-----------------------main --------------------------
     
-def main():
-    print 'le programme de sa mère\n'
-
 class mainApp(App):                                                                                                    
     """Represents the whole application."""
     def build(self):
@@ -332,29 +326,18 @@ class BallsContainer(Widget):
         sumrecov = 0
         sumtrans = 0
         for i in balls_dictionnary.keys() :
-#            if balls_dictionnary[i][0].get_col() != BASE_COLOR and isinstance(balls_dictionnary[i][1], Healthy):
-#                balls_dictionnary[i][0].set_col(BASE_COLOR)
-            pos = balls_dictionnary[i][0]
+            pos = balls_dictionnary[i][0]       #gotta update position (dic) here ! before the quad !
             balls_dictionnary[i][2] = [pos.x, pos.x + pos.width, pos.y, pos.y + pos.height]
             
-                
-            if isinstance(balls_dictionnary[i][1], Parazite) :
-                sumvir += balls_dictionnary[i][1].getVir()
-                self.mean_vir = sumvir/len(list_of_parazites)
-                sumtrans += balls_dictionnary[i][1].getRecovProb()
-                self.mean_trans = sumtrans/len(list_of_parazites)
-                sumrecov +=  balls_dictionnary[i][1].getTransmRate()
-                self.mean_recov = sumrecov/len(list_of_parazites)
-                
-            quad.insert(balls_dictionnary[i][2], i)
+            quad.insert(balls_dictionnary[i][2], i)     #we insert the balls in the quad
 
         for i in balls_dictionnary.keys() :
 
-            temp_balls = quad.fetch(balls_dictionnary[i][2],i)
-            temp_keys = [k[1] for k in temp_balls]
-            other_balls = {key:balls_dictionnary[key] for key in temp_keys}
+            temp_balls = quad.fetch(balls_dictionnary[i][2],i)  #fetch the collisions for each ball
+            temp_keys = [k[1] for k in temp_balls]              #get the keys of those collisions
+            other_balls = {key:balls_dictionnary[key] for key in temp_keys}     #create a new dic with the collisions
 
-            for j in other_balls.keys():
+            for j in other_balls.keys():            #and for each of those collisions, action !
                 
                 if physical_collision2(balls_dictionnary[i][0], other_balls[j][0]):
                     actions_when_collision(balls_dictionnary[i][1], other_balls[j][1])
@@ -362,7 +345,7 @@ class BallsContainer(Widget):
             physical_wall_collisions2(balls_dictionnary[i][0], self)
 
             #-------------- update balls here -----------------
-            balls_dictionnary[i][0].update(dt)
+            balls_dictionnary[i][0].update(dt)              #update the positions of the balls (widget)
             #-------------- update balls here -----------------
 
     def update_life_and_death(self,dt):
@@ -392,12 +375,22 @@ class BallsContainer(Widget):
             pass
         if len(list_of_healthies) + len(list_of_parazites) < 50 and ALL_NIGHT_LONG == 1:
             REPRODUCTION_PROB = BOTTOM_REPRODUCTION_PROB
-        elif len(list_of_healthies) + len(list_of_parazites) >50 and ALL_NIGHT_LONG==1:
+        elif len(list_of_healthies) + len(list_of_parazites) > 50 and ALL_NIGHT_LONG == 1:
             REPRODUCTION_PROB = STOCK_REPRODUCTION_PROB
 
     def update_numbers(self) :
         self.num_parazites = len(list_of_parazites)
         self.num_healthies = len(list_of_healthies)
+
+        sumvir, sumrecov, sumtrans = 0,0,0
+        for i in balls_dictionnary.keys() :
+            if isinstance(balls_dictionnary[i][1], Parazite) :
+                sumvir += balls_dictionnary[i][1].getVir()
+                self.mean_vir = sumvir/len(list_of_parazites)
+                sumtrans += balls_dictionnary[i][1].getRecovProb()
+                self.mean_trans = sumtrans/len(list_of_parazites)
+                sumrecov +=  balls_dictionnary[i][1].getTransmRate()
+                self.mean_recov = sumrecov/len(list_of_parazites)
 
     def on_pause(self):
         Clock.unschedule(self.update)
