@@ -392,10 +392,10 @@ class BallsContainer(Widget):
                 sumtrans += balls_dictionnary[i][1].getRecovProb()
                 sumrecov +=  balls_dictionnary[i][1].getTransmRate()
 
-                if balls_dictionnary[i][1].getIdd() is in testlist.keys() :
-                    test.list[balls_dictionnary[i][1].getIdd()] += 1
+                if balls_dictionnary[i][1].getIdd() in testlist.keys() :
+                    testlist[balls_dictionnary[i][1].getIdd()] += 1
                 else :
-                    test.list[balls_dictionnary[i][1].getIdd()] = 1
+                    testlist[balls_dictionnary[i][1].getIdd()] = 1
                     
 
         self.mean_vir = sumvir/len(list_of_parazites)
