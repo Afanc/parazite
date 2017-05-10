@@ -2,6 +2,7 @@
 #!/usr/bin/env python
 
 #from BallsContainer import *
+from __future__ import division
 from parazite1 import *
 from healthy import *
 from kivy.app import App
@@ -216,8 +217,6 @@ def random_mutation_on(para_i, what) :
         new_strain = 'Souche:' + new_strain[2:]
         para_i.setStrain(new_strain)
         strain_dictionary[new_strain] = [[para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb],[para_i.getIdd()]]
-        if what == 'living':
-            print  "________________ bug?", para_i.getIdd(),"  ", para_i.getStrain()
         
         x = randint(0,2)
         random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
@@ -253,16 +252,16 @@ def infect_him(para_i,heal_i, parazites_reproducing=False) :
             balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(tuple(random_color))
 
 def parazite_against_parazite(p1,p2) :
-    if uniform(0,1) < INFECTION_CHANCE *(1+p1.getTransmRate()) : 
-        if p1.getVir() > p2.getVir() :
+    if p1.getVir() > p2.getVir() :
+        if uniform(0,1) < INFECTION_CHANCE *(1+p1.getTransmRate()) : 
             p2.setVir(p1.getVir())
             p2.setTransmRate(p1.getTransmRate())
             p2.setRecovProb(p1.getRecovProb())
             balls_dictionnary[p2.getIdd()][0].set_col(balls_dictionnary[p1.getIdd()][0].get_col())
             p2.setStrain(p1.getStrain())
             strain_dictionary[p1.getStrain()][1].append(p2.getIdd())
-        elif p2.getVir() > p1.getVir() :
-            parazite_against_parazite(p2,p1)
+    elif p2.getVir() > p1.getVir() :
+        parazite_against_parazite(p2,p1)
     
 def actions_when_collision(p1,p2):
     possible_classes = [Healthy, Parazite, Parazite]
@@ -309,6 +308,7 @@ class BallsContainer(Widget):
     nb_coll, mean_vir, mean_trans, mean_recov = NumericProperty(0),NumericProperty(0),NumericProperty(0),NumericProperty(0)
     top_idds = ListProperty([[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]])
     temp_widg_to_remove_list = []
+    test = NumericProperty(0)
 
     def start_balls(self,dt):
         for i in range(0,NB_SAINS):
@@ -337,9 +337,6 @@ class BallsContainer(Widget):
         quad = Quadtree(0,[self.x,self.x + self.width, self.y, self.y + self.height])
         quad.reset()    #est-ce que ça sert à rien ?
         
-        sumvir = 0
-        sumrecov = 0
-        sumtrans = 0
         for i in balls_dictionnary.keys() :
             pos = balls_dictionnary[i][0]       #gotta update position (dic) here ! before the quad !
             balls_dictionnary[i][2] = [pos.x, pos.x + pos.width, pos.y, pos.y + pos.height]
@@ -405,9 +402,9 @@ class BallsContainer(Widget):
 
         for i in balls_dictionnary.keys() :
             if isinstance(balls_dictionnary[i][1], Parazite) :
-                sumvir += balls_dictionnary[i][1].getVir()
-                sumtrans += balls_dictionnary[i][1].getRecovProb()
-                sumrecov +=  balls_dictionnary[i][1].getTransmRate()
+                sumvir += float(balls_dictionnary[i][1].getVir())
+                sumtrans += float(balls_dictionnary[i][1].getRecovProb())
+                sumrecov +=  float(balls_dictionnary[i][1].getTransmRate())
 
                 if balls_dictionnary[i][1].getStrain() in tempdic.keys() :
                     tempdic[balls_dictionnary[i][1].getStrain()][0] += 1
@@ -424,14 +421,12 @@ class BallsContainer(Widget):
                 self.top_idds[i]= ['ID'+key[7:], tempdic2[key][0], ind[1].getVir(), ind[1].getTransmRate(), ind[1].getRecovProb(), ind[0].get_col()] #add [souche,number,vir,trans,recov,color]
                 del tempdic2[key]
 
-        #if len(list_of_parazites) != 0 :
         try :
-            self.mean_vir = sumvir/len(list_of_parazites)
             self.mean_trans = sumtrans/len(list_of_parazites)
             self.mean_recov = sumrecov/len(list_of_parazites)
+            self.mean_vir = sumvir/len(list_of_parazites)
         except:
-        #else :
-            self.mean_vir, self.mean_trans, self.mean_recov = 0,0,1
+            self.mean_vir, self.mean_trans, self.mean_recov = 0,0,0
 
         #=========GUI BULLSHIT==================================
         temp_wig = []
