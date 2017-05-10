@@ -413,11 +413,13 @@ class BallsContainer(Widget):
                 self.top_idds[i]= ['ID'+key[7:], tempdic2[key][0], ind[1].getVir(), ind[1].getTransmRate(), ind[1].getRecovProb(), ind[0].get_col()] #add [souche,number,vir,trans,recov,color]
                 del tempdic2[key]
 
-        if len(list_of_parazites) != 0 :
+        #if len(list_of_parazites) != 0 :
+        try :
             self.mean_vir = sumvir/len(list_of_parazites)
             self.mean_trans = sumtrans/len(list_of_parazites)
             self.mean_recov = sumrecov/len(list_of_parazites)
-        else :
+        except:
+        #else :
             self.mean_vir, self.mean_trans, self.mean_recov = 0,0,1
 
         #=========GUI BULLSHIT==================================
