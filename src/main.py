@@ -2,6 +2,7 @@
 #!/usr/bin/env python
 
 #from BallsContainer import *
+from __future__ import division
 from parazite1 import *
 from healthy import *
 from kivy.app import App
@@ -308,6 +309,7 @@ class BallsContainer(Widget):
     nb_coll, mean_vir, mean_trans, mean_recov = NumericProperty(0),NumericProperty(0),NumericProperty(0),NumericProperty(0)
     top_idds = ListProperty([[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]])
     temp_widg_to_remove_list = []
+    test = NumericProperty(0)
 
     def start_balls(self,dt):
         for i in range(0,NB_SAINS):
@@ -336,9 +338,6 @@ class BallsContainer(Widget):
         quad = Quadtree(0,[self.x,self.x + self.width, self.y, self.y + self.height])
         quad.reset()    #est-ce que ça sert à rien ?
         
-        sumvir = 0
-        sumrecov = 0
-        sumtrans = 0
         for i in balls_dictionnary.keys() :
             pos = balls_dictionnary[i][0]       #gotta update position (dic) here ! before the quad !
             balls_dictionnary[i][2] = [pos.x, pos.x + pos.width, pos.y, pos.y + pos.height]
@@ -403,9 +402,9 @@ class BallsContainer(Widget):
 
         for i in balls_dictionnary.keys() :
             if isinstance(balls_dictionnary[i][1], Parazite) :
-                sumvir += balls_dictionnary[i][1].getVir()
-                sumtrans += balls_dictionnary[i][1].getRecovProb()
-                sumrecov +=  balls_dictionnary[i][1].getTransmRate()
+                sumvir += float(balls_dictionnary[i][1].getVir())
+                sumtrans += float(balls_dictionnary[i][1].getRecovProb())
+                sumrecov +=  float(balls_dictionnary[i][1].getTransmRate())
 
                 if balls_dictionnary[i][1].getStrain() in tempdic.keys() :
                     tempdic[balls_dictionnary[i][1].getStrain()][0] += 1
@@ -422,14 +421,14 @@ class BallsContainer(Widget):
                 self.top_idds[i]= ['ID'+key[7:], tempdic2[key][0], ind[1].getVir(), ind[1].getTransmRate(), ind[1].getRecovProb(), ind[0].get_col()] #add [souche,number,vir,trans,recov,color]
                 del tempdic2[key]
 
-        #if len(list_of_parazites) != 0 :
-        try :
-            self.mean_vir = sumvir/len(list_of_parazites)
+        if len(list_of_parazites) != 0 :
+        #try :
             self.mean_trans = sumtrans/len(list_of_parazites)
             self.mean_recov = sumrecov/len(list_of_parazites)
-        except:
-        #else :
-            self.mean_vir, self.mean_trans, self.mean_recov = 0,0,1
+            self.mean_vir = sumvir/len(list_of_parazites)
+        #except:
+        else :
+            self.mean_vir, self.mean_trans, self.mean_recov = 0,0,0
 
         #=========GUI BULLSHIT==================================
         temp_wig = []
