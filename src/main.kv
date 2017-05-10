@@ -34,21 +34,21 @@
         text_size: self.size
         pos: root.width-115, root.height-70
         font_size: 12
-        text: "    "+str(root.top_idds[0][0])+" \ " +str(root.top_idds[0][1])+"\nVir : " +str("%.2f" % root.top_idds[0][2])+"\nTrans : "+str("%.2f" % root.top_idds[0][3])+"\nRecov: "+str("%.2f" % root.top_idds[0][4])
+        text: "    "+str(root.top_idds[0][0])+" \ " +str(root.top_idds[0][1])+"\nVir : " +str("%.2f" % root.top_idds[0][2])+"\nTrans : "+str("%.2f" % root.top_idds[0][3])+"\nRecov: "+str("%.2f" % (1-root.top_idds[0][4]))
 
     Label:
         color: 1,1,1,1
         text_size: self.size
         pos: root.width-115, root.height-150
         font_size: 12
-        text: "    "+ str(root.top_idds[1][0])+" \ " +str(root.top_idds[1][1])+"\nVir : " +str("%.2f" % root.top_idds[1][2])+"\nTrans : "+str("%.2f" % root.top_idds[1][3])+"\nRecov: "+str("%.2f" % root.top_idds[1][4])
+        text: "    "+ str(root.top_idds[1][0])+" \ " +str(root.top_idds[1][1])+"\nVir : " +str("%.2f" % root.top_idds[1][2])+"\nTrans : "+str("%.2f" % root.top_idds[1][3])+"\nRecov: "+str("%.2f" % (1-root.top_idds[1][4]))
 
     Label:
         color: 1,1,1,1
         text_size: self.size
         pos: root.width-115, root.height-230
         font_size: 12
-        text: "    "+str(root.top_idds[2][0])+" \ " +str(root.top_idds[2][1])+"\nVir : " +str("%.2f" % root.top_idds[2][2])+"\nTrans : "+str("%.2f" % root.top_idds[2][3])+"\nRecov: "+str("%.2f" % root.top_idds[2][4])
+        text: "    "+str(root.top_idds[2][0])+" \ " +str(root.top_idds[2][1])+"\nVir : " +str("%.2f" % root.top_idds[2][2])+"\nTrans : "+str("%.2f" % root.top_idds[2][3])+"\nRecov: "+str("%.2f" % (1-root.top_idds[2][4]))
 
 
     Label:
