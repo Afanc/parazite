@@ -298,6 +298,7 @@ class BallsContainer(Widget):
     num_parazites = NumericProperty(0)
     nb_coll, mean_vir, mean_trans, mean_recov = NumericProperty(0),NumericProperty(0),NumericProperty(0),NumericProperty(0)
     top_idds = ListProperty([[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]])
+    temp_widg_to_remove_list = []
 
     def start_balls(self,dt):
         for i in range(0,NB_SAINS):
@@ -435,6 +436,8 @@ class BallsContainer(Widget):
                 self.remove_widget(c)
                 self.add_widget(c)
 
+        for c in self.temp_widg_to_remove_list :
+            self.remove_widget(c)
         for i in range(0,3) :
             ball = Ball()
             ball.size = 10,10
@@ -445,6 +448,7 @@ class BallsContainer(Widget):
             else :
                 ball.set_col((0,0,0))
             self.add_widget(ball)
+            self.temp_widg_to_remove_list.append(ball)
 
 
 
