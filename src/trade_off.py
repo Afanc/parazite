@@ -9,8 +9,8 @@ def trade_off(para_i = None):
         new_transmission = 0
         effect = uniform(0,10)
         new_vir = 1/(1+exp(-(effect/1.1-5)))
-        new_transmission = -0.1 * effect + 1
-        new_recov = 1- 0.1 * effect 
+        new_transmission = (effect**2)/100
+        new_recov = (effect**2) /100 
         para_i.setVir(new_vir)
         para_i.setTransmRate(new_transmission)
         para_i.setRecovProb(new_recov)
@@ -20,8 +20,8 @@ def trade_off(para_i = None):
         new_transmission = 0
         effect = uniform(0,10)
         new_vir = 1/(1+exp(-(effect/1.1-5)))
-        new_transmission = -0.1 * effect + 1
-        new_recov = 1 - 0.1 * effect 
+        new_transmission = (effect**2) /100 
+        new_recov =  (effect**2) /100 
         return [new_vir,new_transmission,new_recov]
     '''
 new_vir = []    
@@ -32,9 +32,9 @@ plt.show()
 '''    
 
     
-'''
+
 test = Parazite(0.7, 0.1, 0, 'ID23')    
 trade_off(test)
 print test.getVir()
 print test.getTransmRate()
-print test.getRecovProb()'''
+print test.getRecovProb()

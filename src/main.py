@@ -23,7 +23,7 @@ Window.size = (800, 600)
 
 seed(42)
 
-dico_id = {}            #id:objet (pour tous les individus vivant)
+dico_id = {}            #id:objet (pour tous les individus vivant) #ne sert plus a rien non?
 balls_dictionnary = {}  #id:[widget_ball,individual, position] # pour les individus vivants
 strain_dictionary = {} #{souche:[vir,transmission, guérison][liste des infectés]} contient toutes les souches qui ont existé
 
@@ -54,40 +54,40 @@ def add_one_healthy() :
             
 def add_one_parazite(p = None) :
     '''ajoute un parasite'''
-    try:
-        temp_id = create_id() #commence par créer un ID
-        if p != None :      #si parasite est donné en argument
-            temp_vir = p.getVir() #sa virulence, 
-            temp_trans = p.getTransmRate() # son taux de transmission, 
-            temp_recov = p.getRecovProb() # et sa probabilité de guérison sont stockées dans des variables temporaires
-        elif TRADE_OFF == 'leo' :              #sinon on crée
-            attribute = trade_off()
-            temp_vir = attribute[0]
-            temp_trans = attribute[1]
-            temp_recov = attribute[2]
-        elif TRADE_OFF == 'dariush':
-            temp_vir = uniform(0,1) #une virulance
-            temp_trans = uniform(0,1) # un taux de transmission,
-            temp_recov = uniform(0,1) # une probabilité de guérison
-            norm = BASE_FITNESS/(temp_vir + temp_trans + temp_recov) # on crée une variable pour les normaliser
-            temp_vir *= norm # et on normalise les trois paramètre
-            temp_trans *= norm
-            temp_recov *= norm
+    #try:
+    temp_id = create_id() #commence par créer un ID
+    if p != None :      #si parasite est donné en argument
+        temp_vir = p.getVir() #sa virulence, 
+        temp_trans = p.getTransmRate() # son taux de transmission, 
+        temp_recov = p.getRecovProb() # et sa probabilité de guérison sont stockées dans des variables temporaires
+    elif TRADE_OFF == 'leo' :              #sinon on crée
+        attribute = trade_off()
+        temp_vir = attribute[0]
+        temp_trans = attribute[1]
+        temp_recov = attribute[2]
+    elif TRADE_OFF == 'dariush':
+        temp_vir = uniform(0,1) #une virulance
+        temp_trans = uniform(0,1) # un taux de transmission,
+        temp_recov = uniform(0,1) # une probabilité de guérison
+        norm = BASE_FITNESS/(temp_vir + temp_trans + temp_recov) # on crée une variable pour les normaliser
+        temp_vir *= norm # et on normalise les trois paramètre
+        temp_trans *= norm
+        temp_recov *= norm
 
-        if temp_id not in dico_id.keys(): # si l'ID n'est pas dans les ID existants
-            list_of_parazites.append(Parazite(temp_vir, temp_trans, temp_recov, temp_id)) #on ajoute le parasite à la liste
-            temp_strain = list(list_of_parazites[-1].getStrain()) # la souche est pour l'instant "[]" par défaut
-            temp_strain.append(list_of_parazites[-1].getIdd()) # on lui ajoute l'ID dans la liste
-            temp_strain = str('Souche:' + temp_strain[0][2:])# On modifie la variable temporaire pour que les souches et les ID soient bien distincts
-            list_of_parazites[-1].setStrain(temp_strain) #On modifie la souche du parasite pour la souche temporaire
-            strain_dictionary[temp_strain] = [[temp_vir, temp_trans, temp_recov],[str(temp_id)]] #et on stocke la souche et l'individu infecté dans le dico des souches
+    if temp_id not in dico_id.keys(): # si l'ID n'est pas dans les ID existants
+        list_of_parazites.append(Parazite(temp_vir, temp_trans, temp_recov, temp_id)) #on ajoute le parasite à la liste
+        temp_strain = list(list_of_parazites[-1].getStrain()) # la souche est pour l'instant "[]" par défaut
+        temp_strain.append(list_of_parazites[-1].getIdd()) # on lui ajoute l'ID dans la liste
+        temp_strain = str('Souche:' + temp_strain[0][2:])# On modifie la variable temporaire pour que les souches et les ID soient bien distincts
+        list_of_parazites[-1].setStrain(temp_strain) #On modifie la souche du parasite pour la souche temporaire
+        strain_dictionary[temp_strain] = [[temp_vir, temp_trans, temp_recov],[str(temp_id)]] #et on stocke la souche et l'individu infecté dans le dico des souches
         
-            dico_id[temp_id] = list_of_parazites[-1] # on stocke l'individu dans le dico 
-            return list_of_parazites[-1] # la fonction retourne l'individu crée
+        dico_id[temp_id] = list_of_parazites[-1] # on stocke l'individu dans le dico 
+        return list_of_parazites[-1] # la fonction retourne l'individu crée
 
-        else :
-            print temp, 'exists in ', dico_id.keys(), "in add_healthy function" #message d'erreur
-    except: 
+    else :
+        print temp, 'exists in ', dico_id.keys(), "in add_healthy function" #message d'erreur
+    #except: 
         print "could not add parazite: ID problem" #messsge d'erreur
                  
 
@@ -116,7 +116,7 @@ def reproduce(root,p):
     root.add_widget(ball) #ajoute la balle au container
     
 
-    healthy = add_one_healthy()
+    healthy = add_one_healthy() 
     balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
     
     
@@ -152,7 +152,7 @@ def guerison(p):
 def cure_the_lucky_ones(dt) :
 
     for i in iter(list_of_parazites):
-        if uniform(0,1) > (1-BASE_CHANCE_OF_HEALING)*(1+i.getRecovProb()) :    #! RecovProb = 1 --> aucune chance de recover
+        if uniform(0,1) < BASE_CHANCE_OF_HEALING *(1+i.getRecovProb()) :    #! RecovProb = 1 --> aucune chance de recover
             guerison(i)
 
 def mutate_those_who_wish(dt) :
@@ -253,15 +253,16 @@ def infect_him(para_i,heal_i, parazites_reproducing=False) :
             balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(tuple(random_color))
 
 def parazite_against_parazite(p1,p2) :
-    if p1.getVir() > p2.getVir() :
-        p2.setVir(p1.getVir())
-        p2.setTransmRate(p1.getTransmRate())
-        p2.setRecovProb(p1.getRecovProb())
-        balls_dictionnary[p2.getIdd()][0].set_col(balls_dictionnary[p1.getIdd()][0].get_col())
-        p2.setStrain(p1.getStrain())
-        strain_dictionary[p1.getStrain()][1].append(p2.getIdd())
-    elif p2.getVir() > p1.getVir() :
-        parazite_against_parazite(p2,p1)
+    if uniform(0,1) < INFECTION_CHANCE *(1+p1.getTransmRate()) : 
+        if p1.getVir() > p2.getVir() :
+            p2.setVir(p1.getVir())
+            p2.setTransmRate(p1.getTransmRate())
+            p2.setRecovProb(p1.getRecovProb())
+            balls_dictionnary[p2.getIdd()][0].set_col(balls_dictionnary[p1.getIdd()][0].get_col())
+            p2.setStrain(p1.getStrain())
+            strain_dictionary[p1.getStrain()][1].append(p2.getIdd())
+        elif p2.getVir() > p1.getVir() :
+            parazite_against_parazite(p2,p1)
     
 def actions_when_collision(p1,p2):
     possible_classes = [Healthy, Parazite, Parazite]
@@ -371,6 +372,7 @@ class BallsContainer(Widget):
         self.all_nighter()
 
     def all_nighter(self) :
+        global REPRODUCTION_PROB, DYING_PROB
         if len(list_of_parazites) <1 and ALL_NIGHT_LONG == 1:
             for i in range (0,NB_PARASITE):    
                 ball = Ball()
