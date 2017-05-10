@@ -418,6 +418,7 @@ class BallsContainer(Widget):
         else :
             self.mean_vir, self.mean_trans, self.mean_recov = 0,0,1
 
+        #=========GUI BULLSHIT==================================
         temp_wig = []
         for c in self.children:
             if not isinstance(c, Ball) :
@@ -432,6 +433,15 @@ class BallsContainer(Widget):
             if isinstance(c,Label) :
                 self.remove_widget(c)
                 self.add_widget(c)
+        for i in range(0,3) :
+            if len(tempdic) != 0 :
+                ball = Ball()
+                ball.center = (self.width-10,self.height-10)
+                ball.velocity = (0,0)
+                ball.set_col(self.top_idds[0][5])
+                self.add_widget(ball)
+
+        #=========GUI BULLSHIT==================================
 
     def on_pause(self):
         Clock.unschedule(self.update)
