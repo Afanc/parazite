@@ -10,7 +10,7 @@ def trade_off(para_i = None):
         effect = uniform(0,10)
         new_vir = 1/(1+exp(-(effect/1.1-5)))
         new_transmission = -0.1 * effect + 1
-        new_recov = 0.1 * effect 
+        new_recov = 1- 0.1 * effect 
         para_i.setVir(new_vir)
         para_i.setTransmRate(new_transmission)
         para_i.setRecovProb(new_recov)
@@ -21,7 +21,7 @@ def trade_off(para_i = None):
         effect = uniform(0,10)
         new_vir = 1/(1+exp(-(effect/1.1-5)))
         new_transmission = -0.1 * effect + 1
-        new_recov = 0.1 * effect 
+        new_recov = 1 - 0.1 * effect 
         return [new_vir,new_transmission,new_recov]
     '''
 new_vir = []    

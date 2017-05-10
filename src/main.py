@@ -18,6 +18,7 @@ from quadtree import Quadtree
 from collision import *
 import matplotlib.pyplot as plt
 from time import clock
+from trade_off import trade_off
 Window.size = (800, 600)
 
 seed(42)
@@ -59,7 +60,12 @@ def add_one_parazite(p = None) :
             temp_vir = p.getVir() #sa virulence, 
             temp_trans = p.getTransmRate() # son taux de transmission, 
             temp_recov = p.getRecovProb() # et sa probabilité de guérison sont stockées dans des variables temporaires
-        else :              #sinon on crée
+        elif TRADE_OFF == 'leo' :              #sinon on crée
+            attribute = trade_off()
+            temp_vir = attribute[0]
+            temp_trans = attribute[1]
+            temp_recov = attribute[2]
+        elif TRADE_OFF = 'dariush':
             temp_vir = uniform(0,1) #une virulance
             temp_trans = uniform(0,1) # un taux de transmission,
             temp_recov = uniform(0,1) # une probabilité de guérison
@@ -185,14 +191,15 @@ def random_mutation_on(para_i, what) :
             
     if uniform(0,1) < chance:      #prob. de mutation
         
-        old_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
+        '''old_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
         attribute_functions = {'0':para_i.set_New_Vir, '1':para_i.set_New_TransmRate, '2':para_i.set_New_RecovProb, '3': para_i.setStrain([])}
         
         rand_mod = (randint(0,1)*2-1)*(1+uniform(0, fit_change))    #modificateur valant au max 1+0.2 (p. ex)
         rand_index = randint(0,2)
         new_value = max(min(old_attributes[rand_index] * rand_mod, 1),0)   #new attribute = 1.2*old attribute (au max)
         attribute_functions[str(rand_index)](new_value)                     #on appelle la fonction correspondante
-        new_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
+        new_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]'''
+        trade_off(para_i)
         if what == 'living':
             temp_idd = para_i.getIdd() + '*'
             balls_dictionnary[temp_idd] = balls_dictionnary[para_i.getIdd()]
@@ -372,7 +379,7 @@ class BallsContainer(Widget):
                 ball.set_col((uniform(0,1),uniform(0,1),0))
                 parazite = add_one_parazite()
                 balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
-        if len(list_of_healthies) > 250 and HEALTHY_ROOF == 1:
+        if len(list_of_healthies) + len(list_of_parazites) > 300 and HEALTHY_ROOF == 1:
             DYING_PROB = ROOF_DYING_PROB
         elif len(list_of_healthies)<= 250 and HEALTHY_ROOF == 1:
             DYING_PROB = STOCK_DYING_PROB
