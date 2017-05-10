@@ -402,14 +402,15 @@ class BallsContainer(Widget):
                 else :
                     tempdic[balls_dictionnary[i][1].getStrain()] = [1, balls_dictionnary[i][1].getIdd()]
 
+        tempdic2 = dict(tempdic)
         for i in range(0,3) :
-            if len(tempdic) == 0 :
-                self.top_idds[i] = [0,0,0,0,0]
+            if len(tempdic2) == 0 :
+                self.top_idds[i] = [0,0,0,0,0,[1,1,1]]
             else :
-                key = self.idd_max(tempdic)
-                ind = balls_dictionnary[tempdic[key][1]]
-                self.top_idds[i]= ['ID'+key[7:], tempdic[key][0], ind[1].getVir(), ind[1].getTransmRate(), ind[1].getRecovProb(), ind[0].get_col()] #add [souche,number,vir,trans,recov,color]
-                del tempdic[key]
+                key = self.idd_max(tempdic2)
+                ind = balls_dictionnary[tempdic2[key][1]]
+                self.top_idds[i]= ['ID'+key[7:], tempdic2[key][0], ind[1].getVir(), ind[1].getTransmRate(), ind[1].getRecovProb(), ind[0].get_col()] #add [souche,number,vir,trans,recov,color]
+                del tempdic2[key]
 
         if len(list_of_parazites) != 0 :
             self.mean_vir = sumvir/len(list_of_parazites)
@@ -433,13 +434,19 @@ class BallsContainer(Widget):
             if isinstance(c,Label) :
                 self.remove_widget(c)
                 self.add_widget(c)
+
         for i in range(0,3) :
-            if len(tempdic) != 0 :
-                ball = Ball()
-                ball.center = (self.width-10,self.height-10)
-                ball.velocity = (0,0)
-                ball.set_col(self.top_idds[0][5])
-                self.add_widget(ball)
+            ball = Ball()
+            ball.size = 10,10
+            ball.center = (self.width-112,self.height-80*i-17)
+            ball.velocity = (0,0)
+            if len(self.top_idds) > i:
+                ball.set_col(self.top_idds[i][5])
+            else :
+                ball.set_col((0,0,0))
+            self.add_widget(ball)
+
+
 
         #=========GUI BULLSHIT==================================
 
