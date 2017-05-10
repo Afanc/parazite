@@ -65,7 +65,7 @@ def add_one_parazite(p = None) :
             temp_vir = attribute[0]
             temp_trans = attribute[1]
             temp_recov = attribute[2]
-        elif TRADE_OFF = 'dariush':
+        elif TRADE_OFF == 'dariush':
             temp_vir = uniform(0,1) #une virulance
             temp_trans = uniform(0,1) # un taux de transmission,
             temp_recov = uniform(0,1) # une probabilité de guérison
@@ -190,16 +190,18 @@ def random_mutation_on(para_i, what) :
         fit_change = MAX_FITNESS_CHANGE_ON_NOTHING
             
     if uniform(0,1) < chance:      #prob. de mutation
-        
-        '''old_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
-        attribute_functions = {'0':para_i.set_New_Vir, '1':para_i.set_New_TransmRate, '2':para_i.set_New_RecovProb, '3': para_i.setStrain([])}
-        
-        rand_mod = (randint(0,1)*2-1)*(1+uniform(0, fit_change))    #modificateur valant au max 1+0.2 (p. ex)
-        rand_index = randint(0,2)
-        new_value = max(min(old_attributes[rand_index] * rand_mod, 1),0)   #new attribute = 1.2*old attribute (au max)
-        attribute_functions[str(rand_index)](new_value)                     #on appelle la fonction correspondante
-        new_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]'''
-        trade_off(para_i)
+        if TRADE_OFF == 'dariush':
+            old_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
+            attribute_functions = {'0':para_i.set_New_Vir, '1':para_i.set_New_TransmRate, '2':para_i.set_New_RecovProb, '3': para_i.setStrain([])}
+            
+            rand_mod = (randint(0,1)*2-1)*(1+uniform(0, fit_change))    #modificateur valant au max 1+0.2 (p. ex)
+            rand_index = randint(0,2)
+            new_value = max(min(old_attributes[rand_index] * rand_mod, 1),0)   #new attribute = 1.2*old attribute (au max)
+            attribute_functions[str(rand_index)](new_value)                     #on appelle la fonction correspondante
+            new_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
+        elif TRADE_OFF == 'leo':
+            trade_off(para_i)
+            
         if what == 'living':
             temp_idd = para_i.getIdd() + '*'
             balls_dictionnary[temp_idd] = balls_dictionnary[para_i.getIdd()]
