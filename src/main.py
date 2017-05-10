@@ -217,8 +217,6 @@ def random_mutation_on(para_i, what) :
         new_strain = 'Souche:' + new_strain[2:]
         para_i.setStrain(new_strain)
         strain_dictionary[new_strain] = [[para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb],[para_i.getIdd()]]
-        if what == 'living':
-            print  "________________ bug?", para_i.getIdd(),"  ", para_i.getStrain()
         
         x = randint(0,2)
         random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
@@ -421,13 +419,11 @@ class BallsContainer(Widget):
                 self.top_idds[i]= ['ID'+key[7:], tempdic2[key][0], ind[1].getVir(), ind[1].getTransmRate(), ind[1].getRecovProb(), ind[0].get_col()] #add [souche,number,vir,trans,recov,color]
                 del tempdic2[key]
 
-        if len(list_of_parazites) != 0 :
-        #try :
+        try :
             self.mean_trans = sumtrans/len(list_of_parazites)
             self.mean_recov = sumrecov/len(list_of_parazites)
             self.mean_vir = sumvir/len(list_of_parazites)
-        #except:
-        else :
+        except:
             self.mean_vir, self.mean_trans, self.mean_recov = 0,0,0
 
         #=========GUI BULLSHIT==================================
