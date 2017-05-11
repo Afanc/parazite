@@ -20,7 +20,12 @@ from collision import *
 import matplotlib.pyplot as plt
 from time import clock
 from trade_off import trade_off
+from sys import exit
+from os.path import isfile
+import csv
 Window.size = (800, 600)
+
+
 
 seed(42)
 
@@ -31,6 +36,11 @@ strain_dictionary = {} #{souche:[vir,transmission, guérison][liste des infecté
 list_of_healthies = [] #liste des individus sains vivants
 list_of_parazites = [] #liste des parasites vivants
 
+if isfile('data.csv') and 'y' != raw_input("le fichier data existe déjà, le remplaçer? (y/n)"): sys.exit(0)
+else:
+    with open('data.csv', 'w') as par:
+        new_line = csv.writer(par, delimiter=',')
+        new_line.writerow(['temps', 'nb_indiv', 'nb_parasites', 'virulence','transmission','guerison'])
 
 def create_id(): 
     '''crée un nouvel id pour chaque nouveau parasite'''
@@ -126,7 +136,7 @@ def reproduce(root,p):
         random_mutation_on(balls_dictionnary[list_of_parazites[-1].getIdd()][1], 'reproduction') #si il n'y a pas de mutation
         try :
             if uniform(0,1) > GENERATION_RESISTANCE: #permet de lancer le programme avec ou sans le passage des résistance
-                for i in p.getResistances() : # CHaque resistance du parent
+                for i in p.getResistances() : # Chaque resistance du parent
                     list_of_healthies[-1].addResistance(i) # est passée au jeune
         except :
             print "\n _________________________________________________\nl'erreur ligne 116 !\n______________________________________________\n"
@@ -305,7 +315,7 @@ class BallsContainer(Widget):
     faster_events = []
     num_healthies = NumericProperty(0)
     num_parazites = NumericProperty(0)
-    nb_coll, mean_vir, mean_trans, mean_recov = NumericProperty(0),NumericProperty(0),NumericProperty(0),NumericProperty(0)
+    nb_coll, mean_vir, mean_trans, mean_recov,last_clock, duration, paused = NumericProperty(0),NumericProperty(0),NumericProperty(0),NumericProperty(0),NumericProperty(0), NumericProperty(0), NumericProperty(0)
     top_idds = ListProperty([[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]])
     temp_widg_to_remove_list = []
     test = NumericProperty(0)
@@ -367,7 +377,8 @@ class BallsContainer(Widget):
         mutate_those_who_wish(dt)
         self.update_numbers()
         self.all_nighter()
-
+        
+        
     def all_nighter(self) :
         global REPRODUCTION_PROB, DYING_PROB
         if len(list_of_parazites) <1 and ALL_NIGHT_LONG == 1:
@@ -395,7 +406,7 @@ class BallsContainer(Widget):
         self.num_parazites = len(list_of_parazites)
         self.num_healthies = len(list_of_healthies)
 
-        sumvir, sumrecov, sumtrans = 0,0,0
+        sumvir, sumrecov, sumtrans, time = 0,0,0, clock()
 
         tempdic = {}
         self.top_idds = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
@@ -422,12 +433,20 @@ class BallsContainer(Widget):
                 del tempdic2[key]
 
         try :
+            
             self.mean_trans = sumtrans/len(list_of_parazites)
             self.mean_recov = sumrecov/len(list_of_parazites)
-            self.mean_vir = sumvir/len(list_of_parazites)
+            self.mean_vir = sumvir/len(list_of_parazites) 
+            
         except:
             self.mean_vir, self.mean_trans, self.mean_recov = 0,0,0
-
+        self.duration = clock()- self.paused
+        
+        #------------------------------- Enregistrement des données--------------------
+        with open("data.csv", "a") as par:
+            
+            test =csv.writer(par, delimiter=',')
+            test.writerow([self.duration,len(list_of_healthies) + len(list_of_healthies), len(list_of_parazites),self.mean_vir,self.mean_trans,self.mean_recov])
         #=========GUI BULLSHIT==================================
         temp_wig = []
         for c in self.children:
@@ -482,18 +501,21 @@ class BallsContainer(Widget):
         plt.scatter(listx, listy)
         plt.ylabel('Secondary infections')
         plt.plot((self.mean_vir, self.mean_vir), (0,len(listy)), 'k-',color = 'r')
-        plt.title('Nb of sec. infections following virulance at time = ' + str(int(clock())) + 'sec')
+        plt.title('Nb of sec. infections following virulance at time = ' + str(self.duration) + 'sec')
         plt.show()
         return 
 
     def Keyboard(self, window, keycode, *args) :
         if keycode == 32 and not self.pause:              #SPACE - pour ça je rajoute un print keycode avant et check le int
+            self.duration = clock() - self.paused
+            self.paused -= clock()
             self.on_pause()
             self.pause = True
-
+            
         elif keycode == 32 and self.pause :
             self.on_resume()
             self.pause = False
+            self.paused += clock()
 
         elif keycode == 275 :           #right
             self.faster_events.append([Clock.schedule_interval(self.update, DELTA_TIME), Clock.schedule_interval(self.update_life_and_death, 60*DELTA_TIME)])
@@ -505,12 +527,11 @@ class BallsContainer(Widget):
                 self.faster_events.pop()
           
         elif keycode == 274:            #nombre de collision/intervalle de temps
-            elapsed = clock() - last_clock
             mean_col = self.nb_coll/elapsed
             print "virulence moyenne: ", self.mean_vir
             print "recovery moyenne: ", self.mean_recov
             print "transmission moyenne : ", self.mean_trans
-            last_clock = clock()
+            self.last_clock = clock()
             self.nb_coll = 0
 
     def idd_max(self,dico):
