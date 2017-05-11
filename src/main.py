@@ -20,6 +20,12 @@ from collision import *
 import matplotlib.pyplot as plt
 from time import clock
 from trade_off import trade_off
+from del_useless_files import * # si on arrive à faire en sorte que ça se lance tout seul quand on ferme le programme ce serait top
+import csv 
+import time 
+import os 
+import shutil 
+from time import clock 
 Window.size = (800, 600)
 
 seed(42)
@@ -27,10 +33,16 @@ seed(42)
 dico_id = {}            #id:objet (pour tous les individus vivant) #ne sert plus a rien non?
 balls_dictionnary = {}  #id:[widget_ball,individual, position] # pour les individus vivants
 strain_dictionary = {} #{souche:[vir,transmission, guérison][liste des infectés]} contient toutes les souches qui ont existé
+dico_of_strains_for_csv = {}  #{souche:variable.writerow()}
 
 list_of_healthies = [] #liste des individus sains vivants
 list_of_parazites = [] #liste des parasites vivants
 
+
+csv_nb_total_sains_infectes = csv.writer(open("nb_total_sains_infectes.csv","wb")) #creer le fichier des données générales de la population 
+csv_nb_total_sains_infectes.writerow(["temps","population totale","individus sains","individus infectés","pourcentage de la population infectée",
+                                      "virulence moyenne","taux de transmission guérison","taux de transmission"]) #header des données générales de la pop
+initial_time = time.clock() 
 
 def create_id(): 
     '''crée un nouvel id pour chaque nouveau parasite'''
@@ -84,6 +96,11 @@ def add_one_parazite(p = None) :
         strain_dictionary[temp_strain] = [[temp_vir, temp_trans, temp_recov],[str(temp_id)]] #et on stocke la souche et l'individu infecté dans le dico des souches
         
         dico_id[temp_id] = list_of_parazites[-1] # on stocke l'individu dans le dico 
+        
+        with open("data/" + temp_strain + ".csv","wb") as NewStrainFile:
+            dico_of_strains_for_csv[temp_strain] = csv.writer(NewStrainFile) #création du fichier .csv avec le nom de la souche
+            dico_of_strains_for_csv[temp_strain].writerow(["Souche","temps[s]","nombre infection secondaires","population totale en vie","parasites de cette souche en vie","pourcentage de la population de parasites", #header du csv
+        "virulence: "+ str(temp_vir), "taux de transmision: "+ str(temp_trans), "probabilité de guérison contre le parasite: " + str(temp_recov)])
         return list_of_parazites[-1] # la fonction retourne l'individu crée
 
     else :
@@ -218,6 +235,13 @@ def random_mutation_on(para_i, what) :
         para_i.setStrain(new_strain)
         strain_dictionary[new_strain] = [[para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb],[para_i.getIdd()]]
         
+        with open("data/" + new_strain + ".csv","wb") as NewMutStrainFile: #créer un fichier .csv avec le nom de la souche
+            dico_of_strains_for_csv[new_strain] = csv.writer(NewMutStrainFile)        
+            dico_of_strains_for_csv[new_strain].writerow(["Souche","temps[s]","nombre infection secondaires","population totale en vie"
+        ,"parasites en vie","pourcentage de la population de parasites",
+        "virulence: "+ str(para_i.getVir()), "taux de transmision: "+ str(para_i.getTransmRate()), 
+        "probabilité de guérison contre le parasite: " + str(para_i.getTransmRate())]) 
+        
         x = randint(0,2)
         random_color = list(balls_dictionnary[list_of_parazites[-1].getIdd()][0].get_col())
         random_color[x] = max(min(uniform(-1,1)+random_color[x], 1),0)
@@ -291,6 +315,7 @@ class mainApp(App):
         Clock.schedule_once(root.update_life_and_death,1.1)         #on attend que la fenêtre soit lancée
         Clock.schedule_interval(root.update, DELTA_TIME)
         Clock.schedule_interval(root.update_life_and_death, 60*DELTA_TIME)    #ça ça marche
+        Clock.schedule_interval(root.update_data_files,10*DELTA_TIME) #inscrit les données dans les fichiers csv, DELTA_TIME *10 pour avoir ~ 5 mesures/sec
         Window.bind(on_key_down=root.Keyboard)                      #pour le clavier
 
         return root
@@ -517,7 +542,39 @@ class BallsContainer(Widget):
         a = [i[0] for i in dico.values()]
         b=list(dico.keys())
         return b[a.index(max(a))]
-
+        
+    def update_data_files(self,dt):
+        current_time = time.clock()
+        simulation_time = round(current_time - initial_time,4) 
+        nb_of_healthies = len(list_of_healthies) #liste des individus sains vivants
+        total_nb_of_parazites_alive = len(list_of_parazites) #liste des parasites vivants
+        total_population = nb_of_healthies +  total_nb_of_parazites_alive
+        if nb_of_healthies > 0 :
+            percentage_of_parazites_in_pop = round((float(total_nb_of_parazites_alive)/total_population)*100,2) #pourcentage de parasite dans la population totale
+        else :
+            percentage_of_parazites_in_pop = 0 # pour éviter division par zéro
+            
+        #inscription dans le fichier src/nb_sains_infectes.csv
+        csv_nb_total_sains_infectes.writerow([simulation_time,total_population,nb_of_healthies,
+                                              total_nb_of_parazites_alive,percentage_of_parazites_in_pop,self.mean_vir,self.mean_recov,self.mean_trans])
+        
+        #parcours les souches et met à jour le fichier "souche.csv" qui leur correspond
+        for strain_id in strain_dictionary:
+            total_nb_of_infections = len(strain_dictionary[strain_id][1]) #nombre total d'infection secondaires
+            nb_of_parazites_alive = 0 # nombre de parasites de cette souche en vie à l'instant t
+            for id_infected_by_this_strain in strain_dictionary[strain_id][1]:  # on parcours la liste des id qui ont été infectés par cette souche
+                if id_infected_by_this_strain in balls_dictionnary: #on prend la liste des id qui ont été inféctés par cette souche et on compare avec la liste des invidividus encore en vie
+                    nb_of_parazites_alive += 1    
+            
+            percentage_of_all_infections = round((float(nb_of_parazites_alive)/total_nb_of_parazites_alive) * 100, 2) #quelle importance a cette souche comparée au total des autres   
+       
+            if nb_of_parazites_alive > 0 :    #on contnu de mettre à jour le fichier csv seuelment si la souche est encore active ( au moins 1 parasite encore en vie)
+                    with open("data/" + strain_id + ".csv","a") as UpdateStrainFile:
+                        dico_of_strains_for_csv[strain_id] = csv.writer(UpdateStrainFile)
+                        dico_of_strains_for_csv[strain_id].writerow([simulation_time,strain_id,total_nb_of_infections,
+                                                            total_population,nb_of_parazites_alive, percentage_of_all_infections])
+            
+                
 
             
 # -------------------- balls container--------------------
