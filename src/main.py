@@ -325,7 +325,6 @@ class mainApp(App):
         Clock.schedule_once(root.update_life_and_death,1.1)         #on attend que la fenêtre soit lancée
         Clock.schedule_interval(root.update, DELTA_TIME)
         Clock.schedule_interval(root.update_life_and_death, 60*DELTA_TIME)    #ça ça marche
-        Clock.schedule_interval(root.update_data_files,10*DELTA_TIME) #inscrit les données dans les fichiers csv, DELTA_TIME *10 pour avoir ~ 5 mesures/sec
         Window.bind(on_key_down=root.Keyboard)                      #pour le clavier
 
         return root
@@ -400,9 +399,9 @@ class BallsContainer(Widget):
         reproduce_those_who_have_to(self,dt)
         cure_the_lucky_ones(dt)
         mutate_those_who_wish(dt)
-        self.update_numbers()
         self.all_nighter()
-        
+        self.update_numbers()
+        self.update_data_files(dt)
         
     def all_nighter(self) :
         global REPRODUCTION_PROB, DYING_PROB
@@ -592,12 +591,7 @@ class BallsContainer(Widget):
                         dico_of_strains_for_csv[strain_id].writerow([simulation_time,strain_id,total_nb_of_infections,
                                                             total_population,nb_of_parazites_alive, percentage_of_all_infections])
             
-                
-
-            
 # -------------------- balls container--------------------
-
-
 
 #-----------------------------Kivy GUI-----------------------------------------------
 if __name__ == '__main__':  
