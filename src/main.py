@@ -43,7 +43,7 @@ dico_of_strains_for_csv = {}  #{souche:variable.writerow()}
 list_of_healthies = [] #liste des individus sains vivants
 list_of_parazites = [] #liste des parasites vivants
 
-if isfile('data.csv') and 'y' != raw_input("le fichier data existe déjà, le remplaçer? (y/n)"): sys.exit(0)
+if isfile('data.csv') and 'y' != raw_input("le fichier data existe déjà, le remplacer? (y/n)"): sys.exit(0)
 else:
     with open('data.csv', 'w') as par:
         new_line = csv.writer(par, delimiter=',')
@@ -552,12 +552,9 @@ class BallsContainer(Widget):
                 self.faster_events.pop()
           
         elif keycode == 274:            #nombre de collision/intervalle de temps
-            mean_col = self.nb_coll/elapsed
             print "virulence moyenne: ", self.mean_vir
             print "recovery moyenne: ", self.mean_recov
             print "transmission moyenne : ", self.mean_trans
-            self.last_clock = clock()
-            self.nb_coll = 0
 
     def idd_max(self,dico):
         a = [i[0] for i in dico.values()]
