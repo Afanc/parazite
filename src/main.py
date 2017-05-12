@@ -266,7 +266,6 @@ def infect_him(para_i,heal_i, parazites_reproducing=False) :
     testing_par = para_i.getStrain()
     if testing_par in heal_i.getResistances() :
         resistant = True
-        print "------------------- I RESISTED", heal_i.getResistances()
     if not resistant :
         temp_par = list(para_i.getPar())
         temp_par.append(para_i.getIdd())
@@ -438,8 +437,8 @@ class BallsContainer(Widget):
         for i in balls_dictionnary.keys() :
             if isinstance(balls_dictionnary[i][1], Parazite) :
                 sumvir += float(balls_dictionnary[i][1].getVir())
-                sumtrans += float(balls_dictionnary[i][1].getRecovProb())
-                sumrecov +=  float(balls_dictionnary[i][1].getTransmRate())
+                sumtrans += float(balls_dictionnary[i][1].getTransmRate())
+                sumrecov +=  float(balls_dictionnary[i][1].getRecovProb())
 
                 if balls_dictionnary[i][1].getStrain() in tempdic.keys() :
                     tempdic[balls_dictionnary[i][1].getStrain()][0] += 1
