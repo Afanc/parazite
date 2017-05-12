@@ -419,13 +419,13 @@ class BallsContainer(Widget):
         cure_the_lucky_ones(dt)
         mutate_those_who_wish(dt)
         self.all_nighter()
+        print "i tried"
         self.theory_tester(dt)
         self.update_numbers()
         self.update_data_files(dt)
         
     def all_nighter(self) :
         global REPRODUCTION_PROB, DYING_PROB
-        print ALL_NIGHT_LONG
         if ALL_NIGHT_LONG == 1 and len(list_of_parazites) < 1:
             for i in range (0,NB_PARASITE):    
                 ball = Ball()
@@ -449,13 +449,23 @@ class BallsContainer(Widget):
             REPRODUCTION_PROB = STOCK_REPRODUCTION_PROB
     
     def theory_tester(self,dt):
+        print "hard"
+        compteur = 0
+        #print "dt : ", str(dt)
         if TEST_THEORY == 1:
-            compteur = 0
-            if len(list_of_parazites) == 0 or self.duration - self.last_clock >= 60:
+            global CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE 
+            CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE,GENERATION_RESISTANCE = 0,0,0,0,0
+            if len(list_of_parazites) == 0 or self.duration - self.last_clock >= 15 :
+                print "to get this results"
+                print len(list_of_parazites)
                 for i in list_of_parazites:
-                    kill(i,dt)
+                    kill(self, i)
+                    self.on_pause()
+                print len(list_of_parazites)
                 for i in list_of_healthies:
-                    kill(i,dt)
+                    kill(self, i)
+                print len(list_of_healthies)
+                print "done"
                 self.start_balls(dt)
                 for i in range(0,NB_PARASITE):
                     ball = Ball()
@@ -467,7 +477,7 @@ class BallsContainer(Widget):
 
                     parazite = add_one_parazite(effect = compteur)
                     balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
-            self.last_clock = self.duration
+                self.last_clock = self.duration
             compteur += 0.2
             if compteur >= 10.2:
                 exit()
@@ -510,7 +520,9 @@ class BallsContainer(Widget):
             
         except:
             self.mean_vir, self.mean_trans, self.mean_recov = 0,0,0
-        self.duration = clock()- self.paused
+        
+        self.duration = clock()- self.paused 
+        print self.duration - float(self.last_clock)
         
         #------------------------------- Enregistrement des données--------------------
         with open("data.csv", "a") as par:
