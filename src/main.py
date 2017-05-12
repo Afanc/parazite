@@ -43,7 +43,9 @@ dico_of_strains_for_csv = {}  #{souche:variable.writerow()}
 list_of_healthies = [] #liste des individus sains vivants
 list_of_parazites = [] #liste des parasites vivants
 
-if isfile('data.csv') and 'y' != raw_input("le fichier data existe déjà, le remplacer? (y/n)"): sys.exit(0)
+
+if isfile('data.csv') and 'y' != raw_input("le fichier data existe déjà, le remplaçer? (y/n)"): exit()
+
 else:
     with open('data.csv', 'w') as par:
         new_line = csv.writer(par, delimiter=',')
@@ -266,6 +268,7 @@ def infect_him(para_i,heal_i, parazites_reproducing=False) :
     testing_par = para_i.getStrain()
     if testing_par in heal_i.getResistances() :
         resistant = True
+
     if not resistant :
         temp_par = list(para_i.getPar())
         temp_par.append(para_i.getIdd())
@@ -529,6 +532,7 @@ class BallsContainer(Widget):
         return 
 
     def Keyboard(self, window, keycode, *args) :
+        
         if keycode == 32 and not self.pause:              #SPACE - pour ça je rajoute un print keycode avant et check le int
             self.duration = clock() - self.paused
             self.paused -= clock()
@@ -553,6 +557,13 @@ class BallsContainer(Widget):
             print "virulence moyenne: ", self.mean_vir
             print "recovery moyenne: ", self.mean_recov
             print "transmission moyenne : ", self.mean_trans
+
+            self.last_clock = clock()
+            self.nb_coll = 0
+        
+        elif keycode == 115:# s pour stop
+            exit()
+
 
     def idd_max(self,dico):
         a = [i[0] for i in dico.values()]
