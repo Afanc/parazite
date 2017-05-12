@@ -12,7 +12,7 @@ def trade_off(para_i = None, effect_arg = None):
         effect = effect_arg
         new_vir = (effect**2)/100
         new_transmission = 1/(1+exp(-(effect/1.1-5)))
-        new_recov =  0.1 + 1/2 * effect
+        new_recov =  0.1 + 1/effect
         if new_recov > 1:
             new_recov = 1
         
@@ -32,7 +32,7 @@ def trade_off(para_i = None, effect_arg = None):
             effect = (para_i.getVir()*100)**0.5
         new_vir = (effect**2)/100
         new_transmission = 1/(1+exp(-(effect/1.1-5)))
-        new_recov =  0.1 + 1/2 * effect
+        new_recov =  0.1 + 1/effect
         if new_recov > 1:
             new_recov = 1
         para_i.setVir(new_vir)
@@ -45,12 +45,13 @@ def trade_off(para_i = None, effect_arg = None):
         effect = uniform(0,10)
         new_vir = (effect**2)/100
         new_transmission = 1/(1+exp(-(effect/1.1-5)))
-        new_recov =  0.1 + 1/2 * effect
+        new_recov =  0.1 + 1/effect
         if new_recov > 1:
             new_recov = 1
         
         return [new_vir,new_transmission,new_recov]
 
+print trade_off(effect_arg=2.0)
 '''     
 y = []
 x = []

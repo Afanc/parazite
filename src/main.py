@@ -140,7 +140,8 @@ def kill(root,p):
     del balls_dictionnary[p.getIdd()][0]                    #puis on gère le dico des balles, on tue l'objet
     del balls_dictionnary[p.getIdd()]                       #on tue l'entrée dans le dico
     del p                                                   #et enfin on tue l'objet
-
+    
+    
 def reproduce(root,p):
     '''duplique un individu, prend un individu 'p' en argument'''
     ball = Ball() # crée une balle dans la variable ball
@@ -202,7 +203,7 @@ def kill_those_who_have_to_die(root,dt) :
     for i in list_of_parazites:
         if uniform(0,1) < DYING_PROB*(1 + balls_dictionnary[i.getIdd()][1].getVir()) :    #! RecovProb = 1 --> aucune chance de recover
             kill(root,i)
-
+            
 def reproduce_those_who_have_to(root,dt) :
     for i in list_of_healthies:
         if uniform(0,1) < REPRODUCTION_PROB :    #! RecovProb = 1 --> aucune chance de recover
@@ -419,7 +420,6 @@ class BallsContainer(Widget):
         cure_the_lucky_ones(dt)
         mutate_those_who_wish(dt)
         self.all_nighter()
-        print "i tried"
         self.theory_tester(dt)
         self.update_numbers()
         self.update_data_files(dt)
@@ -448,24 +448,38 @@ class BallsContainer(Widget):
         elif len(list_of_healthies) + len(list_of_parazites) > 50 and ALL_NIGHT_LONG == 1:
             REPRODUCTION_PROB = STOCK_REPRODUCTION_PROB
     
+    def place_neuve(self, dt):
+        for i in range(len(list_of_parazites)):
+            kill(self, list_of_parazites[-1])
+        for i in list_of_healthies:
+            kill(self, i)
+        print "plus de heal?"    
+        print len(list_of_healthies)
+
+    
     def theory_tester(self,dt):
         print "hard"
-        compteur = 0
         #print "dt : ", str(dt)
         if TEST_THEORY == 1:
             global CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE 
             CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE,GENERATION_RESISTANCE = 0,0,0,0,0
             if len(list_of_parazites) == 0 or self.duration - self.last_clock >= 15 :
+                try:
+                    eff = (list_of_parazites[-1].getVir()*100)**0.5
+                except:
+                    eff = 0.2
+                print "effect = ", str(eff)
                 print "to get this results"
-                print len(list_of_parazites)
-                for i in list_of_parazites:
-                    kill(self, i)
-                    self.on_pause()
-                print len(list_of_parazites)
-                for i in list_of_healthies:
-                    kill(self, i)
-                print len(list_of_healthies)
-                print "done"
+                self.place_neuve(dt)
+                times = 0
+                while len(list_of_parazites) > 0 or len(list_of_healthies) > 0:
+                    self.place_neuve(dt)
+                    times += 1
+                    print "a boucle ", str(times)
+                    
+                print "on fait moins le malin"
+                print "nb heal :", str(len(list_of_healthies))
+                print "nb par : ", str(len(list_of_parazites))
                 self.start_balls(dt)
                 for i in range(0,NB_PARASITE):
                     ball = Ball()
@@ -475,12 +489,13 @@ class BallsContainer(Widget):
                     self.add_widget(ball)
                     ball.set_col((uniform(0,1),uniform(0,1),0))
 
-                    parazite = add_one_parazite(effect = compteur)
+                    parazite = add_one_parazite(effect = eff)
                     balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
                 self.last_clock = self.duration
-            compteur += 0.2
-            if compteur >= 10.2:
-                exit()
+                print "nb heal :", str(len(list_of_healthies))
+                print "nb par : ", str(len(list_of_parazites))
+                if (list_of_parazites[-1].getVir()*100)**0.5 >=9.81:
+                    self.pause()
         
     def update_numbers(self) :
         self.num_parazites = len(list_of_parazites)
