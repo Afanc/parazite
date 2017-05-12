@@ -44,7 +44,7 @@ list_of_healthies = [] #liste des individus sains vivants
 list_of_parazites = [] #liste des parasites vivants
 
 
-if isfile('data.csv') and 'y' != raw_input("le fichier data existe déjà, le remplaçer? (y/n)"): exit()
+if isfile('data.csv') and 'y' != raw_input("le fichier data existe déjà, le remplaçer? (y/n)"): exit() #écrit les headers dans le dossier 
 
 else:
     with open('data.csv', 'w') as par:
@@ -77,26 +77,31 @@ def add_one_healthy() :
     except: 
         print "could not add health" # imprime un  message si il n'arrive pas à le créer
             
-def add_one_parazite(p = None) :
-    '''ajoute un parasite'''
+def add_one_parazite(p = None, effect = None) :
+    '''ajoute un parasite, peut prendre un parasite 'p' ou un effet 'effect' en argument'''
     #try:
     temp_id = create_id() #commence par créer un ID
-    if p != None :      #si parasite est donné en argument
+    if p != None :      #si un parasite est donné en argument
         temp_vir = p.getVir() #sa virulence, 
         temp_trans = p.getTransmRate() # son taux de transmission, 
         temp_recov = p.getRecovProb() # et sa probabilité de guérison sont stockées dans des variables temporaires
-    elif TRADE_OFF == 'leo' :              #sinon on crée
-        attribute = trade_off()
-        temp_vir = attribute[0]
-        temp_trans = attribute[1]
-        temp_recov = attribute[2]
-    elif TRADE_OFF == 'dariush':
-        temp_vir = uniform(0,1) #une virulance
+    elif effect != None: #si un effet est donné en argument ...
+        attribute = trade_off(effect_arg = effect) #on utillise la fonction trade_off pour
+        temp_vir = attribute[0] #créer une virulence 
+        temp_trans = attribute[1] #crée un taux de transmision
+        temp_recov = attribute[2]#crée un taux de guérison
+    elif TRADE_OFF == 'leo' : #si rien n'est donné en argument et que la méthode de trade_off est "léo"         
+        attribute = trade_off() #on utilise trade off sans spécifier d'effet
+        temp_vir = attribute[0] # pour créer une virulance,
+        temp_trans = attribute[1] #un taux de transmision,
+        temp_recov = attribute[2] # un taux de guérison.
+    elif TRADE_OFF == 'dariush': # Enfin, si la méthode de trade_off est 'dariush', on crée 
+        temp_vir = uniform(0,1) #une virulance,
         temp_trans = uniform(0,1) # un taux de transmission,
-        temp_recov = uniform(0,1) # une probabilité de guérison
-        norm = BASE_FITNESS/(temp_vir + temp_trans + temp_recov) # on crée une variable pour les normaliser
-        temp_vir *= norm # et on normalise les trois paramètre
-        temp_trans *= norm
+        temp_recov = uniform(0,1) # une probabilité de guérison.
+        norm = BASE_FITNESS/(temp_vir + temp_trans + temp_recov) # On crée une variable pour les normaliser
+        temp_vir *= norm # et on normalise les trois paramètre.
+        temp_trans *= norm 
         temp_recov *= norm
 
     if temp_id not in dico_id.keys(): # si l'ID n'est pas dans les ID existants
@@ -122,7 +127,7 @@ def add_one_parazite(p = None) :
                  
 
 def kill(root,p):
-    '''tue un individu'''
+    '''tue un individu, prend un individu 'p' en argument'''
     if not isinstance(p, Individual): # vérifie que l'instance donnée en argument soit un individu
         print "%s doit être un individu pour être tué" % str(p) # sinon imprime un message d'erreur
         return # et ne retourne rien
@@ -138,7 +143,7 @@ def kill(root,p):
     del p                                                   #et enfin on tue l'objet
 
 def reproduce(root,p):
-    '''duplique un individu'''
+    '''duplique un individu, prend un individu 'p' en argument'''
     ball = Ball() # crée une balle dans la variable ball
     x = uniform(0,1) # crée une nombre aléatoire entre zéro et un....
     ball.center = (balls_dictionnary[p.getIdd()][0].center[0] + x, balls_dictionnary[p.getIdd()][0].center[1] + (1-x)) # pour le placement de la boule
@@ -166,7 +171,7 @@ def reproduce(root,p):
                 list_of_healthies[-1].addResistance(i) #est passée au jeune
 
 def guerison(p):
-    '''gueris un parasite'''
+    '''gueris un parasite, prend un parasite 'p' en argument '''
     if isinstance(p, Parazite):
         list_of_healthies.append(Healthy(p.getIdd()))
         if uniform(0,1) < TRANSMISSION_OF_RESISTANCE_PROB:
@@ -180,17 +185,18 @@ def guerison(p):
     else : print "pas parazite"
     
 def cure_the_lucky_ones(dt) :
+''' '''
+    for i in iter(list_of_parazites): #Parcours la liste des parasites. 
+        if uniform(0,1) < BASE_CHANCE_OF_HEALING *(1+i.getRecovProb()) :  #  Si la probabilité de guérison de base * 1 + la probabilité de guérison spécifique au parasite est plus grande qu'un nombre au hasard entre 0 et 1 
+            guerison(i) #l'individu est guéri. !si le taux de guérison vaut 1, plus de chances de guérir.
 
-    for i in iter(list_of_parazites):
-        if uniform(0,1) < BASE_CHANCE_OF_HEALING *(1+i.getRecovProb()) :    #! RecovProb = 1 --> aucune chance de recover
-            guerison(i)
+def mutate_those_who_wish(dt) : 
+''' '''
+    for i in iter(list_of_parazites) : #Parcours la liste des parasites.
+        if uniform(0,1) < CHANCE_OF_MUTATION_ON_NOTHING : # Si la probabilité de mutation spontanée de base est plus grande qu'un nombre au hasard entre 0 et 1
+            random_mutation_on(i,'living') # on utilise la fonction pour faire muter un parasites, avec l'argument what = 'living'
 
-def mutate_those_who_wish(dt) :
-    for i in iter(list_of_parazites) :
-        if uniform(0,1) < CHANCE_OF_MUTATION_ON_NOTHING :
-            random_mutation_on(i,'living')
-
-def kill_those_who_have_to_die(root,dt) :
+def kill_those_who_have_to_die(root,dt) : 
     for i in list_of_healthies:
         if uniform(0,1) < DYING_PROB :    #! RecovProb = 1 --> aucune chance de recover
             kill(root,i)

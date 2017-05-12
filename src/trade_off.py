@@ -3,7 +3,19 @@ from random import uniform, sample
 import matplotlib.pyplot as plt
 from CONSTANTES import *
 
-def trade_off(para_i = None):
+def trade_off(para_i = None, effect_arg = None):
+    if effect_arg != None:
+        new_vir = 0
+        new_recov = 0
+        new_transmission = 0
+        effect = effect_arg
+        new_vir = (effect**2)/100
+        new_transmission = 1/(1+exp(-(effect/1.1-5)))
+        new_recov =  0.1 + 1/2 * effect
+        if new_recov > 1:
+            new_recov = 1
+        
+        return [new_vir,new_transmission,new_recov]
     if isinstance(para_i, Parazite):
         new_vir = 0
         new_recov = 0
@@ -38,7 +50,7 @@ def trade_off(para_i = None):
         
         return [new_vir,new_transmission,new_recov]
 
-'''        
+'''     
 y = []
 x = []
 R0 = 0
@@ -59,6 +71,7 @@ plt.scatter(x,y)
 
 plt.show()
 '''
+#print trade_off(effect_arg = 7.0) #correspond à une virulance de 0.49
 '''    
 new_vir = []    
 for effect in range(0,10,1):
