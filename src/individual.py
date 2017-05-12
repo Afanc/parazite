@@ -52,3 +52,4 @@ class Individual(object):   #object afin d'avoir des 'nouvelles' classes
         self.position = pos
 
 
+print ALL_NIGHT_LONG

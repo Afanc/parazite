@@ -28,7 +28,6 @@ import shutil
 from time import clock 
 from sys import exit
 from os.path import isfile
-import csv
 Window.size = (800, 600)
 
 
@@ -185,13 +184,13 @@ def guerison(p):
     else : print "pas parazite"
     
 def cure_the_lucky_ones(dt) :
-''' '''
+    ''' '''
     for i in iter(list_of_parazites): #Parcours la liste des parasites. 
         if uniform(0,1) < BASE_CHANCE_OF_HEALING *(1+i.getRecovProb()) :  #  Si la probabilité de guérison de base * 1 + la probabilité de guérison spécifique au parasite est plus grande qu'un nombre au hasard entre 0 et 1 
             guerison(i) #l'individu est guéri. !si le taux de guérison vaut 1, plus de chances de guérir.
 
 def mutate_those_who_wish(dt) : 
-''' '''
+    ''' '''
     for i in iter(list_of_parazites) : #Parcours la liste des parasites.
         if uniform(0,1) < CHANCE_OF_MUTATION_ON_NOTHING : # Si la probabilité de mutation spontanée de base est plus grande qu'un nombre au hasard entre 0 et 1
             random_mutation_on(i,'living') # on utilise la fonction pour faire muter un parasites, avec l'argument what = 'living'
@@ -353,27 +352,39 @@ class BallsContainer(Widget):
     test = NumericProperty(0)
 
     def start_balls(self,dt):
-        for i in range(0,NB_SAINS):
-            ball = Ball()
-            ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
-            ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
-                             -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
-            self.add_widget(ball)
+        global TEST_THEORY
+        if TEST_THEORY != 1:
+            for i in range(0,NB_SAINS):
+                ball = Ball()
+                ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
+                ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
+                                 -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
+                self.add_widget(ball)
 
-            healthy = add_one_healthy()
-            balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
-            
-        for i in range(0,NB_PARASITE):
-            ball = Ball()
-            ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
-            ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
-                             -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
-            self.add_widget(ball)
-            ball.set_col((uniform(0,1),uniform(0,1),0))
+                healthy = add_one_healthy()
+                balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+                
+            for i in range(0,NB_PARASITE):
+                ball = Ball()
+                ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
+                ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
+                                 -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
+                self.add_widget(ball)
+                ball.set_col((uniform(0,1),uniform(0,1),0))
 
-            parazite = add_one_parazite()
-            balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+                parazite = add_one_parazite()
+                balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+                print "start balls"
+        else:
+            for i in range (0,200):
+                ball = Ball()
+                ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
+                ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
+                                 -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
+                self.add_widget(ball)
 
+                healthy = add_one_healthy()
+                balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
     #@profile
     def update(self,dt):
         quad = Quadtree(0,[self.x,self.x + self.width, self.y, self.y + self.height])
@@ -401,19 +412,21 @@ class BallsContainer(Widget):
             #-------------- update balls here -----------------
             balls_dictionnary[i][0].update(dt)              #update the positions of the balls (widget)
             #-------------- update balls here -----------------
-
+            
     def update_life_and_death(self,dt):
         kill_those_who_have_to_die(self,dt)
         reproduce_those_who_have_to(self,dt)
         cure_the_lucky_ones(dt)
         mutate_those_who_wish(dt)
         self.all_nighter()
+        self.theory_tester(dt)
         self.update_numbers()
         self.update_data_files(dt)
         
     def all_nighter(self) :
         global REPRODUCTION_PROB, DYING_PROB
-        if len(list_of_parazites) <1 and ALL_NIGHT_LONG == 1:
+        print ALL_NIGHT_LONG
+        if ALL_NIGHT_LONG == 1 and len(list_of_parazites) < 1:
             for i in range (0,NB_PARASITE):    
                 ball = Ball()
                 ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
@@ -422,6 +435,7 @@ class BallsContainer(Widget):
                 self.add_widget(ball)
                 ball.set_col((uniform(0,1),uniform(0,1),0))
                 parazite = add_one_parazite()
+                print "la faute à all nighter"
                 balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
         if len(list_of_healthies) + len(list_of_parazites) > 300 and HEALTHY_ROOF == 1:
             DYING_PROB = ROOF_DYING_PROB
@@ -433,7 +447,31 @@ class BallsContainer(Widget):
             REPRODUCTION_PROB = BOTTOM_REPRODUCTION_PROB
         elif len(list_of_healthies) + len(list_of_parazites) > 50 and ALL_NIGHT_LONG == 1:
             REPRODUCTION_PROB = STOCK_REPRODUCTION_PROB
+    
+    def theory_tester(self,dt):
+        if TEST_THEORY == 1:
+            compteur = 0
+            if len(list_of_parazites) == 0 or self.duration - self.last_clock >= 60:
+                for i in list_of_parazites:
+                    kill(i,dt)
+                for i in list_of_healthies:
+                    kill(i,dt)
+                self.start_balls(dt)
+                for i in range(0,NB_PARASITE):
+                    ball = Ball()
+                    ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
+                    ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
+                                     -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
+                    self.add_widget(ball)
+                    ball.set_col((uniform(0,1),uniform(0,1),0))
 
+                    parazite = add_one_parazite(effect = compteur)
+                    balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+            self.last_clock = self.duration
+            compteur += 0.2
+            if compteur >= 10.2:
+                exit()
+        
     def update_numbers(self) :
         self.num_parazites = len(list_of_parazites)
         self.num_healthies = len(list_of_healthies)

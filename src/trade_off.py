@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-        
 from parazite1 import *
 from random import uniform, sample
 import matplotlib.pyplot as plt
