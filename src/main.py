@@ -14,6 +14,7 @@ from kivy.core.window import Window
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.graphics import *
+from kivy.app import App
 from functools import partial
 from datetime import datetime
 from quadtree import Quadtree
@@ -32,6 +33,7 @@ from sys import exit
 from os.path import isfile
 import sys
 Window.size = (800, 600)
+starting_time = 0
 
 
 
@@ -317,7 +319,7 @@ def actions_when_collision(p1,p2):
                 if uniform(0,1) < INFECTION_CHANCE *(1+p1.getTransmRate()) :    #là aussi, infection chance cap at 0.5
                     infect_him(p1,p2)
 
-
+    
 #-----------------------main --------------------------
     
 class mainApp(App) :
@@ -356,40 +358,42 @@ class BallsContainer(Widget):
     temp_widg_to_remove_list = []
     test = NumericProperty(0)
 
+    starting_time = time.time()
+
     def start_balls(self,dt):
-        global TEST_THEORY
-        if TEST_THEORY != 1:
-            for i in range(0,NB_SAINS):
-                ball = Ball()
-                ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
-                ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
-                                 -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
-                self.add_widget(ball)
+        #global TEST_THEORY
+        #if TEST_THEORY != 1:
+        for i in range(0,NB_SAINS):
+            ball = Ball()
+            ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
+            ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
+                             -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
+            self.add_widget(ball)
 
-                healthy = add_one_healthy()
-                balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
-                
-            for i in range(0,NB_PARASITE):
-                ball = Ball()
-                ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
-                ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
-                                 -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
-                self.add_widget(ball)
-                ball.set_col((uniform(0,1),uniform(0,1),0))
+            healthy = add_one_healthy()
+            balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+            
+        for i in range(0,NB_PARASITE):
+            ball = Ball()
+            ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
+            ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
+                             -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
+            self.add_widget(ball)
+            ball.set_col((uniform(0,1),uniform(0,1),0))
 
-                parazite = add_one_parazite()
-                balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
-                print "start balls"
-        else:
-            for i in range (0,200):
-                ball = Ball()
-                ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
-                ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
-                                 -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
-                self.add_widget(ball)
+            parazite = add_one_parazite()
+            balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+        print "start balls"
+        #else:
+        #    for i in range (0,200):
+        #        ball = Ball()
+        #        ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
+        #        ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
+        #                         -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
+        #        self.add_widget(ball)
 
-                healthy = add_one_healthy()
-                balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+        #        healthy = add_one_healthy()
+        #        balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
     #@profile
     def update(self,dt):
         quad = Quadtree(0,[self.x,self.x + self.width, self.y, self.y + self.height])
@@ -423,13 +427,14 @@ class BallsContainer(Widget):
         reproduce_those_who_have_to(self,dt)
         cure_the_lucky_ones(dt)
         mutate_those_who_wish(dt)
+        self.shall_we_kill_the_simulation(dt)
         #self.all_nighter()
     
     def update_files(self, dt, filename = None) :
         #self.theory_tester(dt)
         self.update_numbers(filename)
         #self.update_data_files(dt)
-        
+       
     def all_nighter(self) :
         global REPRODUCTION_PROB, DYING_PROB
         if ALL_NIGHT_LONG == 1 and len(list_of_parazites) < 1:
@@ -460,39 +465,39 @@ class BallsContainer(Widget):
         for i in list_of_healthies :
             kill(self, i)
     
-    def theory_tester(self,dt):
-        if TEST_THEORY == 1:
-            global CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE 
-            CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE,GENERATION_RESISTANCE = 0,0,0,0,0
-            if len(list_of_parazites) == 0 or self.duration - self.last_clock >= 15 :       #time - change here
-                try:
-                    eff = (list_of_parazites[-1].getVir()*100)**0.5
-                except:
-                    eff = 0.2
-                print "effect = ", str(eff)
-                print "to get this results"
-
-                self.place_neuve(dt)
-
-                print "nb heal :", len(list_of_healthies)
-                print "nb par : ", len(list_of_parazites)
-
-                self.start_balls(dt)
-                for i in range(0,NB_PARASITE):
-                    ball = Ball()
-                    ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
-                    ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
-                                     -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
-                    self.add_widget(ball)
-                    ball.set_col((uniform(0,1),uniform(0,1),0))
-
-                    parazite = add_one_parazite(effect = eff)
-                    balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
-                self.last_clock = self.duration
-                print "nb heal :", str(len(list_of_healthies))
-                print "nb par : ", str(len(list_of_parazites))
-                if (list_of_parazites[-1].getVir()*100)**0.5 >=9.81:
-                    self.pause()
+#    def theory_tester(self,dt):
+#        if TEST_THEORY == 1:
+#            global CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE 
+#            CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE,GENERATION_RESISTANCE = 0,0,0,0,0
+#            if len(list_of_parazites) == 0 or self.duration - self.last_clock >= 15 :       #time - change here
+#                try:
+#                    eff = (list_of_parazites[-1].getVir()*100)**0.5
+#                except:
+#                    eff = 0.2
+#                print "effect = ", str(eff)
+#                print "to get this results"
+#
+#                self.place_neuve(dt)
+#
+#                print "nb heal :", len(list_of_healthies)
+#                print "nb par : ", len(list_of_parazites)
+#
+#                self.start_balls(dt)
+#                for i in range(0,NB_PARASITE):
+#                    ball = Ball()
+#                    ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
+#                    ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
+#                                     -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
+#                    self.add_widget(ball)
+#                    ball.set_col((uniform(0,1),uniform(0,1),0))
+#
+#                    parazite = add_one_parazite(effect = eff)
+#                    balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+#                self.last_clock = self.duration
+#                print "nb heal :", str(len(list_of_healthies))
+#                print "nb par : ", str(len(list_of_parazites))
+#                if (list_of_parazites[-1].getVir()*100)**0.5 >=9.81:
+#                    self.pause()
         
     def update_numbers(self,filename = None) :
         self.num_parazites = len(list_of_parazites)
@@ -576,7 +581,11 @@ class BallsContainer(Widget):
             self.add_widget(ball)
             self.temp_widg_to_remove_list.append(ball)
 
-
+    def shall_we_kill_the_simulation(self, dt) :
+        elapsed_time = time.time() - self.starting_time
+        if len(list_of_parazites) == 0 or elapsed_time > SIMULATION_TIME :
+            self.on_stop()
+ 
 
         #=========GUI BULLSHIT==================================
 
@@ -590,6 +599,7 @@ class BallsContainer(Widget):
         Clock.schedule_interval(self.update_life_and_death, 60*DELTA_TIME)
 
     def on_stop(self):
+        App.get_running_app().stop()
         return True
 
     def on_touch_down(self, touch):

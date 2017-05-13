@@ -1,5 +1,8 @@
 # resistance = 
 
+#SIMULATION
+SIMULATION_TIME = 300
+
 #GUI
 DELTA_TIME = 1.0 / 60.0
 MAX_BALL_SPEED = 100
