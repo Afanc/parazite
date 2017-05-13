@@ -14,6 +14,7 @@ from kivy.core.window import Window
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.graphics import *
+from functools import partial
 from datetime import datetime
 from quadtree import Quadtree
 from collision import *
@@ -28,6 +29,7 @@ import shutil
 from time import clock 
 from sys import exit
 from os.path import isfile
+import sys
 Window.size = (800, 600)
 
 
@@ -43,16 +45,11 @@ list_of_healthies = [] #liste des individus sains vivants
 list_of_parazites = [] #liste des parasites vivants
 
 
-if isfile('data.csv') and 'y' != raw_input("le fichier data existe déjà, le remplaçer? (y/n)"): exit() #écrit les headers dans le dossier 
-
-else:
-    with open('data.csv', 'w') as par:
-        new_line = csv.writer(par, delimiter=',')
-        new_line.writerow(['temps', 'nb_indiv', 'nb_parasites', 'virulence','transmission','guerison'])
-
-csv_nb_total_sains_infectes = csv.writer(open("nb_total_sains_infectes.csv","wb")) #creer le fichier des données générales de la population 
-csv_nb_total_sains_infectes.writerow(["temps","population totale","individus sains","individus infectés","pourcentage de la population infectée",
-                                      "virulence moyenne","taux de transmission guérison","taux de transmission"]) #header des données générales de la pop
+#if isfile('data.csv') and 'y' != raw_input("le fichier data existe déjà, le remplaçer? (y/n)"): exit() #écrit les headers dans le dossier 
+#
+#csv_nb_total_sains_infectes = csv.writer(open("nb_total_sains_infectes.csv","wb")) #creer le fichier des données générales de la population 
+#csv_nb_total_sains_infectes.writerow(["temps","population totale","individus sains","individus infectés","pourcentage de la population infectée",
+#                                      "virulence moyenne","taux de transmission guérison","taux de transmission"]) #header des données générales de la pop
 initial_time = time.clock() 
 
 def create_id(): 
@@ -320,15 +317,21 @@ def actions_when_collision(p1,p2):
                     infect_him(p1,p2)
 
 
-
-
 #-----------------------main --------------------------
     
-class mainApp(App):                                                                                                    
+class mainApp(App) :
     """Represents the whole application."""
-    def build(self):
+    def build(self) :
         """Entry point for creating app's UI."""
         root = BallsContainer()
+
+        args = None                 #passage d'argument
+        if len(sys.argv) > 1 :
+            args = sys.argv[1]
+
+        Clock.schedule_once(root.update_files,1.1)         #on attend que la fenêtre soit lancée
+        Clock.schedule_interval(partial(root.update_files, filename = args), 60*DELTA_TIME)
+
         Clock.schedule_once(root.start_balls,1)         #on attend que la fenêtre soit lancée
         Clock.schedule_once(root.update_life_and_death,1.1)         #on attend que la fenêtre soit lancée
         Clock.schedule_interval(root.update, DELTA_TIME)
@@ -419,10 +422,12 @@ class BallsContainer(Widget):
         reproduce_those_who_have_to(self,dt)
         cure_the_lucky_ones(dt)
         mutate_those_who_wish(dt)
-        self.all_nighter()
-        self.theory_tester(dt)
-        self.update_numbers()
-        self.update_data_files(dt)
+        #self.all_nighter()
+    
+    def update_files(self, dt, filename = None) :
+        #self.theory_tester(dt)
+        self.update_numbers(filename)
+        #self.update_data_files(dt)
         
     def all_nighter(self) :
         global REPRODUCTION_PROB, DYING_PROB
@@ -449,37 +454,28 @@ class BallsContainer(Widget):
             REPRODUCTION_PROB = STOCK_REPRODUCTION_PROB
     
     def place_neuve(self, dt):
-        for i in range(len(list_of_parazites)):
-            kill(self, list_of_parazites[-1])
-        for i in list_of_healthies:
+        for i in list_of_parazites :
             kill(self, i)
-        print "plus de heal?"    
-        print len(list_of_healthies)
-
+        for i in list_of_healthies :
+            kill(self, i)
     
     def theory_tester(self,dt):
-        print "hard"
-        #print "dt : ", str(dt)
         if TEST_THEORY == 1:
             global CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE 
             CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE,GENERATION_RESISTANCE = 0,0,0,0,0
-            if len(list_of_parazites) == 0 or self.duration - self.last_clock >= 15 :
+            if len(list_of_parazites) == 0 or self.duration - self.last_clock >= 15 :       #time - change here
                 try:
                     eff = (list_of_parazites[-1].getVir()*100)**0.5
                 except:
                     eff = 0.2
                 print "effect = ", str(eff)
                 print "to get this results"
+
                 self.place_neuve(dt)
-                times = 0
-                while len(list_of_parazites) > 0 or len(list_of_healthies) > 0:
-                    self.place_neuve(dt)
-                    times += 1
-                    print "a boucle ", str(times)
-                    
-                print "on fait moins le malin"
-                print "nb heal :", str(len(list_of_healthies))
-                print "nb par : ", str(len(list_of_parazites))
+
+                print "nb heal :", len(list_of_healthies)
+                print "nb par : ", len(list_of_parazites)
+
                 self.start_balls(dt)
                 for i in range(0,NB_PARASITE):
                     ball = Ball()
@@ -497,7 +493,7 @@ class BallsContainer(Widget):
                 if (list_of_parazites[-1].getVir()*100)**0.5 >=9.81:
                     self.pause()
         
-    def update_numbers(self) :
+    def update_numbers(self,filename = None) :
         self.num_parazites = len(list_of_parazites)
         self.num_healthies = len(list_of_healthies)
 
@@ -540,10 +536,15 @@ class BallsContainer(Widget):
         print self.duration - float(self.last_clock)
         
         #------------------------------- Enregistrement des données--------------------
-        with open("data.csv", "a") as par:
-            
-            test =csv.writer(par, delimiter=',')
-            test.writerow([self.duration,len(list_of_healthies) + len(list_of_healthies), len(list_of_parazites),self.mean_vir,self.mean_trans,self.mean_recov])
+        # faudrait rajouter les en-têtes
+        if filename is not None or len(sys.argv) > 1:
+            if len(sys.argv) > 1 :
+                arg = str(sys.argv[1]) + '.csv'
+            else :
+                arg = str(filename)+'.csv'
+            with open(str(arg), 'w') as par:
+                test =csv.writer(par, delimiter=',')
+                test.writerow([self.duration,len(list_of_healthies) + len(list_of_healthies), len(list_of_parazites),self.mean_vir,self.mean_trans,self.mean_recov])
         #=========GUI BULLSHIT==================================
         temp_wig = []
         for c in self.children:
@@ -586,6 +587,9 @@ class BallsContainer(Widget):
     def on_resume(self):
         Clock.schedule_interval(self.update, DELTA_TIME)
         Clock.schedule_interval(self.update_life_and_death, 60*DELTA_TIME)
+
+    def on_stop(self):
+        return True
 
     def on_touch_down(self, touch):
         if not self.pause :
@@ -641,37 +645,37 @@ class BallsContainer(Widget):
         b=list(dico.keys())
         return b[a.index(max(a))]
         
-    def update_data_files(self,dt):
-        current_time = time.clock()
-        simulation_time = round(current_time - initial_time,4) 
-        nb_of_healthies = len(list_of_healthies) #liste des individus sains vivants
-        total_nb_of_parazites_alive = len(list_of_parazites) #liste des parasites vivants
-        total_population = nb_of_healthies +  total_nb_of_parazites_alive
-        if nb_of_healthies > 0 :
-            percentage_of_parazites_in_pop = round((float(total_nb_of_parazites_alive)/total_population)*100,2) #pourcentage de parasite dans la population totale
-        else :
-            percentage_of_parazites_in_pop = 0 # pour éviter division par zéro
-            
-        #inscription dans le fichier src/nb_sains_infectes.csv
-        csv_nb_total_sains_infectes.writerow([simulation_time,total_population,nb_of_healthies,
-                                              total_nb_of_parazites_alive,percentage_of_parazites_in_pop,self.mean_vir,self.mean_recov,self.mean_trans])
-        
-        #parcours les souches et met à jour le fichier "souche.csv" qui leur correspond
-        for strain_id in strain_dictionary:
-            total_nb_of_infections = len(strain_dictionary[strain_id][1]) #nombre total d'infection secondaires
-            nb_of_parazites_alive = 0 # nombre de parasites de cette souche en vie à l'instant t
-            for id_infected_by_this_strain in strain_dictionary[strain_id][1]:  # on parcours la liste des id qui ont été infectés par cette souche
-                if id_infected_by_this_strain in balls_dictionnary: #on prend la liste des id qui ont été inféctés par cette souche et on compare avec la liste des invidividus encore en vie
-                    nb_of_parazites_alive += 1    
-            
-            percentage_of_all_infections = round((float(nb_of_parazites_alive)/total_nb_of_parazites_alive) * 100, 2) #quelle importance a cette souche comparée au total des autres   
-       
-            if nb_of_parazites_alive > 0 :    #on contnu de mettre à jour le fichier csv seuelment si la souche est encore active ( au moins 1 parasite encore en vie)
-                    with open("data/" + strain_id + ".csv","a") as UpdateStrainFile:
-                        dico_of_strains_for_csv[strain_id] = csv.writer(UpdateStrainFile)
-                        dico_of_strains_for_csv[strain_id].writerow([simulation_time,strain_id,total_nb_of_infections,
-                                                            total_population,nb_of_parazites_alive, percentage_of_all_infections])
-            
+#    def update_data_files(self,dt):
+#        current_time = time.clock()
+#        simulation_time = round(current_time - initial_time,4) 
+#        nb_of_healthies = len(list_of_healthies) #liste des individus sains vivants
+#        total_nb_of_parazites_alive = len(list_of_parazites) #liste des parasites vivants
+#        total_population = nb_of_healthies +  total_nb_of_parazites_alive
+#        if nb_of_healthies > 0 :
+#            percentage_of_parazites_in_pop = round((float(total_nb_of_parazites_alive)/total_population)*100,2) #pourcentage de parasite dans la population totale
+#        else :
+#            percentage_of_parazites_in_pop = 0 # pour éviter division par zéro
+#            
+#        #inscription dans le fichier src/nb_sains_infectes.csv
+#        csv_nb_total_sains_infectes.writerow([simulation_time,total_population,nb_of_healthies,
+#                                              total_nb_of_parazites_alive,percentage_of_parazites_in_pop,self.mean_vir,self.mean_recov,self.mean_trans])
+#        
+#        #parcours les souches et met à jour le fichier "souche.csv" qui leur correspond
+#        for strain_id in strain_dictionary:
+#            total_nb_of_infections = len(strain_dictionary[strain_id][1]) #nombre total d'infection secondaires
+#            nb_of_parazites_alive = 0 # nombre de parasites de cette souche en vie à l'instant t
+#            for id_infected_by_this_strain in strain_dictionary[strain_id][1]:  # on parcours la liste des id qui ont été infectés par cette souche
+#                if id_infected_by_this_strain in balls_dictionnary: #on prend la liste des id qui ont été inféctés par cette souche et on compare avec la liste des invidividus encore en vie
+#                    nb_of_parazites_alive += 1    
+#            
+#            percentage_of_all_infections = round((float(nb_of_parazites_alive)/total_nb_of_parazites_alive) * 100, 2) #quelle importance a cette souche comparée au total des autres   
+#       
+#            if nb_of_parazites_alive > 0 :    #on contnu de mettre à jour le fichier csv seuelment si la souche est encore active ( au moins 1 parasite encore en vie)
+#                    with open("data/" + strain_id + ".csv","a") as UpdateStrainFile:
+#                        dico_of_strains_for_csv[strain_id] = csv.writer(UpdateStrainFile)
+#                        dico_of_strains_for_csv[strain_id].writerow([simulation_time,strain_id,total_nb_of_infections,
+#                                                            total_population,nb_of_parazites_alive, percentage_of_all_infections])
+#            
 # -------------------- balls container--------------------
 
 #-----------------------------Kivy GUI-----------------------------------------------
