@@ -539,9 +539,9 @@ class BallsContainer(Widget):
         # faudrait rajouter les en-têtes
         if filename is not None or len(sys.argv) > 1:
             if len(sys.argv) > 1 :
-                arg = str(sys.argv[1]) + '.csv'
+                arg = "data_per_param/"+str(sys.argv[1]) + '.csv'
             else :
-                arg = str(filename)+'.csv'
+                arg = "data_per_param/"+str(filename)+'.csv'
             with open(str(arg), 'w') as par:
                 test =csv.writer(par, delimiter=',')
                 test.writerow([self.duration,len(list_of_healthies) + len(list_of_healthies), len(list_of_parazites),self.mean_vir,self.mean_trans,self.mean_recov])
