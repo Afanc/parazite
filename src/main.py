@@ -374,6 +374,9 @@ class BallsContainer(Widget):
                 parazite = add_one_parazite()
             balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
 
+        if len(sys.argv) > 2 :
+            for _ in range(10) :
+                reproduce(self, list_of_parazites[-1])
         print "start balls"
 
     #@profile
