@@ -74,6 +74,7 @@ plt.scatter(x,y)
 
 plt.show()
 '''
+
 #print trade_off(effect_arg = 7.0) #correspond à une virulance de 0.49
 '''    
 new_vir = []    

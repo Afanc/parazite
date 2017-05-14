@@ -1,37 +1,39 @@
-# resistance = 
+# -*- coding: utf-8 -*-                                                                                                
 
-#SIMULATION
-SIMULATION_TIME = 10
+#mode: 'theory_tester', 'war', 'all_night_long'
+MODE = 'war'
+
+#mode theory tester :
+SIMULATION_TIME = 300
+TEST_THEORY = 1
+
+#all_night_long
+ALL_NIGHT_LONG = 0
+HEALTHY_ROOF = 1
+STOCK_DYING_PROB = 0.13
+ROOF_DYING_PROB = 0.2
+STOCK_REPRODUCTION_PROB = 0.13
+BOTTOM_REPRODUCTION_PROB = 0.15
 
 #GUI
 DELTA_TIME = 1.0 / 60.0
 MAX_BALL_SPEED = 100
 BASE_COLOR = [0,0,1]
-SPEC_BASE_COLOR = [0,0.5,.5]
-POS_X = 0
-POS_Y = 0
 
 #MAIN
+TRADE_OFF = 'leo'
 NB_SAINS = 100
 NB_PARASITE = 1 
 MAX_VELOCITY= 1
 MAX_VIRULANCE= 1
-ALL_NIGHT_LONG = 0
-HEALTHY_ROOF = 1
-MIN_SIZE_FOR_DATA = 40 * 1000  #pour avoir mesure en kb 
-TEST_THEORY = 1
+MIN_SIZE_FOR_DATA = 40 * 1000  #pour avoir mesure en kb, à utiliser dans all_night_long et war
 
 #INDIVIDUAL
 DYING_PROB = 0.13    #max 0.5
-STOCK_DYING_PROB = 0.13
-ROOF_DYING_PROB = 0.2
 REPRODUCTION_PROB = 0.13
-STOCK_REPRODUCTION_PROB = 0.13
-BOTTOM_REPRODUCTION_PROB = 0.15
-TRADE_OFF = 'leo'
 
 #HEALTHY
-GENERATION_RESISTANCE = 1
+TRANSMISSION_RESISTANCE = 1
 
 #PARAZITE
 BASE_FITNESS = 0.8
