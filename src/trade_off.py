@@ -3,6 +3,7 @@ from parazite1 import *
 from random import uniform, sample
 import matplotlib.pyplot as plt
 from CONSTANTES import *
+from CHANGING_CONST import *
 
 def trade_off(para_i = None, effect_arg = None):
     if effect_arg != None:
@@ -15,7 +16,6 @@ def trade_off(para_i = None, effect_arg = None):
         new_recov =  0.1 + 1/effect
         if new_recov > 1:
             new_recov = 1
-        
         return [new_vir,new_transmission,new_recov]
     if isinstance(para_i, Parazite):
         new_vir = 0
@@ -51,8 +51,9 @@ def trade_off(para_i = None, effect_arg = None):
         
         return [new_vir,new_transmission,new_recov]
 
-print trade_off(effect_arg=2.0)
-'''     
+
+
+'''  
 y = []
 x = []
 R0 = 0
@@ -65,7 +66,7 @@ for i in arange(0.1,10.0,0.1):
     if new_recov > 1:
         new_recov = 1
     R0num = (100 * (1+new_transmission)*INFECTION_CHANCE)
-    R0den = (DYING_PROB + (1+new_vir)*DYING_PROB + (1+new_recov)*BASE_CHANCE_OF_HEALING)
+    R0den = ((1+new_vir)*DYING_PROB + (1+new_recov)*BASE_CHANCE_OF_HEALING)
     R0 = R0num/R0den
     y.append(R0)
 

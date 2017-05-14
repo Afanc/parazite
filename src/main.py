@@ -369,6 +369,7 @@ class BallsContainer(Widget):
             ball.set_col((uniform(0,1),uniform(0,1),0))
 
             if len(sys.argv) > 2 :                      #ICI on check pour mass-effect simulations
+                print sys.argv[2]
                 parazite = add_one_parazite(sys.argv[2])
             else :
                 parazite = add_one_parazite()

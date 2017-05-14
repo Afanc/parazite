@@ -19,25 +19,28 @@ list_of_param = [INFECTION_CHANCE, CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MU
 
 
 #A CHANGER ICI
-EFFECT = 0
+global  EFFECT
 
 #A CHANGER ICI
 MAX_LEVEL = 10
 STEP = 0.2
 
-def launch() :
-    filename = "effect_", str(EFFECT)
+def launch(eff) :
+    filename = "effect_"  + str(eff)
     
-            
-    os.system("python main.py "+ str(filename) + str(EFFECT)     #pas d'autre moyen parce que difficile de flush les objets en mémoire
-
+    eff = str(eff)
+    print "------------------------------------------------"
+    print float(eff)
+    os.system("python main.py "+ str(filename) + " " + str(eff))     #pas d'autre moyen parce que difficile de flush les objets en mémoire
+    print "avant le sleep"
     time.sleep(2)                                   #juste pour se donner du temps
-
+    print "après le sleep"
 
 #---- the tester
 EFFECT = 0 # somme des argument 
 while EFFECT < MAX_LEVEL :
+    print " un tour"
     EFFECT += STEP
-    launch()
+    launch(EFFECT)
 
         
