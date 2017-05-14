@@ -18,14 +18,17 @@ list_of_names = ['INFECTION_CHANCE', 'CHANCE_OF_MUTATION_ON_INFECTION', 'CHANCE_
 
 list_of_param = [INFECTION_CHANCE, CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE,TRANSMISSION_OF_RESISTANCE_PROB, BASE_CHANCE_OF_HEALING]
 
+#A CHANGER ICI
 sub_list_of_param = [CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION]
 
+#A CHANGER ICI
 MAX_LEVEL = 0.3
 STEP = 0.1
 
 def launch() :
     filename = 'inf'+str(list_of_param[0])+'_infmut'+str(list_of_param[1])+'_notmut'+str(list_of_param[2])+'_repmut'+str(list_of_param[3])+'_fight'+str(list_of_param[4])+'_restransm'+str(list_of_param[5])+'_heal'+str(list_of_param[6])
     
+    #A CHANGER ICI
     list_of_param[1] = sub_list_of_param[0]
     list_of_param[2] = sub_list_of_param[1]
     list_of_param[3] = sub_list_of_param[2]
