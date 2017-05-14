@@ -14,8 +14,6 @@ from kivy.core.window import Window
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.graphics import *
-from kivy.app import App
-from functools import partial
 from datetime import datetime
 from quadtree import Quadtree
 from collision import *
@@ -27,14 +25,12 @@ import csv
 import time 
 import os 
 import shutil 
-from CHANGING_CONST import *
 from time import clock 
 from sys import exit
 from os.path import isfile
-import sys
 Window.size = (800, 600)
-starting_time = 0
-initial_time = time.clock() 
+
+
 
 seed(42)
 
@@ -46,6 +42,18 @@ dico_of_strains_for_csv = {}  #{souche:variable.writerow()}
 list_of_healthies = [] #liste des individus sains vivants
 list_of_parazites = [] #liste des parasites vivants
 
+
+if isfile('data.csv') and 'y' != raw_input("le fichier data existe déjà, le remplaçer? (y/n)"): exit() #écrit les headers dans le dossier 
+
+else:
+    with open('data.csv', 'w') as par:
+        new_line = csv.writer(par, delimiter=',')
+        new_line.writerow(['temps', 'nb_indiv', 'nb_parasites', 'virulence','transmission','guerison'])
+
+csv_nb_total_sains_infectes = csv.writer(open("nb_total_sains_infectes.csv","wb")) #creer le fichier des données générales de la population 
+csv_nb_total_sains_infectes.writerow(["temps","population totale","individus sains","individus infectés","pourcentage de la population infectée",
+                                      "virulence moyenne","taux de transmission guérison","taux de transmission"]) #header des données générales de la pop
+initial_time = time.clock() 
 
 def create_id(): 
     '''crée un nouvel id pour chaque nouveau parasite'''
@@ -68,12 +76,15 @@ def add_one_healthy() :
     except: 
         print "could not add health" # imprime un  message si il n'arrive pas à le créer
             
-def add_one_parazite(effect = None) :
-    '''ajoute un parasite, peut prendre un effet 'effect' en argument'''
+def add_one_parazite(p = None, effect = None) :
+    '''ajoute un parasite, peut prendre un parasite 'p' ou un effet 'effect' en argument'''
     #try:
     temp_id = create_id() #commence par créer un ID
-    if effect != None: #si un effet est donné en argument ...
-        effect = float(effect)
+    if p != None :      #si un parasite est donné en argument
+        temp_vir = p.getVir() #sa virulence, 
+        temp_trans = p.getTransmRate() # son taux de transmission, 
+        temp_recov = p.getRecovProb() # et sa probabilité de guérison sont stockées dans des variables temporaires
+    elif effect != None: #si un effet est donné en argument ...
         attribute = trade_off(effect_arg = effect) #on utillise la fonction trade_off pour
         temp_vir = attribute[0] #créer une virulence 
         temp_trans = attribute[1] #crée un taux de transmision
@@ -308,22 +319,16 @@ def actions_when_collision(p1,p2):
                 if uniform(0,1) < INFECTION_CHANCE *(1+p1.getTransmRate()) :    #là aussi, infection chance cap at 0.5
                     infect_him(p1,p2)
 
-    
+
+
+
 #-----------------------main --------------------------
     
-class mainApp(App) :
+class mainApp(App):                                                                                                    
     """Represents the whole application."""
-    def build(self) :
+    def build(self):
         """Entry point for creating app's UI."""
         root = BallsContainer()
-
-        args = None                 #passage d'argument
-        if len(sys.argv) > 1 :
-            args = sys.argv[1]
-
-        Clock.schedule_once(root.update_files,1.1)         #on attend que la fenêtre soit lancée
-        Clock.schedule_interval(partial(root.update_files, filename = args), 60*DELTA_TIME)
-
         Clock.schedule_once(root.start_balls,1)         #on attend que la fenêtre soit lancée
         Clock.schedule_once(root.update_life_and_death,1.1)         #on attend que la fenêtre soit lancée
         Clock.schedule_interval(root.update, DELTA_TIME)
@@ -347,39 +352,40 @@ class BallsContainer(Widget):
     temp_widg_to_remove_list = []
     test = NumericProperty(0)
 
-    starting_time = time.time()
-
     def start_balls(self,dt):
-        for i in range(0,NB_SAINS):
-            ball = Ball()
-            ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
-            ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
-                             -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
-            self.add_widget(ball)
+        global TEST_THEORY
+        if TEST_THEORY != 1:
+            for i in range(0,NB_SAINS):
+                ball = Ball()
+                ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
+                ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
+                                 -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
+                self.add_widget(ball)
 
-            healthy = add_one_healthy()
-            balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
-            
-        for i in range(0,NB_PARASITE):
-            ball = Ball()
-            ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
-            ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
-                             -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
-            self.add_widget(ball)
-            ball.set_col((uniform(0,1),uniform(0,1),0))
+                healthy = add_one_healthy()
+                balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+                
+            for i in range(0,NB_PARASITE):
+                ball = Ball()
+                ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
+                ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
+                                 -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
+                self.add_widget(ball)
+                ball.set_col((uniform(0,1),uniform(0,1),0))
 
-            if len(sys.argv) > 2 :                      #ICI on check pour mass-effect simulations
-                print sys.argv[2]
-                parazite = add_one_parazite(sys.argv[2])
-            else :
                 parazite = add_one_parazite()
-            balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+                balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+                print "start balls"
+        else:
+            for i in range (0,200):
+                ball = Ball()
+                ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
+                ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
+                                 -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
+                self.add_widget(ball)
 
-        if len(sys.argv) > 2 :
-            for _ in range(10) :
-                reproduce(self, list_of_parazites[-1])
-        print "start balls"
-
+                healthy = add_one_healthy()
+                balls_dictionnary[healthy.getIdd()] = [ball, healthy, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
     #@profile
     def update(self,dt):
         quad = Quadtree(0,[self.x,self.x + self.width, self.y, self.y + self.height])
@@ -413,12 +419,11 @@ class BallsContainer(Widget):
         reproduce_those_who_have_to(self,dt)
         cure_the_lucky_ones(dt)
         mutate_those_who_wish(dt)
-        self.shall_we_kill_the_simulation(dt)
-        #self.all_nighter()
-    
-    def update_files(self, dt, filename = None) :
-        self.update_numbers(filename)
-       
+        self.all_nighter()
+        self.theory_tester(dt)
+        self.update_numbers()
+        self.update_data_files(dt)
+        
     def all_nighter(self) :
         global REPRODUCTION_PROB, DYING_PROB
         if ALL_NIGHT_LONG == 1 and len(list_of_parazites) < 1:
@@ -444,13 +449,55 @@ class BallsContainer(Widget):
             REPRODUCTION_PROB = STOCK_REPRODUCTION_PROB
     
     def place_neuve(self, dt):
-        for i in list_of_parazites :
+        for i in range(len(list_of_parazites)):
+            kill(self, list_of_parazites[-1])
+        for i in list_of_healthies:
             kill(self, i)
-        for i in list_of_healthies :
-            kill(self, i)
+        print "plus de heal?"    
+        print len(list_of_healthies)
+
     
-       
-    def update_numbers(self,filename = None) :
+    def theory_tester(self,dt):
+        print "hard"
+        #print "dt : ", str(dt)
+        if TEST_THEORY == 1:
+            global CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE 
+            CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE,GENERATION_RESISTANCE = 0,0,0,0,0
+            if len(list_of_parazites) == 0 or self.duration - self.last_clock >= 15 :
+                try:
+                    eff = (list_of_parazites[-1].getVir()*100)**0.5
+                except:
+                    eff = 0.2
+                print "effect = ", str(eff)
+                print "to get this results"
+                self.place_neuve(dt)
+                times = 0
+                while len(list_of_parazites) > 0 or len(list_of_healthies) > 0:
+                    self.place_neuve(dt)
+                    times += 1
+                    print "a boucle ", str(times)
+                    
+                print "on fait moins le malin"
+                print "nb heal :", str(len(list_of_healthies))
+                print "nb par : ", str(len(list_of_parazites))
+                self.start_balls(dt)
+                for i in range(0,NB_PARASITE):
+                    ball = Ball()
+                    ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
+                    ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
+                                     -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
+                    self.add_widget(ball)
+                    ball.set_col((uniform(0,1),uniform(0,1),0))
+
+                    parazite = add_one_parazite(effect = eff)
+                    balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
+                self.last_clock = self.duration
+                print "nb heal :", str(len(list_of_healthies))
+                print "nb par : ", str(len(list_of_parazites))
+                if (list_of_parazites[-1].getVir()*100)**0.5 >=9.81:
+                    self.pause()
+        
+    def update_numbers(self) :
         self.num_parazites = len(list_of_parazites)
         self.num_healthies = len(list_of_healthies)
 
@@ -493,29 +540,10 @@ class BallsContainer(Widget):
         print self.duration - float(self.last_clock)
         
         #------------------------------- Enregistrement des données--------------------
-        # faudrait rajouter les en-têtes
-        if filename is not None or len(sys.argv) > 1:
-            if len(sys.argv) > 2 :
-                arg = "data_effect_tester/"+str(sys.argv[2]) + '.csv'       #si on mass-effect
-            elif len(sys.argv) > 1 :
-                arg = "data_per_param/"+str(sys.argv[1]) + '.csv'           #si on other param
-            else :
-                arg = "data_per_param/"+str(filename)+'.csv'
-
-            if not isfile(str(arg)) :
-                with open(str(arg), 'w') as par:
-                    csv_file = csv.writer(par, delimiter=',')
-                    if len(sys.argv) > 2 :                  #si on mass-effect
-                            csv_file.writerow(['time', 'secondary_infections'])
-                    elif len(sys.argv) > 1:
-                        csv_file.writerow(['time', 'healthies', 'parazites', 'mean_vir', 'mean_trans', 'mean_recov'])
-            else :
-                with open(str(arg), 'a') as par :
-                    csv_file =csv.writer(par, delimiter=',')
-                    if len(sys.argv) > 2 and len(strain_dictionary) > 0:                  #si on mass-effect
-                        csv_file.writerow([self.duration,len(strain_dictionary['Souche:101'][1])])
-                    elif len(sys.argv) > 1 :                #si on other param
-                        csv_file.writerow([self.duration,len(list_of_healthies), len(list_of_parazites),self.mean_vir,self.mean_trans,self.mean_recov])
+        with open("data.csv", "a") as par:
+            
+            test =csv.writer(par, delimiter=',')
+            test.writerow([self.duration,len(list_of_healthies) + len(list_of_healthies), len(list_of_parazites),self.mean_vir,self.mean_trans,self.mean_recov])
         #=========GUI BULLSHIT==================================
         temp_wig = []
         for c in self.children:
@@ -546,11 +574,7 @@ class BallsContainer(Widget):
             self.add_widget(ball)
             self.temp_widg_to_remove_list.append(ball)
 
-    def shall_we_kill_the_simulation(self, dt) :
-        elapsed_time = time.time() - self.starting_time
-        if len(list_of_parazites) == 0 or elapsed_time > SIMULATION_TIME :
-            self.on_stop()
- 
+
 
         #=========GUI BULLSHIT==================================
 
@@ -562,10 +586,6 @@ class BallsContainer(Widget):
     def on_resume(self):
         Clock.schedule_interval(self.update, DELTA_TIME)
         Clock.schedule_interval(self.update_life_and_death, 60*DELTA_TIME)
-
-    def on_stop(self):
-        App.get_running_app().stop()
-        return True
 
     def on_touch_down(self, touch):
         if not self.pause :
@@ -621,7 +641,37 @@ class BallsContainer(Widget):
         b=list(dico.keys())
         return b[a.index(max(a))]
         
-#            
+    def update_data_files(self,dt):
+        current_time = time.clock()
+        simulation_time = round(current_time - initial_time,4) 
+        nb_of_healthies = len(list_of_healthies) #liste des individus sains vivants
+        total_nb_of_parazites_alive = len(list_of_parazites) #liste des parasites vivants
+        total_population = nb_of_healthies +  total_nb_of_parazites_alive
+        if nb_of_healthies > 0 :
+            percentage_of_parazites_in_pop = round((float(total_nb_of_parazites_alive)/total_population)*100,2) #pourcentage de parasite dans la population totale
+        else :
+            percentage_of_parazites_in_pop = 0 # pour éviter division par zéro
+            
+        #inscription dans le fichier src/nb_sains_infectes.csv
+        csv_nb_total_sains_infectes.writerow([simulation_time,total_population,nb_of_healthies,
+                                              total_nb_of_parazites_alive,percentage_of_parazites_in_pop,self.mean_vir,self.mean_recov,self.mean_trans])
+        
+        #parcours les souches et met à jour le fichier "souche.csv" qui leur correspond
+        for strain_id in strain_dictionary:
+            total_nb_of_infections = len(strain_dictionary[strain_id][1]) #nombre total d'infection secondaires
+            nb_of_parazites_alive = 0 # nombre de parasites de cette souche en vie à l'instant t
+            for id_infected_by_this_strain in strain_dictionary[strain_id][1]:  # on parcours la liste des id qui ont été infectés par cette souche
+                if id_infected_by_this_strain in balls_dictionnary: #on prend la liste des id qui ont été inféctés par cette souche et on compare avec la liste des invidividus encore en vie
+                    nb_of_parazites_alive += 1    
+            
+            percentage_of_all_infections = round((float(nb_of_parazites_alive)/total_nb_of_parazites_alive) * 100, 2) #quelle importance a cette souche comparée au total des autres   
+       
+            if nb_of_parazites_alive > 0 :    #on contnu de mettre à jour le fichier csv seuelment si la souche est encore active ( au moins 1 parasite encore en vie)
+                    with open("data/" + strain_id + ".csv","a") as UpdateStrainFile:
+                        dico_of_strains_for_csv[strain_id] = csv.writer(UpdateStrainFile)
+                        dico_of_strains_for_csv[strain_id].writerow([simulation_time,strain_id,total_nb_of_infections,
+                                                            total_population,nb_of_parazites_alive, percentage_of_all_infections])
+            
 # -------------------- balls container--------------------
 
 #-----------------------------Kivy GUI-----------------------------------------------
@@ -689,72 +739,4 @@ print list_of_parazites[-1].getStrain()
 print strain_dictionary[balls_dictionnary['ID2'][1].getStrain()]
 
 reproduce(dt, balls_dictionnary['ID2'][1])
-#    def theory_tester(self,dt):
-#        if TEST_THEORY == 1:
-#            global CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE 
-#            CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE,GENERATION_RESISTANCE = 0,0,0,0,0
-#            if len(list_of_parazites) == 0 or self.duration - self.last_clock >= 15 :       #time - change here
-#                try:
-#                    eff = (list_of_parazites[-1].getVir()*100)**0.5
-#                except:
-#                    eff = 0.2
-#                print "effect = ", str(eff)
-#                print "to get this results"
-#
-#                self.place_neuve(dt)
-#
-#                print "nb heal :", len(list_of_healthies)
-#                print "nb par : ", len(list_of_parazites)
-#
-#                self.start_balls(dt)
-#                for i in range(0,NB_PARASITE):
-#                    ball = Ball()
-#                    ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
-#                    ball.velocity = (-MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED),         #à revoir
-#                                     -MAX_BALL_SPEED + random() * (2 * MAX_BALL_SPEED))
-#                    self.add_widget(ball)
-#                    ball.set_col((uniform(0,1),uniform(0,1),0))
-#
-#                    parazite = add_one_parazite(effect = eff)
-#                    balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
-#                self.last_clock = self.duration
-#                print "nb heal :", str(len(list_of_healthies))
-#                print "nb par : ", str(len(list_of_parazites))
-#                if (list_of_parazites[-1].getVir()*100)**0.5 >=9.81:
-#                    self.pause()
- #if isfile('data.csv') and 'y' != raw_input("le fichier data existe déjà, le remplaçer? (y/n)"): exit() #écrit les headers dans le dossier 
-#
-#csv_nb_total_sains_infectes = csv.writer(open("nb_total_sains_infectes.csv","wb")) #creer le fichier des données générales de la population 
-#csv_nb_total_sains_infectes.writerow(["temps","population totale","individus sains","individus infectés","pourcentage de la population infectée",
-#                                      "virulence moyenne","taux de transmission guérison","taux de transmission"]) #header des données générales de la pop
-#    def update_data_files(self,dt):
-#        current_time = time.clock()
-#        simulation_time = round(current_time - initial_time,4) 
-#        nb_of_healthies = len(list_of_healthies) #liste des individus sains vivants
-#        total_nb_of_parazites_alive = len(list_of_parazites) #liste des parasites vivants
-#        total_population = nb_of_healthies +  total_nb_of_parazites_alive
-#        if nb_of_healthies > 0 :
-#            percentage_of_parazites_in_pop = round((float(total_nb_of_parazites_alive)/total_population)*100,2) #pourcentage de parasite dans la population totale
-#        else :
-#            percentage_of_parazites_in_pop = 0 # pour éviter division par zéro
-#            
-#        #inscription dans le fichier src/nb_sains_infectes.csv
-#        csv_nb_total_sains_infectes.writerow([simulation_time,total_population,nb_of_healthies,
-#                                              total_nb_of_parazites_alive,percentage_of_parazites_in_pop,self.mean_vir,self.mean_recov,self.mean_trans])
-#        
-#        #parcours les souches et met à jour le fichier "souche.csv" qui leur correspond
-#        for strain_id in strain_dictionary:
-#            total_nb_of_infections = len(strain_dictionary[strain_id][1]) #nombre total d'infection secondaires
-#            nb_of_parazites_alive = 0 # nombre de parasites de cette souche en vie à l'instant t
-#            for id_infected_by_this_strain in strain_dictionary[strain_id][1]:  # on parcours la liste des id qui ont été infectés par cette souche
-#                if id_infected_by_this_strain in balls_dictionnary: #on prend la liste des id qui ont été inféctés par cette souche et on compare avec la liste des invidividus encore en vie
-#                    nb_of_parazites_alive += 1    
-#            
-#            percentage_of_all_infections = round((float(nb_of_parazites_alive)/total_nb_of_parazites_alive) * 100, 2) #quelle importance a cette souche comparée au total des autres   
-#       
-#            if nb_of_parazites_alive > 0 :    #on contnu de mettre à jour le fichier csv seuelment si la souche est encore active ( au moins 1 parasite encore en vie)
-#                    with open("data/" + strain_id + ".csv","a") as UpdateStrainFile:
-#                        dico_of_strains_for_csv[strain_id] = csv.writer(UpdateStrainFile)
-#                        dico_of_strains_for_csv[strain_id].writerow([simulation_time,strain_id,total_nb_of_infections,
-#                                                            total_population,nb_of_parazites_alive, percentage_of_all_infections])
 '''
