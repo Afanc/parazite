@@ -97,7 +97,7 @@ def add_one_parazite(effect = None) :
         list_of_parazites.append(Parazite(temp_vir, temp_trans, temp_recov, temp_id)) #on ajoute le parasite à la liste
         temp_strain = list(list_of_parazites[-1].getStrain()) # la souche est pour l'instant "[]" par défaut
         temp_strain.append(list_of_parazites[-1].getIdd()) # on lui ajoute l'ID dans la liste
-        temp_strain = str('Souche:' + temp_strain[0][2:])# On modifie la variable temporaire pour que les souches et les ID soient bien distincts
+        temp_strain = str('Souche-' + temp_strain[0][2:])# On modifie la variable temporaire pour que les souches et les ID soient bien distincts
         list_of_parazites[-1].setStrain(temp_strain) #On modifie la souche du parasite pour la souche temporaire
         strain_dictionary[temp_strain] = [[temp_vir, temp_trans, temp_recov],[str(temp_id)]] #et on stocke la souche et l'individu infecté dans le dico des souches
         New_strain_in_csv(temp_strain, temp_vir, temp_trans, temp_recov)
@@ -219,14 +219,14 @@ def random_mutation_on(para_i, what) :
             trade_off(para_i)
             
         if what == 'living':
-            temp_idd = para_i.getIdd() + '*'
+            temp_idd = para_i.getIdd() + 'mut'
             balls_dictionnary[temp_idd] = balls_dictionnary[para_i.getIdd()]
             del balls_dictionnary[para_i.getIdd()]
             para_i.setIdd(temp_idd)
             
         #nouvelle souche
         new_strain = para_i.getIdd()
-        new_strain = 'Souche:' + new_strain[2:]
+        new_strain = 'Souche-' + new_strain[2:]
         para_i.setStrain(new_strain)
         strain_dictionary[new_strain] = [[para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb],[para_i.getIdd()]]
         
@@ -293,13 +293,12 @@ def actions_when_collision(p1,p2):
 
 def New_strain_in_csv(tempStrain, tempVir, tempTrans, tempRecov):
     if MODE == "war" or MODE == 'all_night_long':
-        print "on essaie"
-        with open("data/" + tempStrain + ".csv","wb") as NewStrainFile:
+        with open("data/" + tempStrain +".csv","w") as NewStrainFile:
             dico_of_strains_for_csv[tempStrain] = csv.writer(NewStrainFile) #création du fichier .csv avec le nom de la souche
             dico_of_strains_for_csv[tempStrain].writerow(["Souche","temps[s]","nombre infection secondaires","population totale en vie","parasites de cette souche en vie","pourcentage de la population de parasites", #header du csv
             "virulence: "+ str(tempVir), "taux de transmision: "+ str(tempTrans), "probabilité de guérison contre le parasite: " + str(tempRecov)])
-        print "c'est fait"
-
+        
+        
 #-----------------------main --------------------------
     
 class mainApp(App) :
@@ -536,44 +535,47 @@ class BallsContainer(Widget):
 
     def shall_we_kill_the_simulation(self, dt) :
         '''En mode theory_tester, arrète la simulation quand il n'y a plus de parasite ou si le temps défini c'est écoulé'''
-        elapsed_time = time.time() - self.starting_time
-        if len(list_of_parazites) == 0 or elapsed_time > SIMULATION_TIME :
-            self.on_stop()
+        if MODE == 'theory_tester':
+            elapsed_time = time.time() - self.starting_time
+            if len(list_of_parazites) == 0 or elapsed_time > SIMULATION_TIME :
+                self.on_stop()
 
 
         #=========GUI BULLSHIT==================================
     def update_data_files(self,dt):
-        current_time = time.clock()
-        simulation_time = round(current_time - initial_time,4) 
-        nb_of_healthies = len(list_of_healthies) #liste des individus sains vivants
-        total_nb_of_parazites_alive = len(list_of_parazites) #liste des parasites vivants
-        total_population = nb_of_healthies +  total_nb_of_parazites_alive
-        if nb_of_healthies > 0 :
-            percentage_of_parazites_in_pop = round((float(total_nb_of_parazites_alive)/total_population)*100,2) #pourcentage de parasite dans la population totale
-        else :
-            percentage_of_parazites_in_pop = 0 # pour éviter division par zéro
+        if MODE == 'war' or MODE == 'all_night_long':
+            simulation_time = self.duration
+            nb_of_healthies = len(list_of_healthies) #liste des individus sains vivants
+            total_nb_of_parazites_alive = len(list_of_parazites) #liste des parasites vivants
+            total_population = nb_of_healthies +  total_nb_of_parazites_alive
+            if nb_of_healthies > 0 :
+                percentage_of_parazites_in_pop = round((float(total_nb_of_parazites_alive)/total_population)*100,2) #pourcentage de parasite dans la population totale
+            else :
+                percentage_of_parazites_in_pop = 0 # pour éviter division par zéro
+                
+            #inscription dans le fichier src/nb_sains_infectes.csv
+            with open("nb_total_sains_infectes.csv","a") as csv_nb_total_sains_infectes: #creer le fichier des données générales de la population 
+                writer = csv.writer(csv_nb_total_sains_infectes)
+                writer.writerow([simulation_time,total_population,nb_of_healthies,total_nb_of_parazites_alive,percentage_of_parazites_in_pop,self.mean_vir,self.mean_recov,self.mean_trans])
             
-        #inscription dans le fichier src/nb_sains_infectes.csv
-        with open("nb_total_sains_infectes.csv","a") as csv_nb_total_sains_infectes: #creer le fichier des données générales de la population 
-            writer = csv.writer(csv_nb_total_sains_infectes)
-            writer.writerow([simulation_time,total_population,nb_of_healthies,total_nb_of_parazites_alive,percentage_of_parazites_in_pop,self.mean_vir,self.mean_recov,self.mean_trans])
+            #parcours les souches et met à jour le fichier "souche.csv" qui leur correspond
+            for strain_id in strain_dictionary:
+                print "dans update file  ", strain_id
+                total_nb_of_infections = len(strain_dictionary[strain_id][1]) #nombre total d'infection secondaires
+                nb_of_parazites_alive = 0 # nombre de parasites de cette souche en vie à l'instant t
+                for id_infected_by_this_strain in strain_dictionary[strain_id][1]:  # on parcours la liste des id qui ont été infectés par cette souche
+                    if id_infected_by_this_strain in balls_dictionnary: #on prend la liste des id qui ont été inféctés par cette souche et on compare avec la liste des invidividus encore en vie
+                        nb_of_parazites_alive += 1    
+                if total_nb_of_parazites_alive != 0:
+                    percentage_of_all_infections = round((float(nb_of_parazites_alive)/total_nb_of_parazites_alive) * 100, 2) #quelle importance a cette souche comparée au total des autres   
+                else :
+                    percentage_of_all_infections = 0.0
+                if nb_of_parazites_alive > 0 :    #on contnu de mettre à jour le fichier csv seuelment si la souche est encore active ( au moins 1 parasite encore en vie)
+                        with open("data/" + strain_id + ".csv","a") as UpdateStrainFile:
+                            dico_of_strains_for_csv[strain_id] = csv.writer(UpdateStrainFile)
+                            dico_of_strains_for_csv[strain_id].writerow([simulation_time,strain_id,total_nb_of_infections,
+                                                                total_population,nb_of_parazites_alive, percentage_of_all_infections])
         
-        #parcours les souches et met à jour le fichier "souche.csv" qui leur correspond
-        for strain_id in strain_dictionary:
-            total_nb_of_infections = len(strain_dictionary[strain_id][1]) #nombre total d'infection secondaires
-            nb_of_parazites_alive = 0 # nombre de parasites de cette souche en vie à l'instant t
-            for id_infected_by_this_strain in strain_dictionary[strain_id][1]:  # on parcours la liste des id qui ont été infectés par cette souche
-                if id_infected_by_this_strain in balls_dictionnary: #on prend la liste des id qui ont été inféctés par cette souche et on compare avec la liste des invidividus encore en vie
-                    nb_of_parazites_alive += 1    
-            
-            percentage_of_all_infections = round((float(nb_of_parazites_alive)/total_nb_of_parazites_alive) * 100, 2) #quelle importance a cette souche comparée au total des autres   
-       
-            if nb_of_parazites_alive > 0 :    #on contnu de mettre à jour le fichier csv seuelment si la souche est encore active ( au moins 1 parasite encore en vie)
-                    with open("data/" + strain_id + ".csv","a") as UpdateStrainFile:
-                        dico_of_strains_for_csv[strain_id] = csv.writer(UpdateStrainFile)
-                        dico_of_strains_for_csv[strain_id].writerow([simulation_time,strain_id,total_nb_of_infections,
-                                                            total_population,nb_of_parazites_alive, percentage_of_all_infections])
-    
     def on_pause(self):
         '''Arrète de mettre à jour update, update_life_and_death et update_files '''
         Clock.unschedule(self.update)
