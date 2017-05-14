@@ -11,7 +11,6 @@ class Individual(object):   #object afin d'avoir des 'nouvelles' classes
         self.color = color #pas besoin de tout définir à la main (on peut aussi mettre par défaut...)
         self.idd = idd
         self.resistances = res
-
         
     def __str__(self):  #pseudo-overload
         return 'ID : ' +str(self.idd) + "\n Resistances : " + str(self.resistances)
@@ -32,7 +31,6 @@ class Individual(object):   #object afin d'avoir des 'nouvelles' classes
     def setIdd(self, a):
         self.idd = a
         
-
     def addResistance(self, idd) :
         if idd not in self.resistances:
             temp_res = list(self.resistances)
@@ -42,14 +40,3 @@ class Individual(object):   #object afin d'avoir des 'nouvelles' classes
     def getResistances(self) :
         return self.resistances
 
-    #def setHourglass(self, h):
-        #self.hourglass = h
-
-    #def getHourglass(self) :
-        #return self.hourglass
-
-    def setPosition(self,pos): #pratique, à faire pour ~tous les attributs publiques
-        self.position = pos
-
-
-print ALL_NIGHT_LONG
