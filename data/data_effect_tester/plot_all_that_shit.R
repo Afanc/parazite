@@ -4,13 +4,18 @@
 
 par(ps = 12, cex = 1, cex.main = 1)
 all = list.files(pattern="*.csv")
-par(mfrow=c(4,4))
+vec = NULL
 for (i in all) {
     data = read.csv(i, header=TRUE)
 
-    print(data$mean_recov)
+    x = substr(i, 1,3)
+    y = tail(data, 1)
 
-    plot(data$secondary_infections, type = "l",col='red', xlab='',ylab='')# xlab = 'temps [sec]', ylab= 'mean value')
-    #legend(0,0.2, legend = c("virulence", "transmission","guerison"), lty=c(1,1), col=c("red","blue", "green"))
-    title(paste('Inf',substr(i, 14, 16), 'Rand', substr(i, 24,26), 'Rep', substr(i, 34,36), sep=' '))
+    vec <- rbind(vec, c(x,y[2]))
+
 }
+print(vec)
+
+plot(vec, type = "l",col='red', xlab='Number of secondary infections',ylab='effect')
+title('blabla')
+
