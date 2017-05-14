@@ -73,6 +73,7 @@ def add_one_parazite(effect = None) :
     #try:
     temp_id = create_id() #commence par créer un ID
     if effect != None: #si un effet est donné en argument ...
+        effect = float(effect)
         attribute = trade_off(effect_arg = effect) #on utillise la fonction trade_off pour
         temp_vir = attribute[0] #créer une virulence 
         temp_trans = attribute[1] #crée un taux de transmision
@@ -497,16 +498,22 @@ class BallsContainer(Widget):
             else :
                 arg = "data_per_param/"+str(filename)+'.csv'
 
-            with open(str(arg), 'w') as par:
-                csv_file =csv.writer(par, delimiter=',')
-                if len(sys.argv) > 2 :                  #si on mass-effect
-                    if os.path.getsize(str(arg)) == 0:  #1st line
-                        csv_file.writerow(['time', 'secondary_infections'])
-                    csv_file.writerow([self.duration,0])
-                elif len(sys.argv) > 1 :                #si on other param
-                        #csv_file.writerow(['time', 'healthies', 'parazites', 'mean_vir', 'mean_trans', 'mean_recov'])
-                    csv_file.writerow([self.duration,len(list_of_healthies), len(list_of_parazites),self.mean_vir,self.mean_trans,self.mean_recov])
-            #=========GUI BULLSHIT==================================
+            print strain_dictionary
+            if not isfile(str(arg)) :
+                with open(str(arg), 'w') as par:
+                    csv_file = csv.writer(par, delimiter=',')
+                    if len(sys.argv) > 2 :                  #si on mass-effect
+                            csv_file.writerow(['time', 'secondary_infections'])
+                    elif len(sys.argv) > 1:
+                        csv_file.writerow(['time', 'healthies', 'parazites', 'mean_vir', 'mean_trans', 'mean_recov'])
+            else :
+                with open(str(arg), 'a') as par :
+                    csv_file =csv.writer(par, delimiter=',')
+                    if len(sys.argv) > 2 and len(strain_dictionary) > 0:                  #si on mass-effect
+                        csv_file.writerow([self.duration,len(strain_dictionary['Souche:101'][1])])
+                    elif len(sys.argv) > 1 :                #si on other param
+                        csv_file.writerow([self.duration,len(list_of_healthies), len(list_of_parazites),self.mean_vir,self.mean_trans,self.mean_recov])
+        #=========GUI BULLSHIT==================================
         temp_wig = []
         for c in self.children:
             if not isinstance(c, Ball) :
