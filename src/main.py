@@ -501,7 +501,6 @@ class BallsContainer(Widget):
             else :
                 arg = "data_per_param/"+str(filename)+'.csv'
 
-            print strain_dictionary
             if not isfile(str(arg)) :
                 with open(str(arg), 'w') as par:
                     csv_file = csv.writer(par, delimiter=',')
