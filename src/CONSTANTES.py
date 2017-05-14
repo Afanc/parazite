@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-                                                                                                
 
 #mode: 'theory_tester', 'war', 'all_night_long'
-MODE = 'war'
+MODE = 'theory_tester'
 
 #mode theory tester :
-SIMULATION_TIME = 300
-TEST_THEORY = 1
+SIMULATION_TIME = 10
+TEST_THEORY = 0
 
 #all_night_long
-ALL_NIGHT_LONG = 0
+#ALL_NIGHT_LONG = 0
 HEALTHY_ROOF = 1
 STOCK_DYING_PROB = 0.13
 ROOF_DYING_PROB = 0.2

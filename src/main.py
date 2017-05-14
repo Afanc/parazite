@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-                                                                                                
 #!/usr/bin/env python
 
-#from BallsContainer import *
-from __future__ import division
-from parazite1 import *
-from healthy import *
+
+#from __future__ import division
+#from datetime import datetime
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.properties import NumericProperty, ReferenceListProperty, ListProperty
@@ -16,22 +15,22 @@ from kivy.uix.button import Button
 from kivy.graphics import *
 from kivy.app import App
 from functools import partial
-from datetime import datetime
-from quadtree import Quadtree
-from collision import *
 import matplotlib.pyplot as plt
-from time import clock
-from trade_off import trade_off
-from del_useless_files import * # si on arrive à faire en sorte que ça se lance tout seul quand on ferme le programme ce serait top
 import csv 
 import time 
+#from time import clock
 import os 
 import shutil 
-from CHANGING_CONST import *
-from time import clock 
 from sys import exit
 from os.path import isfile
 import sys
+from quadtree import Quadtree
+from collision import *
+from parazite1 import *
+from healthy import *
+from trade_off import trade_off
+from del_useless_files import * # si on arrive à faire en sorte que ça se lance tout seul quand on ferme le programme ce serait top
+from CHANGING_CONST import *
 Window.size = (800, 600)
 starting_time = 0
 initial_time = time.clock() 
@@ -305,14 +304,15 @@ class mainApp(App) :
     """Represents the whole application."""
     def build(self) :
         """Gestion temporelle des fonctions. Passe les argument "globaux" par défaut. """
+        global Event
         root = BallsContainer()
-
+        
         args = None                 #passage d'argument
         if len(sys.argv) > 1 :
             args = sys.argv[1]
 
-        Clock.schedule_once(root.update_files,1.1)         #on attend que la fenêtre soit lancée
-        Clock.schedule_interval(partial(root.update_files, filename = args), 60*DELTA_TIME)
+        Clock.schedule_once(partial(root.update_files, filename = args),1.1)         #on attend que la fenêtre soit lancée
+        Event = Clock.schedule_interval(partial(root.update_files, filename = args), 60*DELTA_TIME)
 
         Clock.schedule_once(root.start_balls,1)         #on attend que la fenêtre soit lancée
         Clock.schedule_once(root.update_life_and_death,1.1)         #on attend que la fenêtre soit lancée
@@ -335,7 +335,7 @@ class BallsContainer(Widget):
     nb_coll, mean_vir, mean_trans, mean_recov,last_clock, duration, paused = NumericProperty(0),NumericProperty(0),NumericProperty(0),NumericProperty(0),NumericProperty(0), NumericProperty(0), NumericProperty(0)
     top_idds = ListProperty([[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]])
     temp_widg_to_remove_list = []
-    starting_time = time.time()
+#    starting_time = time.time()
 
     def start_balls(self,dt):
         ''' Est apellée une fois, au temps dt(défini dans build). Ajoute les boules. '''
@@ -366,14 +366,12 @@ class BallsContainer(Widget):
         if len(sys.argv) > 2 : #mode theory tester
             for _ in range(10) :
                 reproduce(self, list_of_parazites[-1])
-        print "start balls"
 
     #@profile
     def update(self,dt):
         '''Sert de manager pour les position et les vitesse des boules à l'aide des dictionnaires. Appelle les fonctions qui gèrent les collisions. Est appelé tousles dt, un interval de temps défini dans build. '''
         quad = Quadtree(0,[self.x,self.x + self.width, self.y, self.y + self.height])
         quad.reset()    #est-ce que ça sert à rien ?
-        
         for i in balls_dictionnary.keys() :
             pos = balls_dictionnary[i][0]       #gotta update position (dic) here ! before the quad !
             balls_dictionnary[i][2] = [pos.x, pos.x + pos.width, pos.y, pos.y + pos.height]
@@ -405,16 +403,18 @@ class BallsContainer(Widget):
         mutate_those_who_wish(dt)
         self.shall_we_kill_the_simulation(dt)
         self.all_nighter()
+       
     
     def update_files(self, dt, filename = None) :
         '''Sert à la gestion temporelle de l'écriture dans les fichiers. appelé tous les dt(défini dans build, normalement toutes les secondes)'''
         self.update_numbers(filename)
         self.update_data_files(dt)
+        
        
     def all_nighter(self) :
         ''' Uniquement utilisé dans le mode all_night_long, qui permet de maintenir la population à un nombre gérable par l'ordinateur'''
         global REPRODUCTION_PROB, DYING_PROB
-        if ALL_NIGHT_LONG == 1 and len(list_of_parazites) < 1:
+        if MODE=='all_night_long' and len(list_of_parazites) < 1:
             for i in range (0,NB_PARASITE):    
                 ball = Ball()
                 ball.center = (randint(self.x, self.x+self.width), randint(self.y, self.y+self.height))
@@ -423,17 +423,16 @@ class BallsContainer(Widget):
                 self.add_widget(ball)
                 ball.set_col((uniform(0,1),uniform(0,1),0))
                 parazite = add_one_parazite()
-                print "la faute à all nighter"
                 balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
-        if len(list_of_healthies) + len(list_of_parazites) > 300 and HEALTHY_ROOF == 1:
+        if len(list_of_healthies) + len(list_of_parazites) > 300 and MODE == 'all_night_long':
             DYING_PROB = ROOF_DYING_PROB
-        elif len(list_of_healthies)<= 250 and HEALTHY_ROOF == 1:
+        elif len(list_of_healthies)<= 250 and MODE == 'all_night_long':
             DYING_PROB = STOCK_DYING_PROB
         else :
             pass
-        if len(list_of_healthies) + len(list_of_parazites) < 50 and ALL_NIGHT_LONG == 1:
+        if len(list_of_healthies) + len(list_of_parazites) < 50 and MODE == 'all_night_long':
             REPRODUCTION_PROB = BOTTOM_REPRODUCTION_PROB
-        elif len(list_of_healthies) + len(list_of_parazites) > 50 and ALL_NIGHT_LONG == 1:
+        elif len(list_of_healthies) + len(list_of_parazites) > 50 and MODE == 'all_night_long':
             REPRODUCTION_PROB = STOCK_REPRODUCTION_PROB
     
        
@@ -442,7 +441,7 @@ class BallsContainer(Widget):
         self.num_parazites = len(list_of_parazites)
         self.num_healthies = len(list_of_healthies)
 
-        sumvir, sumrecov, sumtrans, time = 0,0,0, clock()
+        sumvir, sumrecov, sumtrans = 0,0,0
 
         tempdic = {}
         self.top_idds = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
@@ -478,7 +477,8 @@ class BallsContainer(Widget):
             self.mean_vir, self.mean_trans, self.mean_recov = 0,0,0
         
         #_---------------gestion du temps sans les pauses--------
-        self.duration = clock()- self.paused 
+        if self.pause == False:
+            self.duration = time.clock()- self.paused 
         
         #------------------------------- Enregistrement des données--------------------
         if filename is not None or len(sys.argv) > 1:
@@ -500,7 +500,7 @@ class BallsContainer(Widget):
                 with open(str(arg), 'a') as par :
                     csv_file =csv.writer(par, delimiter=',')
                     if len(sys.argv) > 2 and len(strain_dictionary) > 0:                  #si on mass-effect
-                        csv_file.writerow([self.duration,len(strain_dictionary['Souche:101'][1])])
+                        csv_file.writerow([self.duration,len(strain_dictionary['Souche-101'][1])])
                     elif len(sys.argv) > 1 :                #si on other param
                         csv_file.writerow([self.duration,len(list_of_healthies), len(list_of_parazites),self.mean_vir,self.mean_trans,self.mean_recov])
         #=========GUI BULLSHIT==================================
@@ -535,15 +535,17 @@ class BallsContainer(Widget):
 
     def shall_we_kill_the_simulation(self, dt) :
         '''En mode theory_tester, arrète la simulation quand il n'y a plus de parasite ou si le temps défini c'est écoulé'''
+        
         if MODE == 'theory_tester':
-            elapsed_time = time.time() - self.starting_time
-            if len(list_of_parazites) == 0 or elapsed_time > SIMULATION_TIME :
+            print self.duration
+            if len(list_of_parazites) == 0 or self.duration > SIMULATION_TIME :
                 self.on_stop()
 
 
         #=========GUI BULLSHIT==================================
     def update_data_files(self,dt):
         if MODE == 'war' or MODE == 'all_night_long':
+            print self.duration
             simulation_time = self.duration
             nb_of_healthies = len(list_of_healthies) #liste des individus sains vivants
             total_nb_of_parazites_alive = len(list_of_parazites) #liste des parasites vivants
@@ -560,7 +562,6 @@ class BallsContainer(Widget):
             
             #parcours les souches et met à jour le fichier "souche.csv" qui leur correspond
             for strain_id in strain_dictionary:
-                print "dans update file  ", strain_id
                 total_nb_of_infections = len(strain_dictionary[strain_id][1]) #nombre total d'infection secondaires
                 nb_of_parazites_alive = 0 # nombre de parasites de cette souche en vie à l'instant t
                 for id_infected_by_this_strain in strain_dictionary[strain_id][1]:  # on parcours la liste des id qui ont été infectés par cette souche
@@ -578,16 +579,26 @@ class BallsContainer(Widget):
         
     def on_pause(self):
         '''Arrète de mettre à jour update, update_life_and_death et update_files '''
+        global Event
         Clock.unschedule(self.update)
         Clock.unschedule(self.update_life_and_death)
-        Clock.unschedule(self.update_files)
-        return True
+        args = None                 #passage d'argument
+        if len(sys.argv) > 1 :
+            args = sys.argv[1]
+        Clock.unschedule(Event)
+        
 
     def on_resume(self):
         '''recommence de mettre à jour update, update_life_and_death, update_files'''
+        global Event
         Clock.schedule_interval(self.update, DELTA_TIME)
         Clock.schedule_interval(self.update_life_and_death, 60*DELTA_TIME)
-        Clock.schedule_interval(partial(root.update_files, filename = args), 60*DELTA_TIME)
+        args = None                 #passage d'argument
+        if len(sys.argv) > 1 :
+            args = sys.argv[1]
+        Event = Clock.schedule_interval(partial(self.update_files, filename = args), 60*DELTA_TIME)
+
+        
         
     def on_stop(self):
         '''Ferme l'application'''
@@ -598,6 +609,7 @@ class BallsContainer(Widget):
         """Géré par kivy, quand on clique sur la fenêtre, affiche un graphique du nombre d'infections decondaire en fonction de la virulance"""
         if not self.pause :
             return
+        
         listx = []
         listy = []
         for i in strain_dictionary.keys():
@@ -606,22 +618,22 @@ class BallsContainer(Widget):
         plt.scatter(listx, listy)
         plt.ylabel('Secondary infections')
         plt.plot((self.mean_vir, self.mean_vir), (0,len(list_of_parazites) + len(list_of_healthies)), 'k-',color = 'r')
-        plt.title('Nb of sec. infections following virulance at time = ' + str(int(clock())) + 'sec')
+        plt.title('Nb of sec. infections following virulance at time = ' + str(self.duration) + 'sec')
         plt.show()
         return 
 
     def Keyboard(self, window, keycode, *args) :
         """Géré par Kivy, permet d'utiliser les inputs du clavier"""
         if keycode == 32 and not self.pause:              #SPACE - pour ça je rajoute un print keycode avant et check le int
-            self.duration = clock() - self.paused
-            self.paused -= clock()
+            self.duration = time.clock() - self.paused
+            self.paused -= time.clock()
             self.on_pause()
             self.pause = True
             
         elif keycode == 32 and self.pause :
             self.on_resume()
             self.pause = False
-            self.paused += clock()
+            self.paused += time.clock()
 
         elif keycode == 275 :           #right
             self.faster_events.append([Clock.schedule_interval(self.update, DELTA_TIME), Clock.schedule_interval(self.update_life_and_death, 60*DELTA_TIME)])
@@ -637,7 +649,7 @@ class BallsContainer(Widget):
             print "recovery moyenne: ", self.mean_recov
             print "transmission moyenne : ", self.mean_trans
 
-            self.last_clock = clock()
+            self.last_clock = time.clock()
             self.nb_coll = 0
         
         elif keycode == 115:# s pour stop
