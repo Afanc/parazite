@@ -37,7 +37,7 @@ def launch() :
         f.write('#!/usr/bin/python\n\n')
         for inx, it in enumerate(list_of_param) :
             f.write(str(list_of_names[inx])+' = '+str(list_of_param[inx])+'\n')
-    #os.system("python main.py "+str(filename))      #pas d'autre moyen parce que difficile de flush les objets en mémoire
+    os.system("python main.py "+str(filename))      #pas d'autre moyen parce que difficile de flush les objets en mémoire
 
     time.sleep(2)                                   #juste pour se donner du temps
 
