@@ -496,16 +496,16 @@ class BallsContainer(Widget):
                 arg = "data_per_param/"+str(sys.argv[1]) + '.csv'           #si on other param
             else :
                 arg = "data_per_param/"+str(filename)+'.csv'
+
             with open(str(arg), 'w') as par:
-                test =csv.writer(par, delimiter=',')
+                csv_file =csv.writer(par, delimiter=',')
                 if len(sys.argv) > 2 :                  #si on mass-effect
                     if os.path.getsize(str(arg)) == 0:  #1st line
-                        test.writerow(['time', 'secondary_infections'])
-                    test.writerow([self.duration,0])
+                        csv_file.writerow(['time', 'secondary_infections'])
+                    csv_file.writerow([self.duration,0])
                 elif len(sys.argv) > 1 :                #si on other param
-                    if os.path.getsize(str(arg)) == 0:  #1st line
-                        test.writerow(['time', 'healthies', 'parazites', 'mean_vir', 'mean_trans', 'mean_recov'])
-                    test.writerow([self.duration,len(list_of_healthies), len(list_of_parazites),self.mean_vir,self.mean_trans,self.mean_recov])
+                        #csv_file.writerow(['time', 'healthies', 'parazites', 'mean_vir', 'mean_trans', 'mean_recov'])
+                    csv_file.writerow([self.duration,len(list_of_healthies), len(list_of_parazites),self.mean_vir,self.mean_trans,self.mean_recov])
             #=========GUI BULLSHIT==================================
         temp_wig = []
         for c in self.children:
