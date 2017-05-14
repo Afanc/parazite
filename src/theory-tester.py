@@ -12,31 +12,37 @@ import os
 
 global INFECTION_CHANCE, CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE, TRANSMISSION_OF_RESISTANCE_PROB, BASE_CHANCE_OF_HEALING
 
-INFECTION_CHANCE, CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE,TRANSMISSION_OF_RESISTANCE_PROB, BASE_CHANCE_OF_HEALING = 0,0,0,0,0,0,0
-#INFECTION_CHANCE, CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE,TRANSMISSION_OF_RESISTANCE_PROB, BASE_CHANCE_OF_HEALING = 0.4,0.4,0.5,0.5,0.5,0.5,0.5
+INFECTION_CHANCE, CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE,TRANSMISSION_OF_RESISTANCE_PROB, BASE_CHANCE_OF_HEALING = 0.4,0,0,0,0.5,1,0.1
 
 list_of_names = ['INFECTION_CHANCE', 'CHANCE_OF_MUTATION_ON_INFECTION', 'CHANCE_OF_MUTATION_ON_NOTHING','CHANCE_OF_MUTATION_ON_REPRODUCTION', 'PARAZITE_FIGHT_CHANCE','TRANSMISSION_OF_RESISTANCE_PROB', 'BASE_CHANCE_OF_HEALING']
 
 list_of_param = [INFECTION_CHANCE, CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION, PARAZITE_FIGHT_CHANCE,TRANSMISSION_OF_RESISTANCE_PROB, BASE_CHANCE_OF_HEALING]
 
-MAX_LEVEL = 0.5
+sub_list_of_param = [CHANCE_OF_MUTATION_ON_INFECTION, CHANCE_OF_MUTATION_ON_NOTHING,CHANCE_OF_MUTATION_ON_REPRODUCTION]
+
+MAX_LEVEL = 0.3
 STEP = 0.1
 
 def launch() :
     filename = 'inf'+str(list_of_param[0])+'_infmut'+str(list_of_param[1])+'_notmut'+str(list_of_param[2])+'_repmut'+str(list_of_param[3])+'_fight'+str(list_of_param[4])+'_restransm'+str(list_of_param[5])+'_heal'+str(list_of_param[6])
+    
+    list_of_param[1] = sub_list_of_param[0]
+    list_of_param[2] = sub_list_of_param[1]
+    list_of_param[3] = sub_list_of_param[2]
 
     with open('CHANGING_CONST.py', 'w') as f:
         f.write('#!/usr/bin/python\n\n')
         for inx, it in enumerate(list_of_param) :
             f.write(str(list_of_names[inx])+' = '+str(list_of_param[inx])+'\n')
-    os.system("python main.py "+str(filename))      #pas d'autre moyen parce que difficile de flush les objets en mémoire
+    #os.system("python main.py "+str(filename))      #pas d'autre moyen parce que difficile de flush les objets en mémoire
 
-    time.sleep(5)                                   #juste pour se donner du temps
+    time.sleep(2)                                   #juste pour se donner du temps
 
 def increment_difficulty(l, j=1) :
     if j > len(l) :
         return
 
+    sub_list_of_param = l
     launch()
 
     if l[-j] >= MAX_LEVEL :
@@ -48,9 +54,9 @@ def increment_difficulty(l, j=1) :
 
 #---- the tester
 sum_l = 0
-while sum_l < MAX_LEVEL*len(list_of_param) :
+while sum_l < MAX_LEVEL*len(sub_list_of_param) :
     sum_l = 0
-    increment_difficulty(list_of_param)
-    for a in list_of_param :
+    increment_difficulty(sub_list_of_param)
+    for a in sub_list_of_param :
         sum_l += a
 
