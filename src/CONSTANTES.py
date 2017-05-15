@@ -2,15 +2,15 @@
 from random import seed
 seed(42)
 #mode: 'theory_tester', 'war', 'all_night_long'
-MODE = 'war'
+MODE = 'theory_tester'
 
 #mode theory tester :
-SIMULATION_TIME = 10
+SIMULATION_TIME = 120
 TEST_THEORY = 0
 
 #all_night_long
 #ALL_NIGHT_LONG = 0
-HEALTHY_ROOF = 1
+#HEALTHY_ROOF = 1
 STOCK_DYING_PROB = 0.13
 ROOF_DYING_PROB = 0.2
 STOCK_REPRODUCTION_PROB = 0.13
@@ -23,8 +23,8 @@ BASE_COLOR = [0,0,1]
 
 #MAIN
 TRADE_OFF = 'leo'
-NB_SAINS = 4
-NB_PARASITE = 1 
+NB_SAINS = 100
+NB_PARASITE = 5
 MAX_VELOCITY= 1
 MAX_VIRULANCE= 1
 MIN_SIZE_FOR_DATA = 40 * 1000  #pour avoir mesure en kb, à utiliser dans all_night_long et war
@@ -34,7 +34,7 @@ DYING_PROB = 0.13    #max 0.5
 REPRODUCTION_PROB = 0.13
 
 #HEALTHY
-TRANSMISSION_RESISTANCE = 1
+TRANSMISSION_RESISTANCE = 0
 
 #PARAZITE
 BASE_FITNESS = 0.8
