@@ -573,8 +573,7 @@ class BallsContainer(Widget):
                 if nb_of_parazites_alive > 0 :    #on contnu de mettre à jour le fichier csv seuelment si la souche est encore active ( au moins 1 parasite encore en vie)
                         with open("data/" + strain_id + ".csv","a") as UpdateStrainFile:
                             dico_of_strains_for_csv[strain_id] = csv.writer(UpdateStrainFile)
-                            dico_of_strains_for_csv[strain_id].writerow([simulation_time,strain_id,total_nb_of_infections,
-                                                                total_population,nb_of_parazites_alive, percentage_of_all_infections])
+                            dico_of_strains_for_csv[strain_id].writerow([simulation_time,strain_id,total_nb_of_infections,total_population,nb_of_parazites_alive, percentage_of_all_infections, strain_dictionary[strain_id][0][0], strain_dictionary[strain_id][0][1], strain_dictionary[strain_id][0][2]])
         
     def on_pause(self):
         '''Arrète de mettre à jour update, update_life_and_death et update_files '''
