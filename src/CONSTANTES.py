@@ -27,7 +27,7 @@ NB_SAINS = 120
 NB_PARASITE = 10
 MAX_VELOCITY= 1 
 MAX_VIRULANCE= 1
-NB_FILES_TO_KEEP = 20  #pour avoir mesure en kb, à utiliser dans all_night_long et war
+NB_FILES_TO_KEEP = 20  
 
 #INDIVIDUAL
 DYING_PROB = 0.12    #max 0.5
