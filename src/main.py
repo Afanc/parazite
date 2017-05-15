@@ -403,7 +403,6 @@ class BallsContainer(Widget):
         mutate_those_who_wish(dt)
         self.shall_we_kill_the_simulation(dt)
         self.all_nighter()
-        print strain_dictionary
     
     def update_files(self, dt, filename = None) :
         '''Sert à la gestion temporelle de l'écriture dans les fichiers. appelé tous les dt(défini dans build, normalement toutes les secondes)'''
