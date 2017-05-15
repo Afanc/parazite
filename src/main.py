@@ -2,8 +2,6 @@
 #!/usr/bin/env python
 
 
-#from __future__ import division
-#from datetime import datetime
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.properties import NumericProperty, ReferenceListProperty, ListProperty
@@ -15,15 +13,14 @@ from kivy.uix.button import Button
 from kivy.graphics import *
 from kivy.app import App
 from functools import partial
+from os.path import isfile
+
 import matplotlib.pyplot as plt
 import csv 
 import time 
-#from time import clock
 import os 
-import shutil 
-from sys import exit
-from os.path import isfile
 import sys
+
 from quadtree import Quadtree
 from collision import *
 from parazite1 import *
@@ -31,10 +28,8 @@ from healthy import *
 from trade_off import trade_off
 from del_useless_files import * # si on arrive à faire en sorte que ça se lance tout seul quand on ferme le programme ce serait top
 from CHANGING_CONST import *
-Window.size = (800, 600)
-starting_time = 0
-initial_time = time.clock() 
 
+Window.size = (800, 600)
 seed(42)
 
 
