@@ -28,10 +28,8 @@ from healthy import *
 from trade_off import trade_off
 from del_useless_files import * # si on arrive à faire en sorte que ça se lance tout seul quand on ferme le programme ce serait top
 from CHANGING_CONST import *
-Window.size = (800, 600)
-starting_time = 0
-initial_time = time.clock() 
 
+Window.size = (800, 600)
 seed(42)
 
 
