@@ -214,7 +214,6 @@ def random_mutation_on(para_i, what) :
             rand_index = randint(0,2)
             new_value = max(min(old_attributes[rand_index] * (1+rand_mod), 1),0)   #new attribute = 1.2*old attribute (au max)
             attribute_functions[str(rand_index)](new_value)                     #on appelle la fonction correspondante
-            new_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
         elif TRADE_OFF == 'leo':
             trade_off(para_i)
             
@@ -572,7 +571,7 @@ class BallsContainer(Widget):
                 if nb_of_parazites_alive > 0 :    #on contnu de mettre à jour le fichier csv seuelment si la souche est encore active ( au moins 1 parasite encore en vie)
                         with open("data/" + strain_id + ".csv","a") as UpdateStrainFile:
                             dico_of_strains_for_csv[strain_id] = csv.writer(UpdateStrainFile)
-                            dico_of_strains_for_csv[strain_id].writerow([simulation_time,strain_id,total_nb_of_infections,total_population,nb_of_parazites_alive, percentage_of_all_infections, float(strain_dictionary[strain_id][0][0]), float(strain_dictionary[strain_id][0][1]), float(strain_dictionary[strain_id][0][2]]))
+                            #dico_of_strains_for_csv[strain_id].writerow([simulation_time,strain_id,total_nb_of_infections,total_population,nb_of_parazites_alive, percentage_of_all_infections, float(strain_dictionary[strain_id][0][0]), float(strain_dictionary[strain_id][0][1]), float(strain_dictionary[strain_id][0][2])])
         
     def on_pause(self):
         '''Arrète de mettre à jour update, update_life_and_death et update_files '''
