@@ -15,13 +15,3 @@ class Healthy(Individual):  #est de type Individual
         return 'ID : ' +str(self.idd) +'\nresistance : '+str(self.resistances)\
 
 
-#    def setResistance(self, res) :
-#        if res != [] and res not in self.resistances:
-#            self.resistances.append(res)
-
-
-    def isResistant(self, idd) :
-        if idd in self.resistances:
-            return True
-        return False
-
