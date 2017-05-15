@@ -10,7 +10,7 @@ for (i in all) {
 
     x = substr(i, 1,3)
     #y = tail(data, 1)
-    y = data[40,]
+    y = data[50,]
 
     vec <- rbind(vec, c(x,y[2]))
 
