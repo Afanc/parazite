@@ -22,12 +22,12 @@ MAX_BALL_SPEED = 100
 BASE_COLOR = [0,0,1]
 
 #MAIN
-TRADE_OFF = 'dada'
+TRADE_OFF = 'dada' #peut prendre deux valeur leo ou dada
 NB_SAINS = 120
 NB_PARASITE = 10
-MAX_VELOCITY= 1
+MAX_VELOCITY= 1 
 MAX_VIRULANCE= 1
-MIN_SIZE_FOR_DATA = 40 * 1000  #pour avoir mesure en kb, à utiliser dans all_night_long et war
+NB_FILES_TO_KEEP = 20  #pour avoir mesure en kb, à utiliser dans all_night_long et war
 
 #INDIVIDUAL
 DYING_PROB = 0.12    #max 0.5
