@@ -155,7 +155,7 @@ def cure_the_lucky_ones(dt) :
     '''On parcourt la liste de tous les parasites. A chaque itération on tire un nombre au hasard entre 0 et 1 et on le compare à la constante BASE_CHANCE_OF_HEALING * la probabilité de guérison spécifique au parasite en question. Si le nombre tiré est inférieur on transforme le parasite en individu sain en appelant la fonction guérison.
 '''
     for i in iter(list_of_parazites): #Parcours la liste des parasites. 
-        if uniform(0,1) < BASE_CHANCE_OF_HEALING *(1-i.getRecovProb()) :  #  Si la probabilité de guérison de base * 1 + la probabilité de guérison spécifique au parasite est plus grande qu'un nombre au hasard entre 0 et 1 
+        if uniform(0,1) < BASE_CHANCE_OF_HEALING *(1+i.getRecovProb()) :  #  Si la probabilité de guérison de base * 1 + la probabilité de guérison spécifique au parasite est plus grande qu'un nombre au hasard entre 0 et 1 
             guerison(i) #l'individu est guéri. !si le taux de guérison vaut 1, plus de chances de guérir.
 
 def mutate_those_who_wish(dt) : 
@@ -418,15 +418,15 @@ class BallsContainer(Widget):
                 ball.set_col((uniform(0,1),uniform(0,1),0))
                 parazite = add_one_parazite()
                 balls_dictionnary[parazite.getIdd()] = [ball, parazite, [ball.x, ball.x + ball.width, ball.y, ball.y + ball.height]]
-        if len(list_of_healthies) + len(list_of_parazites) > 300 and MODE == 'all_night_long':
+        if len(list_of_healthies) + len(list_of_parazites) > 300 and MODE != 'war':
             DYING_PROB = ROOF_DYING_PROB
-        elif len(list_of_healthies)<= 250 and MODE == 'all_night_long':
+        elif len(list_of_healthies)<= 250 and MODE != 'war':
             DYING_PROB = STOCK_DYING_PROB
         else :
             pass
-        if len(list_of_healthies) + len(list_of_parazites) < 50 and MODE == 'all_night_long':
+        if len(list_of_healthies) + len(list_of_parazites) < 50 and MODE != 'war':
             REPRODUCTION_PROB = BOTTOM_REPRODUCTION_PROB
-        elif len(list_of_healthies) + len(list_of_parazites) > 50 and MODE == 'all_night_long':
+        elif len(list_of_healthies) + len(list_of_parazites) > 50 and MODE != 'war':
             REPRODUCTION_PROB = STOCK_REPRODUCTION_PROB
     
        
@@ -637,14 +637,6 @@ class BallsContainer(Widget):
                 self.faster_events[-1][0].cancel()
                 self.faster_events[-1][1].cancel()
                 self.faster_events.pop()
-          
-        elif keycode == 274:            #nombre de collision/intervalle de temps
-            print "virulence moyenne: ", self.mean_vir
-            print "recovery moyenne: ", self.mean_recov
-            print "transmission moyenne : ", self.mean_trans
-
-            self.last_clock = time.clock()
-            self.nb_coll = 0
         
         elif keycode == 115:# s pour stop
             self.on_stop()
