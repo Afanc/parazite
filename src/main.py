@@ -155,7 +155,7 @@ def cure_the_lucky_ones(dt) :
     '''On parcourt la liste de tous les parasites. A chaque itération on tire un nombre au hasard entre 0 et 1 et on le compare à la constante BASE_CHANCE_OF_HEALING * la probabilité de guérison spécifique au parasite en question. Si le nombre tiré est inférieur on transforme le parasite en individu sain en appelant la fonction guérison.
 '''
     for i in iter(list_of_parazites): #Parcours la liste des parasites. 
-        if uniform(0,1) < BASE_CHANCE_OF_HEALING *(1+i.getRecovProb()) :  #  Si la probabilité de guérison de base * 1 + la probabilité de guérison spécifique au parasite est plus grande qu'un nombre au hasard entre 0 et 1 
+        if uniform(0,1) < BASE_CHANCE_OF_HEALING *(1-i.getRecovProb()) :  #  Si la probabilité de guérison de base * 1 + la probabilité de guérison spécifique au parasite est plus grande qu'un nombre au hasard entre 0 et 1 
             guerison(i) #l'individu est guéri. !si le taux de guérison vaut 1, plus de chances de guérir.
 
 def mutate_those_who_wish(dt) : 
