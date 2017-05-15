@@ -214,7 +214,6 @@ def random_mutation_on(para_i, what) :
             rand_index = randint(0,2)
             new_value = max(min(old_attributes[rand_index] * (1+rand_mod), 1),0)   #new attribute = 1.2*old attribute (au max)
             attribute_functions[str(rand_index)](new_value)                     #on appelle la fonction correspondante
-            new_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
         elif TRADE_OFF == 'leo':
             trade_off(para_i)
             
