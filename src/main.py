@@ -547,7 +547,6 @@ class BallsContainer(Widget):
         #=========GUI BULLSHIT==================================
     def update_data_files(self,dt):
         if MODE == 'war' or MODE == 'all_night_long':
-            print self.duration
             simulation_time = self.duration
             nb_of_healthies = len(list_of_healthies) #liste des individus sains vivants
             total_nb_of_parazites_alive = len(list_of_parazites) #liste des parasites vivants

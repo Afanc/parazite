@@ -51,10 +51,10 @@ def trade_off(para_i = None, effect_arg = None):
         
         return [new_vir,new_transmission,new_recov]
 
-
-print trade_off(effect_arg = 2.6)
-  
-y = []
+y1 = []
+y2 = []
+y3 = []
+y4 = []
 x = []
 R0 = 0
 for i in arange(0.1,10.0,0.1):
@@ -68,9 +68,20 @@ for i in arange(0.1,10.0,0.1):
     R0num = (200 * (1+new_transmission)*0.4)
     R0den = ((1+new_vir)*DYING_PROB + (1+new_recov)*BASE_CHANCE_OF_HEALING)
     R0 = R0num/R0den
-    y.append(R0)
+    y1.append(new_vir)
+    y2.append(new_transmission)
+    y3.append(new_recov)
+    y4.append(R0)
 
-plt.scatter(x,y)
+
+
+plt.plot(x,y1, label = 'Virulance')
+plt.plot(x,y2, label = 'Transmission')
+plt.plot(x,y3, label = 'Guerison')
+#plt.plot(x,y4, label = 'infections secondaires',)
+plt.xlabel('Charge parasitaire')
+#plt.ylabel('Infections secondaires')
+plt.legend(loc='best')
 
 plt.show()
 
