@@ -78,7 +78,7 @@ def add_one_parazite(effect = None) :
             temp_vir = attribute[0] # pour créer une virulance,
             temp_trans = attribute[1] #un taux de transmision,
             temp_recov = attribute[2] # un taux de guérison.
-        elif TRADE_OFF == 'dariush': # Enfin, si la méthode de trade_off est 'dariush', on crée 
+        elif TRADE_OFF == 'dada': # Enfin, si la méthode de trade_off est 'dada', on crée 
             temp_vir = uniform(0,1) #une virulance,
             temp_trans = uniform(0,1) # un taux de transmission,
             temp_recov = uniform(0,1) # une probabilité de guérison.
@@ -154,7 +154,7 @@ def guerison(p):
 def cure_the_lucky_ones(dt) :
     '''On parcourt la liste de tous les parasites. A chaque itération on tire un nombre au hasard entre 0 et 1 et on le compare à la constante BASE_CHANCE_OF_HEALING * la probabilité de guérison spécifique au parasite en question. Si le nombre tiré est inférieur on transforme le parasite en individu sain en appelant la fonction guérison.
 '''
-    if TRADE_OFF == 'dariush':
+    if TRADE_OFF == 'dada':
         for i in iter(list_of_parazites): #Parcours la liste des parasites. 
             if uniform(0,1) < BASE_CHANCE_OF_HEALING *(1-i.getRecovProb()) :  #  Si la probabilité de guérison de base * 1 + la probabilité de guérison spécifique au parasite est plus grande qu'un nombre au hasard entre 0 et 1 
                 guerison(i) #l'individu est guéri. !si le taux de guérison vaut 1, plus de chances de guérir.
@@ -191,7 +191,7 @@ def reproduce_those_who_have_to(root,dt) :
             reproduce(root,i)
 
 def random_mutation_on(para_i, what) :
-    '''Cette fonction applique la mutation selon le cas donné en argument, 'infection', 'reproduction' ou 'living' et selon la façon de calculer les trades-off 'leo' ou 'dariush' '''  
+    '''Cette fonction applique la mutation selon le cas donné en argument, 'infection', 'reproduction' ou 'living' et selon la façon de calculer les trades-off 'leo' ou 'dada' '''  
     chance = 0
     fit_change = 0
     if what == 'infection' :
@@ -205,7 +205,7 @@ def random_mutation_on(para_i, what) :
         fit_change = MAX_FITNESS_CHANGE_ON_NOTHING
             
     if uniform(0,1) < chance:      #prob. de mutation
-        if TRADE_OFF == 'dariush':
+        if TRADE_OFF == 'dada':
             old_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
             attribute_functions = {'0':para_i.set_New_Vir, '1':para_i.set_New_TransmRate, '2':para_i.set_New_RecovProb, '3': para_i.setStrain([])}
             
