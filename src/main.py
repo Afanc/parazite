@@ -372,7 +372,6 @@ class BallsContainer(Widget):
     def update(self,dt):
         '''Sert de manager pour les position et les vitesse des boules à l'aide des dictionnaires. Appelle les fonctions qui gèrent les collisions. Est appelé tousles dt, un interval de temps défini dans build. '''
         quad = Quadtree(0,[self.x,self.x + self.width, self.y, self.y + self.height])
-        quad.reset()    #est-ce que ça sert à rien ?
         for i in balls_dictionnary.keys() :
             pos = balls_dictionnary[i][0]       #gotta update position (dic) here ! before the quad !
             balls_dictionnary[i][2] = [pos.x, pos.x + pos.width, pos.y, pos.y + pos.height]
