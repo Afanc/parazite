@@ -2,7 +2,7 @@
 from random import *
 seed(42)
 #mode: 'theory_tester', 'war', 'all_night_long'
-MODE = 'war'
+MODE = 'all_night_long'
 
 #mode theory tester :
 SIMULATION_TIME = 120

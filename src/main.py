@@ -29,7 +29,7 @@ from trade_off import trade_off
 from del_useless_files import * # si on arrive à faire en sorte que ça se lance tout seul quand on ferme le programme ce serait top
 from CHANGING_CONST import *
 
-Window.size = (800, 600)
+Window.size = (1000, 800)
 
 
 balls_dictionnary = {}  #id:[widget_ball,individual, position] # pour les individus vivants
@@ -209,9 +209,10 @@ def random_mutation_on(para_i, what) :
             old_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
             attribute_functions = {'0':para_i.set_New_Vir, '1':para_i.set_New_TransmRate, '2':para_i.set_New_RecovProb, '3': para_i.setStrain([])}
             
-            rand_mod = (randint(0,1)*2-1)*(1+uniform(0, fit_change))    #modificateur valant au max 1+0.2 (p. ex)
+            sign = randint(0,1)*2-1
+            rand_mod = sign*(uniform(0, fit_change))    #modificateur valant au max 1+0.2 (p. ex)
             rand_index = randint(0,2)
-            new_value = max(min(old_attributes[rand_index] * rand_mod, 1),0)   #new attribute = 1.2*old attribute (au max)
+            new_value = max(min(old_attributes[rand_index] * (1+rand_mod), 1),0)   #new attribute = 1.2*old attribute (au max)
             attribute_functions[str(rand_index)](new_value)                     #on appelle la fonction correspondante
             new_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
         elif TRADE_OFF == 'leo':
@@ -245,8 +246,6 @@ def infect_him(para_i,heal_i, parazites_reproducing=False) :
     testing_par = para_i.getStrain()
     if testing_par in heal_i.getResistances() :
         resistant = True
-    if heal_i.getIdd() in strain_dictionary[para_i.getStrain()][1] and resistant == False:
-        print "ALERTE GENERALE--------------------------------------------"
     if not resistant :
         temp_par = list(para_i.getPar())
         temp_par.append(para_i.getIdd())
