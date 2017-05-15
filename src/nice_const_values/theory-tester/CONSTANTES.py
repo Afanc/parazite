@@ -2,15 +2,17 @@
 from random import *
 seed(42)
 #mode: 'theory_tester', 'war', 'all_night_long'
-MODE = 'war'
+MODE = 'theory_tester'
+
 
 #mode theory tester :
+#pensez à ne mettre qu'un seul parasite au départ(NB_PARASITE= 1)
+#choisisez la durée de chaque simulation
 SIMULATION_TIME = 120
-TEST_THEORY = 0
 
-#all_night_long
-#ALL_NIGHT_LONG = 0
-#HEALTHY_ROOF = 1
+#mode all_night_long
+#choisisez la natalité quand la population tombe en dessous de 50 et la mortalité quand elle est plus grande que 250
+#les varaibles stock doivent être les mêmes que DYING PROB et REPRODUCTION_PROB
 STOCK_DYING_PROB = 0.13
 ROOF_DYING_PROB = 0.2
 STOCK_REPRODUCTION_PROB = 0.13
@@ -22,8 +24,10 @@ MAX_BALL_SPEED = 100
 BASE_COLOR = [0,0,1]
 
 #MAIN
-TRADE_OFF = 'dariush'
-NB_SAINS = 120
+#Choisisez le type de trade_off. 
+
+TRADE_OFF = 'leo'
+NB_SAINS = 100
 NB_PARASITE = 10
 MAX_VELOCITY= 1
 MAX_VIRULANCE= 1
@@ -40,7 +44,7 @@ TRANSMISSION_RESISTANCE = 1
 BASE_FITNESS = 0.8
 MAX_FITNESS = 1.8
 MAX_FITNESS_CHANGE_ON_INFECTION = 0.2   #max 0.5
-MAX_FITNESS_CHANGE_ON_NOTHING = 0.05   #max 0.5
+MAX_FITNESS_CHANGE_ON_NOTHING = 0.1   #max 0.5
 MAX_FITNESS_CHANGE_ON_REPRODUCTION = 0.2 #max 0.5
 
 #equations

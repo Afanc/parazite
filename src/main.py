@@ -29,7 +29,7 @@ from trade_off import trade_off
 from del_useless_files import * # si on arrive à faire en sorte que ça se lance tout seul quand on ferme le programme ce serait top
 from CHANGING_CONST import *
 
-Window.size = (800, 600)
+Window.size = (1000, 800)
 
 
 balls_dictionnary = {}  #id:[widget_ball,individual, position] # pour les individus vivants
@@ -78,7 +78,7 @@ def add_one_parazite(effect = None) :
             temp_vir = attribute[0] # pour créer une virulance,
             temp_trans = attribute[1] #un taux de transmision,
             temp_recov = attribute[2] # un taux de guérison.
-        elif TRADE_OFF == 'dariush': # Enfin, si la méthode de trade_off est 'dariush', on crée 
+        elif TRADE_OFF == 'dada': # Enfin, si la méthode de trade_off est 'dada', on crée 
             temp_vir = uniform(0,1) #une virulance,
             temp_trans = uniform(0,1) # un taux de transmission,
             temp_recov = uniform(0,1) # une probabilité de guérison.
@@ -154,7 +154,7 @@ def guerison(p):
 def cure_the_lucky_ones(dt) :
     '''On parcourt la liste de tous les parasites. A chaque itération on tire un nombre au hasard entre 0 et 1 et on le compare à la constante BASE_CHANCE_OF_HEALING * la probabilité de guérison spécifique au parasite en question. Si le nombre tiré est inférieur on transforme le parasite en individu sain en appelant la fonction guérison.
 '''
-    if TRADE_OFF == 'dariush':
+    if TRADE_OFF == 'dada':
         for i in iter(list_of_parazites): #Parcours la liste des parasites. 
             if uniform(0,1) < BASE_CHANCE_OF_HEALING *(1-i.getRecovProb()) :  #  Si la probabilité de guérison de base * 1 + la probabilité de guérison spécifique au parasite est plus grande qu'un nombre au hasard entre 0 et 1 
                 guerison(i) #l'individu est guéri. !si le taux de guérison vaut 1, plus de chances de guérir.
@@ -191,7 +191,7 @@ def reproduce_those_who_have_to(root,dt) :
             reproduce(root,i)
 
 def random_mutation_on(para_i, what) :
-    '''Cette fonction applique la mutation selon le cas donné en argument, 'infection', 'reproduction' ou 'living' et selon la façon de calculer les trades-off 'leo' ou 'dariush' '''  
+    '''Cette fonction applique la mutation selon le cas donné en argument, 'infection', 'reproduction' ou 'living' et selon la façon de calculer les trades-off 'leo' ou 'dada' '''  
     chance = 0
     fit_change = 0
     if what == 'infection' :
@@ -205,13 +205,14 @@ def random_mutation_on(para_i, what) :
         fit_change = MAX_FITNESS_CHANGE_ON_NOTHING
             
     if uniform(0,1) < chance:      #prob. de mutation
-        if TRADE_OFF == 'dariush':
+        if TRADE_OFF == 'dada':
             old_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
             attribute_functions = {'0':para_i.set_New_Vir, '1':para_i.set_New_TransmRate, '2':para_i.set_New_RecovProb, '3': para_i.setStrain([])}
             
-            rand_mod = (randint(0,1)*2-1)*(1+uniform(0, fit_change))    #modificateur valant au max 1+0.2 (p. ex)
+            sign = randint(0,1)*2-1
+            rand_mod = sign*(uniform(0, fit_change))    #modificateur valant au max 1+0.2 (p. ex)
             rand_index = randint(0,2)
-            new_value = max(min(old_attributes[rand_index] * rand_mod, 1),0)   #new attribute = 1.2*old attribute (au max)
+            new_value = max(min(old_attributes[rand_index] * (1+rand_mod), 1),0)   #new attribute = 1.2*old attribute (au max)
             attribute_functions[str(rand_index)](new_value)                     #on appelle la fonction correspondante
             new_attributes = [para_i.getVir(), para_i.getTransmRate(), para_i.getRecovProb()]
         elif TRADE_OFF == 'leo':
@@ -245,8 +246,6 @@ def infect_him(para_i,heal_i, parazites_reproducing=False) :
     testing_par = para_i.getStrain()
     if testing_par in heal_i.getResistances() :
         resistant = True
-    if heal_i.getIdd() in strain_dictionary[para_i.getStrain()][1] and resistant == False:
-        print "ALERTE GENERALE--------------------------------------------"
     if not resistant :
         temp_par = list(para_i.getPar())
         temp_par.append(para_i.getIdd())
@@ -295,7 +294,7 @@ def New_strain_in_csv(tempStrain, tempVir, tempTrans, tempRecov):
     if MODE == "war" or MODE == 'all_night_long':
         with open("data/" + tempStrain +".csv","w") as NewStrainFile:
             dico_of_strains_for_csv[tempStrain] = csv.writer(NewStrainFile) #création du fichier .csv avec le nom de la souche
-            dico_of_strains_for_csv[tempStrain].writerow(["Souche","temps[s]","nombre infection secondaires","population totale en vie","parasites de cette souche en vie","pourcentage de la population de parasites", #header du csv
+            dico_of_strains_for_csv[tempStrain].writerow(["temps[s]","Souche","nombre infection secondaires","population totale en vie","parasites de cette souche en vie","pourcentage de la population de parasites", #header du csv
             "virulence: "+ str(tempVir), "taux de transmision: "+ str(tempTrans), "probabilité de guérison contre le parasite: " + str(tempRecov)])
         
         
@@ -372,7 +371,6 @@ class BallsContainer(Widget):
     def update(self,dt):
         '''Sert de manager pour les position et les vitesse des boules à l'aide des dictionnaires. Appelle les fonctions qui gèrent les collisions. Est appelé tousles dt, un interval de temps défini dans build. '''
         quad = Quadtree(0,[self.x,self.x + self.width, self.y, self.y + self.height])
-        quad.reset()    #est-ce que ça sert à rien ?
         for i in balls_dictionnary.keys() :
             pos = balls_dictionnary[i][0]       #gotta update position (dic) here ! before the quad !
             balls_dictionnary[i][2] = [pos.x, pos.x + pos.width, pos.y, pos.y + pos.height]
@@ -404,7 +402,6 @@ class BallsContainer(Widget):
         mutate_those_who_wish(dt)
         self.shall_we_kill_the_simulation(dt)
         self.all_nighter()
-        print strain_dictionary
     
     def update_files(self, dt, filename = None) :
         '''Sert à la gestion temporelle de l'écriture dans les fichiers. appelé tous les dt(défini dans build, normalement toutes les secondes)'''
@@ -575,8 +572,7 @@ class BallsContainer(Widget):
                 if nb_of_parazites_alive > 0 :    #on contnu de mettre à jour le fichier csv seuelment si la souche est encore active ( au moins 1 parasite encore en vie)
                         with open("data/" + strain_id + ".csv","a") as UpdateStrainFile:
                             dico_of_strains_for_csv[strain_id] = csv.writer(UpdateStrainFile)
-                            dico_of_strains_for_csv[strain_id].writerow([simulation_time,strain_id,total_nb_of_infections,
-                                                                total_population,nb_of_parazites_alive, percentage_of_all_infections])
+                            dico_of_strains_for_csv[strain_id].writerow([simulation_time,strain_id,total_nb_of_infections,total_population,nb_of_parazites_alive, percentage_of_all_infections, strain_dictionary[strain_id][0][0], strain_dictionary[strain_id][0][1], strain_dictionary[strain_id][0][2]])
         
     def on_pause(self):
         '''Arrète de mettre à jour update, update_life_and_death et update_files '''

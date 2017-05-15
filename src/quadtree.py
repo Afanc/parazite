@@ -33,15 +33,6 @@ class Quadtree:
     def remove_object(self, obj, idd): 
         self.objects.remove([obj,idd])
 
-    def reset(self):
-        try :
-            del self.objects[:]      #permet de supprimer les références également, objects = [] sinon
-            for i in self.box:
-                i.reset()
-            del self.box[:]
-        except :
-            print "could not reset quadtree"
-
     def split(self):
         #space[i] est rectangle du type [gauche, droite, bas, haut] décrivant chacun les valeurs limites
         midWidth_x = self.space[1] / 2

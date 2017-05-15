@@ -51,11 +51,14 @@ def trade_off(para_i = None, effect_arg = None):
         
         return [new_vir,new_transmission,new_recov]
 
-y1 = []
-y2 = []
-y3 = []
-y4 = []
-x = []
+
+
+
+"""
+print trade_off(effect_arg = 2.6)
+  
+y = []
+
 R0 = 0
 for i in arange(0.1,10.0,0.1):
     x.append(i)
@@ -103,3 +106,4 @@ print test.getVir()
 print test.getTransmRate()
 print test.getRecovProb()
 '''
+"""
