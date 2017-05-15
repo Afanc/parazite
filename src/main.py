@@ -67,7 +67,7 @@ def add_one_parazite(effect = None) :
     '''ajoute un parasite, peut prendre un effet 'effect' en argument'''
     try:
         temp_id = create_id() #commence par créer un ID
-        if effect != None: #si un effet est donné en argument ...
+        if effect != None and TRADE_OFF == 'leo': #si un effet est donné en argument ...
             effect = float(effect)
             attribute = trade_off(effect_arg = effect) #on utillise la fonction trade_off pour
             temp_vir = attribute[0] #créer une virulence 
@@ -231,15 +231,16 @@ def random_mutation_on(para_i, what) :
         balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(tuple(random_color))
     
     else:
-        if what == 'infection':
+        if what == 'infection': #ça marche parce qu'on ne teste plus parasite reproducting
             strain_dictionary[para_i.getStrain()][1].append(para_i.getIdd())
-
+        
 def infect_him(para_i,heal_i, parazites_reproducing=False) :
     resistant = False 
     testing_par = para_i.getStrain()
     if testing_par in heal_i.getResistances() :
         resistant = True
-
+    if heal_i.getIdd() in strain_dictionary[para_i.getStrain()][1] and resistant == False:
+        print "ALERTE GENERALE--------------------------------------------"
     if not resistant :
         temp_par = list(para_i.getPar())
         temp_par.append(para_i.getIdd())
@@ -397,7 +398,7 @@ class BallsContainer(Widget):
         mutate_those_who_wish(dt)
         self.shall_we_kill_the_simulation(dt)
         self.all_nighter()
-       
+        print strain_dictionary
     
     def update_files(self, dt, filename = None) :
         '''Sert à la gestion temporelle de l'écriture dans les fichiers. appelé tous les dt(défini dans build, normalement toutes les secondes)'''
@@ -478,6 +479,7 @@ class BallsContainer(Widget):
         if filename is not None or len(sys.argv) > 1:
             if len(sys.argv) > 2 :
                 arg = "data_effect_tester/"+str(sys.argv[2]) + '.csv'       #si on mass-effect
+                print "saved in data_effect_tester/"
             elif len(sys.argv) > 1 :
                 arg = "data_per_param/"+str(sys.argv[1]) + '.csv'           #si on other param
             else :

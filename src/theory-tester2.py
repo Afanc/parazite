@@ -15,7 +15,7 @@ import os
 global  EFFECT
 
 #A CHANGER ICI
-MAX_LEVEL = 3
+MAX_LEVEL = 10
 STEP = 0.2
 
 def launch(eff) :

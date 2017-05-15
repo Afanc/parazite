@@ -52,8 +52,8 @@ def trade_off(para_i = None, effect_arg = None):
         return [new_vir,new_transmission,new_recov]
 
 
-
-'''  
+print trade_off(effect_arg = 2.6)
+  
 y = []
 x = []
 R0 = 0
@@ -62,10 +62,10 @@ for i in arange(0.1,10.0,0.1):
     effect = i
     new_vir = (effect**2)/100
     new_transmission = 1/(1+exp(-(effect/1.1-5)))
-    new_recov =  0.1 + 1/2 * effect
+    new_recov =  0.1 + 1/effect
     if new_recov > 1:
         new_recov = 1
-    R0num = (100 * (1+new_transmission)*INFECTION_CHANCE)
+    R0num = (200 * (1+new_transmission)*0.4)
     R0den = ((1+new_vir)*DYING_PROB + (1+new_recov)*BASE_CHANCE_OF_HEALING)
     R0 = R0num/R0den
     y.append(R0)
@@ -73,7 +73,7 @@ for i in arange(0.1,10.0,0.1):
 plt.scatter(x,y)
 
 plt.show()
-'''
+
 
 #print trade_off(effect_arg = 7.0) #correspond à une virulance de 0.49
 '''    

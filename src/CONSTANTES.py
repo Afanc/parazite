@@ -24,7 +24,7 @@ BASE_COLOR = [0,0,1]
 #MAIN
 TRADE_OFF = 'leo'
 NB_SAINS = 100
-NB_PARASITE = 5
+NB_PARASITE = 1
 MAX_VELOCITY= 1
 MAX_VIRULANCE= 1
 MIN_SIZE_FOR_DATA = 40 * 1000  #pour avoir mesure en kb, à utiliser dans all_night_long et war
