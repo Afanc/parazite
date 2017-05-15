@@ -13,20 +13,20 @@ from kivy.uix.button import Button
 from kivy.graphics import *
 from kivy.app import App
 from functools import partial
-from os.path import isfile
+
 
 import matplotlib.pyplot as plt
 import csv 
 import time 
 import os 
 import sys
+import shutil
 
 from quadtree import Quadtree
 from collision import *
 from parazite1 import *
 from healthy import *
 from trade_off import trade_off
-from del_useless_files import * # si on arrive à faire en sorte que ça se lance tout seul quand on ferme le programme ce serait top
 from CHANGING_CONST import *
 
 Window.size = (1000, 800)
@@ -39,12 +39,16 @@ dico_of_strains_for_csv = {}  #{souche:variable.writerow()}
 list_of_healthies = [] #liste des individus sains vivants
 list_of_parazites = [] #liste des parasites vivants
 
-if isfile('csv_nb_total_sains_infectes') and 'y' != raw_input("le fichier data existe déjà, le remplaçer? (y/n)"): exit() #écrit les headers dans le dossier 
+if os.path.isfile('csv_nb_total_sains_infectes') and 'y' != raw_input("le fichier csv_nb_total_sains_infectes existe déjà, le remplaçer? (y/n)"): exit() #écrit les headers dans le dossier 
 else:
     with open("nb_total_sains_infectes.csv","w") as csv_nb_total_sains_infectes: #creer le fichier des données générales de la population 
         writer = csv.writer(csv_nb_total_sains_infectes)
         writer.writerow(["temps","population totale","individus sains","individus infectés","pourcentage de la population infectée", "virulence moyenne","taux de guérison","taux de transmission"]) #header des données générales de la pop
 
+if os.path.isdir('data') and 'y' != raw_input("le dossier data existe déja, le remplaçer?"):exit()
+else: 
+    shutil.rmtree('data')
+    os.mkdir('data')
 
 def create_id(): 
     '''crée un nouvel id pour chaque nouveau parasite'''
