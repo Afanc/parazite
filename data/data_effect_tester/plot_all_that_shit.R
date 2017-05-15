@@ -9,8 +9,8 @@ for (i in all) {
     data = read.csv(i, header=TRUE)
 
     x = substr(i, 1,3)
-    #y = tail(data, 1)
-    y = data[50,]
+    y = tail(data, 1)
+    #y = data[40,]
 
     vec <- rbind(vec, c(x,y[2]))
 
