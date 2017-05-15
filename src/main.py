@@ -30,7 +30,6 @@ from del_useless_files import * # si on arrive à faire en sorte que ça se lanc
 from CHANGING_CONST import *
 
 Window.size = (800, 600)
-seed(42)
 
 
 balls_dictionnary = {}  #id:[widget_ball,individual, position] # pour les individus vivants

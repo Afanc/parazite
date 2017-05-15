@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-                                                                                                
 #!/usr/bin/env python
 
-from random import *
 from CONSTANTES import *
-
+ 
 class Individual(object):   #object afin d'avoir des 'nouvelles' classes
 
     #Constructeur, s'utilise : 'johnny = Individual(pos, vit, etc.)'

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-                                                                                                
 #!/usr/bin/env python
 
-from __future__ import division         #seriously - python 2 has no true division ?!
 from individual import *    
 from numpy import *
 

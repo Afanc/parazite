@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-                                                                                                
-
+from random import seed
+seed(42)
 #mode: 'theory_tester', 'war', 'all_night_long'
-MODE = 'theory_tester'
+MODE = 'war'
 
 #mode theory tester :
 SIMULATION_TIME = 10
@@ -22,7 +23,7 @@ BASE_COLOR = [0,0,1]
 
 #MAIN
 TRADE_OFF = 'leo'
-NB_SAINS = 100
+NB_SAINS = 4
 NB_PARASITE = 1 
 MAX_VELOCITY= 1
 MAX_VIRULANCE= 1
