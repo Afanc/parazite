@@ -51,7 +51,7 @@ def trade_off(para_i = None, effect_arg = None):
         
         return [new_vir,new_transmission,new_recov]
 
-
+"""
 print trade_off(effect_arg = 2.6)
   
 y = []
@@ -92,3 +92,4 @@ print test.getVir()
 print test.getTransmRate()
 print test.getRecovProb()
 '''
+"""
