@@ -295,7 +295,7 @@ def New_strain_in_csv(tempStrain, tempVir, tempTrans, tempRecov):
     if MODE == "war" or MODE == 'all_night_long':
         with open("data/" + tempStrain +".csv","w") as NewStrainFile:
             dico_of_strains_for_csv[tempStrain] = csv.writer(NewStrainFile) #création du fichier .csv avec le nom de la souche
-            dico_of_strains_for_csv[tempStrain].writerow(["Souche","temps[s]","nombre infection secondaires","population totale en vie","parasites de cette souche en vie","pourcentage de la population de parasites", #header du csv
+            dico_of_strains_for_csv[tempStrain].writerow(["temps[s]","Souche","nombre infection secondaires","population totale en vie","parasites de cette souche en vie","pourcentage de la population de parasites", #header du csv
             "virulence: "+ str(tempVir), "taux de transmision: "+ str(tempTrans), "probabilité de guérison contre le parasite: " + str(tempRecov)])
         
         
