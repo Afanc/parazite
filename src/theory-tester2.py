@@ -15,7 +15,7 @@ import os
 global  EFFECT
 
 #A CHANGER ICI
-MAX_LEVEL = 5.0
+MAX_LEVEL = 3
 STEP = 0.2
 
 def launch(eff) :
@@ -30,7 +30,7 @@ def launch(eff) :
     print "après le sleep"
 
 #---- the tester
-EFFECT = 1.8 # somme des argument 
+EFFECT = 0 # somme des argument 
 while EFFECT < MAX_LEVEL :
     print " un tour"
     EFFECT += STEP

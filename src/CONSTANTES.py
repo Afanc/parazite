@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-                                                                                                
-from random import seed
+from random import *
 seed(42)
 #mode: 'theory_tester', 'war', 'all_night_long'
 MODE = 'theory_tester'
