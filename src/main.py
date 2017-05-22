@@ -268,7 +268,7 @@ def infect_him(para_i,heal_i, parazites_reproducing=False) :
             balls_dictionnary[list_of_parazites[-1].getIdd()][0].set_col(tuple(random_color))
 
 def parazite_against_parazite(p1,p2) :
-    if p1.getVir() > p2.getVir() :
+    if round(p1.getVir(), 2) > round(p2.getVir(),2) :
         if uniform(0,1) < INFECTION_CHANCE *(1+p1.getTransmRate()) : 
             p2.setVir(p1.getVir())
             p2.setTransmRate(p1.getTransmRate())
